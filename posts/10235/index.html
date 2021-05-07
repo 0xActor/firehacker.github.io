@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Vulner,Brute-force,Init Access,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="从威胁及漏洞视角,弱口令漏洞影响广泛、利用成本低而效果奇佳,本文研究常见弱口令漏洞类型及爆破利用方式...">
+<meta name="keywords" content="Vulner,Brute-force,Init Access">
+<meta property="og:type" content="article">
+<meta property="og:title" content="弱口令及爆破技术浅析">
+<meta property="og:url" content="https://l0n9.cc/posts/10235/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="从威胁及漏洞视角,弱口令漏洞影响广泛、利用成本低而效果奇佳,本文研究常见弱口令漏洞类型及爆破利用方式...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-03-25T13:06:26.005Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="弱口令及爆破技术浅析">
+<meta name="twitter:description" content="从威胁及漏洞视角,弱口令漏洞影响广泛、利用成本低而效果奇佳,本文研究常见弱口令漏洞类型及爆破利用方式...">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/10235/">
+
+
+
+
+
+  <title>弱口令及爆破技术浅析 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/10235/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">弱口令及爆破技术浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-05T21:52:20+08:00">
+                2019-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/漏洞研究/" itemprop="url" rel="index">
+                    <span itemprop="name">漏洞研究</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>从威胁及漏洞视角,弱口令漏洞影响广泛、利用成本低而效果奇佳,本文研究常见弱口令漏洞类型及爆破利用方式...</center>
+
+<a id="more"></a>
+
+<h2 id="0x01-攻击面"><a href="#0x01-攻击面" class="headerlink" title="0x01 攻击面"></a>0x01 攻击面</h2><p>弱口令爆破常用端口及服务总结如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">端口</th>
+<th align="center">服务</th>
+<th align="center">爆破方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">21</td>
+<td align="center">ftp/tftp/vsftpd文件传输协议</td>
+<td align="center">爆破/嗅探/溢出/后门</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="center">ssh远程连接</td>
+<td align="center">爆破/OpenSSH漏洞</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td align="center">Telnet远程连接</td>
+<td align="center">爆破/嗅探</td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td align="center">SMTP邮件服务</td>
+<td align="center">邮件伪造</td>
+</tr>
+<tr>
+<td align="center">53</td>
+<td align="center">DNS域名解析系统</td>
+<td align="center">DNS区域传输/劫持/缓存投毒/欺骗; 利用DNS隧道技术刺透防火墙</td>
+</tr>
+<tr>
+<td align="center">67/68</td>
+<td align="center">dhcp服务</td>
+<td align="center">劫持/欺骗</td>
+</tr>
+<tr>
+<td align="center">69</td>
+<td align="center">tftp(简单文件传输协议,无认证)</td>
+<td align="center">尝试下载目标重要配置文件</td>
+</tr>
+<tr>
+<td align="center">110</td>
+<td align="center">pop3</td>
+<td align="center">爆破/嗅探</td>
+</tr>
+<tr>
+<td align="center">137/139</td>
+<td align="center">Samba服务</td>
+<td align="center">爆破/未授权访问/远程代码执行</td>
+</tr>
+<tr>
+<td align="center">143</td>
+<td align="center">Imap协议</td>
+<td align="center">爆破</td>
+</tr>
+<tr>
+<td align="center">161</td>
+<td align="center">SNMP协议</td>
+<td align="center">爆破/搜集目标内网信息</td>
+</tr>
+<tr>
+<td align="center">389</td>
+<td align="center">Ldap目录访问协议</td>
+<td align="center">注入/未授权访问/弱口令/匿名访问</td>
+</tr>
+<tr>
+<td align="center">445</td>
+<td align="center">smb</td>
+<td align="center">ms17-010/端口溢出</td>
+</tr>
+<tr>
+<td align="center">512/513/514</td>
+<td align="center">Linux Rexec服务</td>
+<td align="center">爆破/Rlogin登陆</td>
+</tr>
+<tr>
+<td align="center">873</td>
+<td align="center">Rsync服务</td>
+<td align="center">文件上传/匿名访问</td>
+</tr>
+<tr>
+<td align="center">1080</td>
+<td align="center">socket</td>
+<td align="center">爆破/内网渗透</td>
+</tr>
+<tr>
+<td align="center">1099</td>
+<td align="center">JAVA RMI</td>
+<td align="center">反序列化远程命令执行漏洞</td>
+</tr>
+<tr>
+<td align="center">1194</td>
+<td align="center">openvpn</td>
+<td align="center">获取vpn账号,进内网</td>
+</tr>
+<tr>
+<td align="center">1352</td>
+<td align="center">Lotus domino邮件服务</td>
+<td align="center">爆破/弱口令/信息泄漏</td>
+</tr>
+<tr>
+<td align="center">1433</td>
+<td align="center">mssql</td>
+<td align="center">爆破/注入攻击/提权/sa弱口令</td>
+</tr>
+<tr>
+<td align="center">1500</td>
+<td align="center">ispmanager主机控制面板</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">1521</td>
+<td align="center">oracle</td>
+<td align="center">注入攻击/TNS爆破/弹shell</td>
+</tr>
+<tr>
+<td align="center">1723</td>
+<td align="center">pptp</td>
+<td align="center">爆破/获取vpn账号,进内网</td>
+</tr>
+<tr>
+<td align="center">2049</td>
+<td align="center">Nfs服务</td>
+<td align="center">配置不当</td>
+</tr>
+<tr>
+<td align="center">2082,2083</td>
+<td align="center">cpanel主机管理面板登录</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">2181</td>
+<td align="center">zookeeper服务</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">2375</td>
+<td align="center">docker remote api</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">2601,2604</td>
+<td align="center">zebra路由</td>
+<td align="center">默认密码zerbra</td>
+</tr>
+<tr>
+<td align="center">3128</td>
+<td align="center">squid代理服务</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">3306</td>
+<td align="center">mysql</td>
+<td align="center">爆破/注入/拒绝服务/提取</td>
+</tr>
+<tr>
+<td align="center">3389</td>
+<td align="center">Rdp远程桌面连接</td>
+<td align="center">爆破/shift后门/ms12-020</td>
+</tr>
+<tr>
+<td align="center">3690</td>
+<td align="center">svn服务</td>
+<td align="center">svn泄露/未授权访问</td>
+</tr>
+<tr>
+<td align="center">4848</td>
+<td align="center">GlassFish控制台</td>
+<td align="center">爆破/认证绕过</td>
+</tr>
+<tr>
+<td align="center">5000</td>
+<td align="center">sybase/DB2数据库</td>
+<td align="center">爆破/注入</td>
+</tr>
+<tr>
+<td align="center">5432</td>
+<td align="center">postgresql</td>
+<td align="center">爆破/注入/缓冲区溢出</td>
+</tr>
+<tr>
+<td align="center">5632</td>
+<td align="center">pcanywhere服务</td>
+<td align="center">拒绝服务/代码执行</td>
+</tr>
+<tr>
+<td align="center">5900,5901,5902</td>
+<td align="center">vnc</td>
+<td align="center">弱口令爆破</td>
+</tr>
+<tr>
+<td align="center">5984</td>
+<td align="center">CouchDB</td>
+<td align="center">未授权访问导致任意指令执行</td>
+</tr>
+<tr>
+<td align="center">6379</td>
+<td align="center">Redis数据库</td>
+<td align="center">未授权访问/爆破</td>
+</tr>
+<tr>
+<td align="center">6443</td>
+<td align="center">Kubernetes API Server</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">7001/7002</td>
+<td align="center">weblogic</td>
+<td align="center">java反序列化/控制台弱口令/控制台上传webshell/SSRF</td>
+</tr>
+<tr>
+<td align="center">80-89,443</td>
+<td align="center">http/https</td>
+<td align="center">web应用漏洞/OpenSSL心脏滴血</td>
+</tr>
+<tr>
+<td align="center">8000</td>
+<td align="center">JDWP</td>
+<td align="center">远程命令执行漏洞</td>
+</tr>
+<tr>
+<td align="center">8069</td>
+<td align="center">zabbix服务</td>
+<td align="center">远程命令执行/注入</td>
+</tr>
+<tr>
+<td align="center">8080-8089</td>
+<td align="center">Jboss/Tomcat/Jenkins/Resin/Jetty</td>
+<td align="center">控制台弱口令/反序列化/远程文件读取</td>
+</tr>
+<tr>
+<td align="center">8083/8086</td>
+<td align="center">influxDB</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">8161</td>
+<td align="center">ActiveMQ</td>
+<td align="center">弱口令/任意文件写入/反序列化</td>
+</tr>
+<tr>
+<td align="center">9000</td>
+<td align="center">fastcgi</td>
+<td align="center">远程命令执行</td>
+</tr>
+<tr>
+<td align="center">9080-9081,9090</td>
+<td align="center">Websphere控制台</td>
+<td align="center">java反序列化/弱口令</td>
+</tr>
+<tr>
+<td align="center">9200/9300</td>
+<td align="center">elasticsearch</td>
+<td align="center">未授权访问/远程代码执行</td>
+</tr>
+<tr>
+<td align="center">11211</td>
+<td align="center">memcached</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">27017/27018</td>
+<td align="center">mongodb</td>
+<td align="center">未授权访问/爆破</td>
+</tr>
+<tr>
+<td align="center">50000</td>
+<td align="center">SAP</td>
+<td align="center">远程代码执行</td>
+</tr>
+<tr>
+<td align="center">50070,50030</td>
+<td align="center">hadoop</td>
+<td align="center">默认端口未授权访问</td>
+</tr>
+</tbody></table>
+<p><em>Refer:</em> <a href="http://www.91ri.org/15441.html" target="_blank" rel="noopener">http://www.91ri.org/15441.html</a></p>
+<h2 id="0x02-爆破字典"><a href="#0x02-爆破字典" class="headerlink" title="0x02 爆破字典"></a>0x02 爆破字典</h2><h3 id="1-厂商初始口令"><a href="#1-厂商初始口令" class="headerlink" title="1. 厂商初始口令"></a>1. 厂商初始口令</h3><p><strong>网络安全设备</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">设备</th>
+<th align="center">默认账号</th>
+<th align="center">初始密码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">深信服设备</td>
+<td align="center">sangfor</td>
+<td align="center">sangfor、sangfor@2019、sangfor@2020</td>
+</tr>
+<tr>
+<td align="center">深信服科技 AD</td>
+<td align="center">sangfor</td>
+<td align="center">dlanrecover</td>
+</tr>
+<tr>
+<td align="center">深信服负载均衡AD 3.6</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">深信服WAC ( WNS V2.6)</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">深信服VPN</td>
+<td align="center">Admin</td>
+<td align="center">Admin</td>
+</tr>
+<tr>
+<td align="center">深信服ipsec-VPN (SSL 5.5)</td>
+<td align="center">Admin</td>
+<td align="center">Admin</td>
+</tr>
+<tr>
+<td align="center">深信服AC6.0</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">SANGFOR防火墙</td>
+<td align="center">admin</td>
+<td align="center">sangfor</td>
+</tr>
+<tr>
+<td align="center">深信服AF(NGAF V2.2)</td>
+<td align="center">admin</td>
+<td align="center">sangfor</td>
+</tr>
+<tr>
+<td align="center">深信服NGAF下一代应用防火墙(NGAF V4.3)</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">深信服AD3.9</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">深信服上网行为管理设备数据中心</td>
+<td align="center">Admin</td>
+<td align="center">密码为空</td>
+</tr>
+<tr>
+<td align="center">SANGFOR_AD_v5.1</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">网御漏洞扫描系统</td>
+<td align="center">leadsec</td>
+<td align="center">leadsec</td>
+</tr>
+<tr>
+<td align="center">天阗入侵检测与管理系统 V7.0</td>
+<td align="center">Admin、Audit、adm</td>
+<td align="center">venus70</td>
+</tr>
+<tr>
+<td align="center">天阗入侵检测与管理系统 V6.0</td>
+<td align="center">Admin、Audit、adm</td>
+<td align="center">venus60</td>
+</tr>
+<tr>
+<td align="center">网御WAF集中控制中心(V3.0R5.0)</td>
+<td align="center">admin、audit、adm</td>
+<td align="center">leadsec.waf</td>
+</tr>
+<tr>
+<td align="center">联想网御</td>
+<td align="center">administrator</td>
+<td align="center">administrator</td>
+</tr>
+<tr>
+<td align="center">网御事件服务器</td>
+<td align="center">admin</td>
+<td align="center">admin123</td>
+</tr>
+<tr>
+<td align="center">联想网御防火墙PowerV</td>
+<td align="center">administrator</td>
+<td align="center">administrator</td>
+</tr>
+<tr>
+<td align="center">联想网御入侵检测系统</td>
+<td align="center">lenovo</td>
+<td align="center">default</td>
+</tr>
+<tr>
+<td align="center">网络卫士入侵检测系统</td>
+<td align="center">admin</td>
+<td align="center">talent</td>
+</tr>
+<tr>
+<td align="center">网御入侵检测系统V3.2.72.0</td>
+<td align="center">adm、admin</td>
+<td align="center">leadsec32</td>
+</tr>
+<tr>
+<td align="center">联想网御入侵检测系统IDS</td>
+<td align="center">root</td>
+<td align="center">111111</td>
+</tr>
+<tr>
+<td align="center">联想网御入侵检测系统IDS</td>
+<td align="center">admin</td>
+<td align="center">admin123</td>
+</tr>
+<tr>
+<td align="center">科来网络回溯分析系统</td>
+<td align="center">csadmin</td>
+<td align="center">colasoft</td>
+</tr>
+<tr>
+<td align="center">中控考勤机web3.0</td>
+<td align="center">administrator</td>
+<td align="center">123456</td>
+</tr>
+<tr>
+<td align="center">H3C iMC</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">H3C SecPath系列</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">H3C S5120-SI</td>
+<td align="center">test</td>
+<td align="center">123</td>
+</tr>
+<tr>
+<td align="center">H3C智能管理中心</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">H3C ER3100</td>
+<td align="center">admin</td>
+<td align="center">adminer3100</td>
+</tr>
+<tr>
+<td align="center">H3C ER3200</td>
+<td align="center">admin</td>
+<td align="center">adminer3200</td>
+</tr>
+<tr>
+<td align="center">H3C ER3260</td>
+<td align="center">admin</td>
+<td align="center">adminer3260</td>
+</tr>
+<tr>
+<td align="center">H3C</td>
+<td align="center">admin</td>
+<td align="center">adminer</td>
+</tr>
+<tr>
+<td align="center">H3C</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">H3C</td>
+<td align="center">admin</td>
+<td align="center">h3capadmin</td>
+</tr>
+<tr>
+<td align="center">H3C</td>
+<td align="center">h3c</td>
+<td align="center">h3c</td>
+</tr>
+<tr>
+<td align="center">360天擎</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">网神防火墙</td>
+<td align="center">firewall</td>
+<td align="center">firewall</td>
+</tr>
+<tr>
+<td align="center">天融信防火墙NGFW4000</td>
+<td align="center">superman</td>
+<td align="center">talent</td>
+</tr>
+<tr>
+<td align="center">黑盾防火墙</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">黑盾防火墙</td>
+<td align="center">rule、audit</td>
+<td align="center">abc123</td>
+</tr>
+<tr>
+<td align="center">华为防火墙</td>
+<td align="center">telnetuser</td>
+<td align="center">telnetpwd</td>
+</tr>
+<tr>
+<td align="center">华为防火墙</td>
+<td align="center">ftpuser</td>
+<td align="center">ftppwd</td>
+</tr>
+<tr>
+<td align="center">方正防火墙</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">飞塔防火墙</td>
+<td align="center">admin</td>
+<td align="center">密码为空</td>
+</tr>
+<tr>
+<td align="center">Juniper_SSG__5防火墙</td>
+<td align="center">netscreen</td>
+<td align="center">netscreen</td>
+</tr>
+<tr>
+<td align="center">中新金盾硬件防火墙</td>
+<td align="center">admin</td>
+<td align="center">123</td>
+</tr>
+<tr>
+<td align="center">kill防火墙(冠群金辰)</td>
+<td align="center">admin</td>
+<td align="center">sys123</td>
+</tr>
+<tr>
+<td align="center">天清汉马USG防火墙</td>
+<td align="center">admin</td>
+<td align="center">venus.fw</td>
+</tr>
+<tr>
+<td align="center">天清汉马USG防火墙</td>
+<td align="center">Audit</td>
+<td align="center">venus.audit</td>
+</tr>
+<tr>
+<td align="center">天清汉马USG防火墙</td>
+<td align="center">useradmin</td>
+<td align="center">venus.user</td>
+</tr>
+<tr>
+<td align="center">阿姆瑞特防火墙</td>
+<td align="center">admin</td>
+<td align="center">manager</td>
+</tr>
+<tr>
+<td align="center">山石网科</td>
+<td align="center">hillstone</td>
+<td align="center">hillstone</td>
+</tr>
+<tr>
+<td align="center">绿盟安全审计系统</td>
+<td align="center">weboper</td>
+<td align="center">weboper</td>
+</tr>
+<tr>
+<td align="center">绿盟安全审计系统</td>
+<td align="center">webaudit</td>
+<td align="center">webaudit</td>
+</tr>
+<tr>
+<td align="center">绿盟安全审计系统</td>
+<td align="center">conadmin</td>
+<td align="center">conadmin</td>
+</tr>
+<tr>
+<td align="center">绿盟安全审计系统</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">绿盟安全审计系统</td>
+<td align="center">shell</td>
+<td align="center">shell</td>
+</tr>
+<tr>
+<td align="center">绿盟产品</td>
+<td align="center"></td>
+<td align="center">nsfocus123</td>
+</tr>
+<tr>
+<td align="center">TopAudit日志审计系统</td>
+<td align="center">superman</td>
+<td align="center">talent</td>
+</tr>
+<tr>
+<td align="center">LogBase日志管理综合审计系统</td>
+<td align="center">admin</td>
+<td align="center">safetybase</td>
+</tr>
+<tr>
+<td align="center">网神SecFox运维安全管理与审计系统</td>
+<td align="center">admin</td>
+<td align="center">!1fw@2soc#3vpn</td>
+</tr>
+<tr>
+<td align="center">天融信数据库审计系统</td>
+<td align="center">superman</td>
+<td align="center">telent</td>
+</tr>
+<tr>
+<td align="center">Hillstone安全审计平台</td>
+<td align="center">hillstone</td>
+<td align="center">hillstone</td>
+</tr>
+<tr>
+<td align="center">网康日志中心</td>
+<td align="center">ns25000</td>
+<td align="center">ns25000</td>
+</tr>
+<tr>
+<td align="center">网络安全审计系统（中科新业）</td>
+<td align="center">admin</td>
+<td align="center">123456</td>
+</tr>
+<tr>
+<td align="center">天玥网络安全审计系统</td>
+<td align="center">Admin</td>
+<td align="center">cyberaudit</td>
+</tr>
+<tr>
+<td align="center">明御WEB应用防火墙</td>
+<td align="center">admin</td>
+<td align="center">admin、adminadmin</td>
+</tr>
+<tr>
+<td align="center">明御攻防实验室平台</td>
+<td align="center">root</td>
+<td align="center">123456</td>
+</tr>
+<tr>
+<td align="center">明御安全网关</td>
+<td align="center">admin</td>
+<td align="center">adminadmin</td>
+</tr>
+<tr>
+<td align="center">明御运维审计与册风险控制系统</td>
+<td align="center">admin</td>
+<td align="center">1q2w3e</td>
+</tr>
+<tr>
+<td align="center">明御运维审计与册风险控制系统</td>
+<td align="center">system、auditor、operator</td>
+<td align="center">1q2w3e4r</td>
+</tr>
+<tr>
+<td align="center">明御网站卫士</td>
+<td align="center">sysmanager</td>
+<td align="center">sysmanager888</td>
+</tr>
+<tr>
+<td align="center">亿邮邮件网关</td>
+<td align="center">eyouuser</td>
+<td align="center">eyou_admin</td>
+</tr>
+<tr>
+<td align="center">亿邮邮件网关</td>
+<td align="center">eyougw</td>
+<td align="center">admin@(eyou)</td>
+</tr>
+<tr>
+<td align="center">亿邮邮件网关</td>
+<td align="center">admin</td>
+<td align="center">+-ccccc</td>
+</tr>
+<tr>
+<td align="center">亿邮邮件网关</td>
+<td align="center">admin</td>
+<td align="center">cyouadmin</td>
+</tr>
+<tr>
+<td align="center">Websense邮件安全网关</td>
+<td align="center">administrator</td>
+<td align="center">admin</td>
+</tr>
+<tr>
+<td align="center">梭子鱼邮件存储网关</td>
+<td align="center">admin</td>
+<td align="center">admin</td>
+</tr>
+</tbody></table>
+<p><em>More:</em> <a href="https://github.com/ihebski/DefaultCreds-cheat-sheet" target="_blank" rel="noopener">https://github.com/ihebski/DefaultCreds-cheat-sheet</a></p>
+<h3 id="2-爆破字典合集"><a href="#2-爆破字典合集" class="headerlink" title="2. 爆破字典合集"></a>2. 爆破字典合集</h3><ul>
+<li><p><a href="https://weakpass.com/" target="_blank" rel="noopener">Weakpass</a> <em>多种类型的爆破字典合集</em></p>
+</li>
+<li><p><a href="https://github.com/TheKingOfDuck/fuzzDicts" target="_blank" rel="noopener">fuzzDicts</a> <em>Web Pentesting Fuzz字典，适用于中国环境</em></p>
+</li>
+<li><p><a href="https://github.com/danielmiessler/SecLists/tree/master/Passwords" target="_blank" rel="noopener">SecLists-Passwords</a> <em>包含众多密码列表的字典合集</em></p>
+</li>
+<li><p><a href="https://github.com/ihebski/DefaultCreds-cheat-sheet" target="_blank" rel="noopener">Default Credentials Cheat Sheet</a> <em>网络及安全设备默认口令</em></p>
+</li>
+<li><p><a href="https://freerainbowtables.com/" target="_blank" rel="noopener">Free Rainbow Tables</a> <em>基于彩虹表的字典合集</em></p>
+</li>
+<li><p><a href="https://project-rainbowcrack.com/table.htm" target="_blank" rel="noopener">List of Rainbow Tables</a>  <em>基于彩虹表的字典合集</em></p>
+</li>
+</ul>
+<h3 id="3-字典生成工具"><a href="#3-字典生成工具" class="headerlink" title="3. 字典生成工具"></a>3. 字典生成工具</h3><ul>
+<li><p><a href="https://github.com/LandGrey/pydictor" target="_blank" rel="noopener">pydictor</a> <em>一款强大用于暴力破解的字典生成器</em></p>
+</li>
+<li><p><a href="https://github.com/Mebus/cupp" target="_blank" rel="noopener">CUPP</a> <em>依据个人信息生成专属字典</em></p>
+</li>
+<li><p><a href="https://github.com/digininja/CeWL" target="_blank" rel="noopener">CeWL</a> <em>通过收集企业信息生成专属字典</em></p>
+</li>
+</ul>
+<h2 id="0x03-爆破实战"><a href="#0x03-爆破实战" class="headerlink" title="0x03 爆破实战"></a>0x03 爆破实战</h2><h3 id="1-爆破工具"><a href="#1-爆破工具" class="headerlink" title="1. 爆破工具"></a>1. 爆破工具</h3><ul>
+<li><p><a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank" rel="noopener">Hydra</a> <em>在线开源密码破解工具，支持多种协议类型及不同形式的WEB表单认证破解</em></p>
+</li>
+<li><p><a href="http://foofus.net/goons/jmk/tools" target="_blank" rel="noopener">Medusa</a> <em>在线开源密码破解工具，支持多种协议，稳定性较高</em></p>
+</li>
+<li><p><a href="https://github.com/nmap/ncrack" target="_blank" rel="noopener">ncrack</a> <em>由nmap项目共同维护的在线密码破解工具，速度和稳定性较高</em></p>
+</li>
+<li><p><a href="https://github.com/galkan/crowbar" target="_blank" rel="noopener">crowbar</a> <em>在线密码破解工具，支持OpenVPN以及基于密钥方式身份认证的SSH、VNC服务</em></p>
+</li>
+<li><p><a href="https://github.com/x90skysn3k/brutespray" target="_blank" rel="noopener">BruteSpray</a> <em>可自动读取和解析nmap的扫描报告，并从中识别出可进行密码破解的服务类型</em></p>
+</li>
+<li><p><a href="https://github.com/netxfly/x-crack" target="_blank" rel="noopener">x-crack</a> <em>一款基于Go语言的常见服务弱口令扫描器</em></p>
+</li>
+<li><p><a href="https://github.com/openwall/john" target="_blank" rel="noopener">John the Ripper</a> <em>离线密码破解工具，可自动识别并解密200多种加密算法和应用</em></p>
+</li>
+<li><p><a href="https://github.com/hashcat/hashcat" target="_blank" rel="noopener">hashcat</a> <em>开源离线密码破解工具，特性全面，速度较快</em></p>
+</li>
+<li><p><a href="https://github.com/gentilkiwi/mimikatz" target="_blank" rel="noopener">mimikatz</a> <em>windows系统凭据收集框架，凭据包括账号密码、HASH、证书、令牌、cookie等众多类型信息</em></p>
+</li>
+<li><p><a href="https://ophcrack.sourceforge.io/" target="_blank" rel="noopener">Ophcrack</a> <em>基于彩虹表的免费Windows密码破解程序</em></p>
+</li>
+<li><p><a href="http://project-rainbowcrack.com/" target="_blank" rel="noopener">RainbowCrack</a> <em>可生成用于密码破解的彩虹表</em></p>
+</li>
+</ul>
+<h3 id="2-在线爆破"><a href="#2-在线爆破" class="headerlink" title="2. 在线爆破"></a>2. 在线爆破</h3><h4 id="a-Hydra"><a href="#a-Hydra" class="headerlink" title="a. Hydra"></a>a. Hydra</h4><p><strong>安装</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/vanhauser-thc/thc-hydra.git</span><br><span class="line"></span><br><span class="line">$ cd thc-hydra</span><br><span class="line"></span><br><span class="line">$ ./configure &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<p><strong>常用参数</strong></p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-l</td>
+<td>指定单个用户名，适合在知道用户名爆破用户名密码时使用</td>
+</tr>
+<tr>
+<td>-L</td>
+<td>指定多个用户名，参数值为存储用户名的文件的路径</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>指定单个密码，适合在知道密码爆破用户名时使用</td>
+</tr>
+<tr>
+<td>-P</td>
+<td>指定多个密码，参数值为存贮密码的文件(通常称为字典)的路径</td>
+</tr>
+<tr>
+<td>-C</td>
+<td>当用户名和密码存储到一个文件时使用此参数。字典文件存储的格式必须为 “用户名:密码” 的格式</td>
+</tr>
+<tr>
+<td>-M</td>
+<td>指定多个攻击目标，此参数为存储攻击目标的文件的路径，列表文件存储格式必须为”地址:端口”</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>指定爆破时的任务数量(线程数)，默认为16</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>指定端口，适用于攻击目标端口非默认的情况</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>指定爆破时使用 SSL 连接</td>
+</tr>
+<tr>
+<td>-R</td>
+<td>继续从上一次爆破进度上继续爆破</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>显示爆破的详细信息</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>一旦爆破成功一个就停止爆破</td>
+</tr>
+</tbody></table>
+<h4 id="b-Medusa"><a href="#b-Medusa" class="headerlink" title="b. Medusa"></a>b. Medusa</h4><p><strong>安装</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y install libssh2-devel libssh2-devel libtool libtool-ltdl libtool-ltdl-devel</span><br><span class="line"></span><br><span class="line">$ yum groupinstall -y &apos;development tools&apos;</span><br><span class="line"></span><br><span class="line">$ wget http://foofus.net/goons/jmk/tools/medusa-2.2.tar.gz</span><br><span class="line"></span><br><span class="line">$ tar zxvf medusa-2.2.tar.gz &amp;&amp; cd medusa-2.2</span><br><span class="line"></span><br><span class="line">$ ./configure &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<p><strong>语法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Medusa [-h host|-H file] [-u username|-U file] [-p password|-P file] [-C file] -M module [OPT]</span><br></pre></td></tr></table></figure>
+
+<p><strong>参数选项</strong></p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-h [TEXT]</td>
+<td>目标主机名称或者IP地址</td>
+</tr>
+<tr>
+<td>-H [FILE]</td>
+<td>包含目标主机名称或者IP地址文件</td>
+</tr>
+<tr>
+<td>-u [TEXT]</td>
+<td>测试的用户名</td>
+</tr>
+<tr>
+<td>-U [FILE]</td>
+<td>包含测试的用户名文件</td>
+</tr>
+<tr>
+<td>-p [TEXT]</td>
+<td>测试的密码</td>
+</tr>
+<tr>
+<td>-P [FILE]</td>
+<td>包含测试的密码文件</td>
+</tr>
+<tr>
+<td>-C [FILE]</td>
+<td>组合条目文件</td>
+</tr>
+<tr>
+<td>-O [FILE]</td>
+<td>日志信息文件</td>
+</tr>
+<tr>
+<td>-e [n/s/ns]</td>
+<td>n代表空密码，s代表为密码与用户名相同</td>
+</tr>
+<tr>
+<td>-M [TEXT]</td>
+<td>模块执行名称</td>
+</tr>
+<tr>
+<td>-m [TEXT]</td>
+<td>传递参数到模块</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>显示所有的模块名称</td>
+</tr>
+<tr>
+<td>-n [NUM]</td>
+<td>使用非默认Tcp端口</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>启用SSL</td>
+</tr>
+<tr>
+<td>-r [NUM]</td>
+<td>重试间隔时间，默认为3秒</td>
+</tr>
+<tr>
+<td>-t [NUM]</td>
+<td>设定线程数量</td>
+</tr>
+<tr>
+<td>-T</td>
+<td>同时测试的主机总数</td>
+</tr>
+<tr>
+<td>-L</td>
+<td>并行化，每个用户使用一个线程</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>在任何主机上找到第一个账号/密码后，停止破解</td>
+</tr>
+<tr>
+<td>-F</td>
+<td>在任何主机上找到第一个有效的用户名/密码后停止审计</td>
+</tr>
+<tr>
+<td>-q</td>
+<td>显示模块的使用信息</td>
+</tr>
+<tr>
+<td>-v [NUM]</td>
+<td>详细级别（0-6）</td>
+</tr>
+<tr>
+<td>-w [NUM]</td>
+<td>错误调试级别（0-10）</td>
+</tr>
+<tr>
+<td>-V</td>
+<td>显示版本</td>
+</tr>
+<tr>
+<td>-Z [TEXT]</td>
+<td>继续上一次扫描</td>
+</tr>
+</tbody></table>
+<h3 id="3-离线爆破"><a href="#3-离线爆破" class="headerlink" title="3. 离线爆破"></a>3. 离线爆破</h3><h4 id="a-John-the-Ripper"><a href="#a-John-the-Ripper" class="headerlink" title="a. John the Ripper"></a>a. John the Ripper</h4><p><strong>安装</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://www.openwall.com/john/k/john-1.9.0.tar.gz</span><br><span class="line"></span><br><span class="line">$ tar zxvf john-1.9.0.tar.gz &amp;&amp; cd john-1.9.0</span><br><span class="line"></span><br><span class="line">$ make &amp;&amp; make clean linux-x86-64</span><br><span class="line"></span><br><span class="line">$ alias john=&apos;/usr/local/john-1.9.0/run/john&apos;</span><br></pre></td></tr></table></figure>
+
+<h4 id="b-hashcat"><a href="#b-hashcat" class="headerlink" title="b. hashcat"></a>b. hashcat</h4><p><strong>安装</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://hashcat.net/files/hashcat-6.1.1.tar.gz</span><br><span class="line"></span><br><span class="line">$ tar zxvf hashcat-6.1.1.tar.gz</span><br><span class="line"></span><br><span class="line">$ make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-防御加固"><a href="#0x04-防御加固" class="headerlink" title="0x04 防御加固"></a>0x04 防御加固</h2><h3 id="1-缺陷总结"><a href="#1-缺陷总结" class="headerlink" title="1. 缺陷总结"></a>1. 缺陷总结</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1) 公共弱口令，出现频率比较高的弱口令</span><br><span class="line"></span><br><span class="line">(2) 数字或字母连排或混排，键盘字母连排</span><br><span class="line"></span><br><span class="line">(3) 默认密码，网络设备、系统组件等默认初始化弱口令</span><br><span class="line"></span><br><span class="line">(4) 生日，姓名+生日（利用社工非常容易被破解）</span><br><span class="line"></span><br><span class="line">(5) 短语密码（如：5201314，love1314等）</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-口令设置"><a href="#2-口令设置" class="headerlink" title="2. 口令设置"></a>2. 口令设置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">（1）不使用空口令或系统缺省的口令，这些口令众所周之，为典型的弱口令</span><br><span class="line"></span><br><span class="line">（2）口令长度不小于8 个字符</span><br><span class="line"></span><br><span class="line">（3）口令不应该为连续的某个字符（例如：AAAAAAAA）或重复某些字符的组合（例如：tzf.tzf.）</span><br><span class="line"></span><br><span class="line">（4）口令应该为以下四类字符的组合，大写字母(A-Z)、小写字母(a-z)、数字(0-9)和特殊字符。每类字符至少包含一个。如果某类字符只包含一个，那么该字符不应为首字符或尾字符</span><br><span class="line"></span><br><span class="line">（5）口令中不应包含本人、父母、子女和配偶的姓名和出生日期、纪念日期、登录名、E-mail 地址等等与本人有关的信息，以及字典中的单词</span><br><span class="line"></span><br><span class="line">（6）口令不应该为用数字或符号代替某些字母的单词</span><br><span class="line"></span><br><span class="line">（7）口令应该易记且可以快速输入，防止他人从你身后很容易看到你的输入</span><br><span class="line"></span><br><span class="line">（8）至少90 天内更换一次口令，防止未被发现的入侵者继续使用该口令\</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-防御策略"><a href="#3-防御策略" class="headerlink" title="3. 防御策略"></a>3. 防御策略</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1) 少用滚键盘类的密码，尽量使用难以猜解的密码</span><br><span class="line"></span><br><span class="line">(2) 防止信息泄漏导致密码泄漏或者可能易于被猜测: 登录名和用户名应进行区分；实行有效的密码策略，杜绝密码中包含用户名；不要使用易于从企业名称或者域名中得到密码信息的口令；防止GitHub信息泄漏</span><br><span class="line"></span><br><span class="line">(3) 禁止大量系统使用同一密码</span><br><span class="line"></span><br><span class="line">(4) 不要使用默认密码，密码默认即为密码公开</span><br><span class="line"></span><br><span class="line">(5) 撞库问题防范: 应定期修改密码，不同的网站或账户不应该使用相同的密码; 对登录进行有效验证限制、各个功能接口做检验</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x05-Reference"><a href="#0x05-Reference" class="headerlink" title="0x05 Reference"></a>0x05 Reference</h2><ul>
+<li><p><a href="https://hashcat.net/wiki/" target="_blank" rel="noopener">https://hashcat.net/wiki/</a></p>
+</li>
+<li><p><a href="https://nmap.org/ncrack/man.html" target="_blank" rel="noopener">https://nmap.org/ncrack/man.html</a></p>
+</li>
+<li><p><a href="https://www.openwall.com/john/doc/" target="_blank" rel="noopener">https://www.openwall.com/john/doc/</a></p>
+</li>
+<li><p><a href="https://www.hackingarticles.in/comprehensive-guide-on-hydra-a-brute-forcing-tool/" target="_blank" rel="noopener">https://www.hackingarticles.in/comprehensive-guide-on-hydra-a-brute-forcing-tool/</a></p>
+</li>
+<li><p><a href="https://www.hackingarticles.in/beginner-guide-john-the-ripper-part-1/" target="_blank" rel="noopener">https://www.hackingarticles.in/beginner-guide-john-the-ripper-part-1/</a></p>
+</li>
+<li><p><a href="https://www.hackingarticles.in/comprehensive-guide-on-medusa-a-brute-forcing-tool/" target="_blank" rel="noopener">https://www.hackingarticles.in/comprehensive-guide-on-medusa-a-brute-forcing-tool/</a></p>
+</li>
+<li><p><a href="https://www.hackingarticles.in/beginners-guide-for-john-the-ripper-part-2/" target="_blank" rel="noopener">https://www.hackingarticles.in/beginners-guide-for-john-the-ripper-part-2/</a></p>
+</li>
+</ul>
+<hr>
+<center>本文涉及内容，仅限于网络安全从业者学习交流，切勿用于非法用途...
+</center>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Vulner/" rel="tag"><i class="fa fa-tag"></i>
+
+ Vulner</a>
+          
+            <a href="/tags/Brute-force/" rel="tag"><i class="fa fa-tag"></i>
+
+ Brute-force</a>
+          
+            <a href="/tags/Init-Access/" rel="tag"><i class="fa fa-tag"></i>
+
+ Init Access</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/50059/" rel="next" title="文件上传漏洞详解">
+                <i class="fa fa-chevron-left"></i> 文件上传漏洞详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/10024/" rel="prev" title="Linux入侵排查实战技巧">
+                Linux入侵排查实战技巧 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-攻击面"><span class="nav-text">0x01 攻击面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-爆破字典"><span class="nav-text">0x02 爆破字典</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-厂商初始口令"><span class="nav-text">1. 厂商初始口令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-爆破字典合集"><span class="nav-text">2. 爆破字典合集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-字典生成工具"><span class="nav-text">3. 字典生成工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-爆破实战"><span class="nav-text">0x03 爆破实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-爆破工具"><span class="nav-text">1. 爆破工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-在线爆破"><span class="nav-text">2. 在线爆破</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-Hydra"><span class="nav-text">a. Hydra</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-Medusa"><span class="nav-text">b. Medusa</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-离线爆破"><span class="nav-text">3. 离线爆破</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-John-the-Ripper"><span class="nav-text">a. John the Ripper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-hashcat"><span class="nav-text">b. hashcat</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-防御加固"><span class="nav-text">0x04 防御加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-缺陷总结"><span class="nav-text">1. 缺陷总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-口令设置"><span class="nav-text">2. 口令设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-防御策略"><span class="nav-text">3. 防御策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-Reference"><span class="nav-text">0x05 Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

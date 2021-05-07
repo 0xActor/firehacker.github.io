@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Red Team,Sqlmap,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文介绍Sql注入自动化工具-Sqlmap常用参数及实用技巧...">
+<meta name="keywords" content="Red Team,Sqlmap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sqlmap基础备忘录">
+<meta property="og:url" content="https://l0n9.cc/posts/30803/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文介绍Sql注入自动化工具-Sqlmap常用参数及实用技巧...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-04-13T15:29:16.705Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sqlmap基础备忘录">
+<meta name="twitter:description" content="本文介绍Sql注入自动化工具-Sqlmap常用参数及实用技巧...">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/30803/">
+
+
+
+
+
+  <title>Sqlmap基础备忘录 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/30803/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Sqlmap基础备忘录</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-05T21:01:43+08:00">
+                2018-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/红队渗透/" itemprop="url" rel="index">
+                    <span itemprop="name">红队渗透</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文介绍Sql注入自动化工具-Sqlmap常用参数及实用技巧...</center>
+
+<a id="more"></a>
+<hr>
+<h2 id="0x01-选项"><a href="#0x01-选项" class="headerlink" title="0x01 选项"></a>0x01 选项</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Usage: python sqlmap.py [options]</span><br><span class="line"></span><br><span class="line">Options（选项）:</span><br><span class="line"></span><br><span class="line">-h,         ## 展示帮助文档参数</span><br><span class="line"></span><br><span class="line">-hh         ## 展示详细帮助文档参数</span><br><span class="line"></span><br><span class="line">--version   ## 显示程序的版本号</span><br><span class="line"></span><br><span class="line">-v          ## 详细级别：0-6（默认为1）</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-目标"><a href="#0x02-目标" class="headerlink" title="0x02 目标"></a>0x02 目标</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Target（目标）:</span><br><span class="line"></span><br><span class="line">-d      ## 指定具体数据库</span><br><span class="line"></span><br><span class="line">-u URL  ## 目标URL (e.g. &quot;http://www.example.com/test.php?id=1&quot;)</span><br><span class="line"></span><br><span class="line">-l      ## 解析目标(s)从Burp或WebScarab代理日志文件</span><br><span class="line"></span><br><span class="line">-x      ## 从远程站点地图文件(.xml)解析目标</span><br><span class="line"></span><br><span class="line">-m      ## 扫描文本文件中给出的多个目标</span><br><span class="line"></span><br><span class="line">-r      ## 从本地文件加载HTTP请求 ，多用于post注入</span><br><span class="line"></span><br><span class="line">-g      ## 处理Google的结果作为目标URL</span><br><span class="line"></span><br><span class="line">-c      ## 从INI配置文件中加载选项</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-请求"><a href="#0x03-请求" class="headerlink" title="0x03 请求"></a>0x03 请求</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">Request（请求）: 这些选项可以用来指定如何连接到目标URL</span><br><span class="line"></span><br><span class="line">--method=METHOD  ## 强制使用给定的HTTP方法（e.g. POST）</span><br><span class="line"></span><br><span class="line">--data=DATA ## 通过POST发送的数据字符串</span><br><span class="line"></span><br><span class="line">--param-del=PARA..  ## 用于拆分参数值的字符</span><br><span class="line"></span><br><span class="line">--cookie=COOKIE ## Cookie头的值</span><br><span class="line"></span><br><span class="line">--cookie-del=COO.. ## 用于分割Cookie值的字符</span><br><span class="line"></span><br><span class="line">--load-cookies=L.. ## 包含Netscape/wget格式的cookie的文件</span><br><span class="line"></span><br><span class="line">--drop-set-cookie ## 从响应中忽略Set-Cookie头</span><br><span class="line"></span><br><span class="line">--user-agent=AGENT ## 指定 HTTP User - Agent头</span><br><span class="line"></span><br><span class="line">--random-agent ##  使用随机选定的HTTP User - Agent头</span><br><span class="line"></span><br><span class="line">--host=HOST ## HTTP主机头值</span><br><span class="line"></span><br><span class="line">--referer=REFERER ##  指定 HTTP Referer头</span><br><span class="line"></span><br><span class="line">-H HEADER, --hea.. ## 额外header (e.g. &quot;X-Forwarded-For: 127.0.0.1&quot;)</span><br><span class="line"></span><br><span class="line">--headers=HEADERS ## 额外header (e.g. &quot;Accept-Language: fr\\nETag: 123&quot;)</span><br><span class="line"></span><br><span class="line">--auth-type=AUTH.. ## 认证类型(Basic, Digest, NTLM or PKI)</span><br><span class="line"></span><br><span class="line">--auth-cred=AUTH.. ##  HTTP认证凭证(name:password)</span><br><span class="line"></span><br><span class="line">--auth-file=AUTH.. ## HTTP认证 PEM认证/私钥文件</span><br><span class="line"></span><br><span class="line">--ignore-401 ## 忽略HTTP错误401</span><br><span class="line"></span><br><span class="line">--proxy=PROXY ## 使用代理连接到目标网址</span><br><span class="line"></span><br><span class="line">--proxy-cred=PRO.. ## 代理认证证书(name:password)</span><br><span class="line"></span><br><span class="line">--proxy-file=PRO.. ## 从文件中加载代理列表</span><br><span class="line"></span><br><span class="line">--ignore-proxy ## 忽略系统默认代理设置</span><br><span class="line"></span><br><span class="line">--tor ## 使用Tor匿名网络</span><br><span class="line"></span><br><span class="line">--tor-port=TORPORT ##  设置Tor代理端口而不是默认值</span><br><span class="line"></span><br><span class="line">--tor-type=TORTYPE ## 设置Tor代理类型</span><br><span class="line"></span><br><span class="line">--check-tor ## 检查Tor是否正确使用</span><br><span class="line"></span><br><span class="line">--delay=DELAY ## 每个HTTP请求之间的延迟（秒）</span><br><span class="line"></span><br><span class="line">--timeout=TIMEOUT ## 秒超时连接前等待（默认30）</span><br><span class="line"></span><br><span class="line">--retries=RETRIES ##  连接超时时重试（默认值3）</span><br><span class="line"></span><br><span class="line">--randomize=RPARAM ## 随机更改给定参数的值(s)</span><br><span class="line"></span><br><span class="line">--safe-url=SAFEURL ## 在测试期间频繁访问的URL地址</span><br><span class="line"></span><br><span class="line">--safe-post=SAFE.. ## POST数据发送到安全URL</span><br><span class="line"></span><br><span class="line">--safe-req=SAFER.. ## 从文件加载安全HTTP请求</span><br><span class="line"></span><br><span class="line">--safe-freq=SAFE.. ## 在两次访问给定安全网址之间测试请求</span><br><span class="line"></span><br><span class="line">--skip-urlencode ## 跳过有效载荷数据的URL编码</span><br><span class="line"></span><br><span class="line">--csrf-token=CSR.. ## 参数用于保存anti-CSRF令牌</span><br><span class="line"></span><br><span class="line">--csrf-url=CSRFURL ## 提取anti-CSRF URL地址访问令牌</span><br><span class="line"></span><br><span class="line">--force-ssl ## 强制使用SSL /HTTPS</span><br><span class="line"></span><br><span class="line">--hpp ## 使用HTTP参数pollution的方法</span><br><span class="line"></span><br><span class="line">--eval=EVALCODE ## 评估请求之前提供Python代码(如&quot;import hashlib;id2=hashlib.md5(id).hexdigest()&quot;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-性能优化"><a href="#0x04-性能优化" class="headerlink" title="0x04 性能优化"></a>0x04 性能优化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Optimization（优化）: 这些选项可用于优化sqlmap的性能</span><br><span class="line"></span><br><span class="line">-o ## 开启所有优化开关</span><br><span class="line"></span><br><span class="line">--predict-output ## 预测常见的查询输出</span><br><span class="line"></span><br><span class="line">--keep-alive ## 使用持久的HTTP（S）连接</span><br><span class="line"></span><br><span class="line">--null-connection ## 从没有实际的HTTP响应体中检索页面长度</span><br><span class="line"></span><br><span class="line">--threads=THREADS ## 最大的HTTP（S）请求并发量（默认为1）</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x05-注入"><a href="#0x05-注入" class="headerlink" title="0x05 注入"></a>0x05 注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">Injection（注入）: 用来指定测试哪些参数，提供自定义的注入payloads和可选篡改脚本</span><br><span class="line"></span><br><span class="line">-p ## 可测试的参数（S）</span><br><span class="line"></span><br><span class="line">--skip=SKIP ## 跳过对给定参数的测试</span><br><span class="line"></span><br><span class="line">--skip-static ## 跳过测试不显示为动态的参数</span><br><span class="line"></span><br><span class="line">--param-exclude=.. ## 使用正则表达式排除参数进行测试（e.g. &quot;ses&quot;）</span><br><span class="line"></span><br><span class="line">--dbms=DBMS ## 强制后端的DBMS为此值</span><br><span class="line"></span><br><span class="line">--dbms-cred=DBMS.. ## DBMS认证凭证(user:password)</span><br><span class="line"></span><br><span class="line">--os=OS ## 强制后端的DBMS操作系统为这个值</span><br><span class="line"></span><br><span class="line">--invalid-bignum ## 使用大数字使值无效</span><br><span class="line"></span><br><span class="line">--invalid-logical ## 使用逻辑操作使值无效</span><br><span class="line"></span><br><span class="line">--invalid-string ## 使用随机字符串使值无效</span><br><span class="line"></span><br><span class="line">--no-cast ## 关闭有效载荷铸造机制</span><br><span class="line"></span><br><span class="line">--no-escape ## 关闭字符串转义机制</span><br><span class="line"></span><br><span class="line">--prefix=PREFIX ## 注入payload字符串前缀</span><br><span class="line"></span><br><span class="line">--suffix=SUFFIX ## 注入payload字符串后缀</span><br><span class="line"></span><br><span class="line">--tamper=TAMPER ## 使用给定的脚本（S）篡改注入数据</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x06-检测"><a href="#0x06-检测" class="headerlink" title="0x06 检测"></a>0x06 检测</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Detection（检测）: 用来指定在SQL盲注时如何解析和比较HTTP响应页面的内容</span><br><span class="line"></span><br><span class="line">--level=LEVEL ## 执行测试的等级（1-5，默认为1）</span><br><span class="line"></span><br><span class="line">--risk=RISK ## 执行测试的风险（0-3，默认为1）</span><br><span class="line"></span><br><span class="line">--string=STRING ## 查询时有效时在页面匹配字符串</span><br><span class="line"></span><br><span class="line">--not-string=NOT.. ## 当查询求值为无效时匹配的字符串</span><br><span class="line"></span><br><span class="line">--regexp=REGEXP ## 查询时有效时在页面匹配正则表达式</span><br><span class="line"></span><br><span class="line">--code=CODE ## 当查询求值为True时匹配的HTTP代码</span><br><span class="line"></span><br><span class="line">--text-only ## 仅基于在文本内容比较网页</span><br><span class="line"></span><br><span class="line">--titles ##  仅根据他们的标题进行比较</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x07-技巧"><a href="#0x07-技巧" class="headerlink" title="0x07 技巧"></a>0x07 技巧</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Techniques（技巧）: 用于调整具体的SQL注入测试。</span><br><span class="line"></span><br><span class="line">--technique=TECH ## SQL 注入技术测试（默认BEUST）</span><br><span class="line"></span><br><span class="line">--time-sec=TIMESEC ##  DBMS响应的延迟时间（默认为5秒）</span><br><span class="line"></span><br><span class="line">--union-cols=UCOLS ##  定列范围用于测试UNION查询注入</span><br><span class="line"></span><br><span class="line">--union-char=UCHAR ##  用于暴力猜解列数的字符</span><br><span class="line"></span><br><span class="line">--union-from=UFROM ##  要在UNION查询SQL注入的FROM部分使用的表</span><br><span class="line"></span><br><span class="line">--dns-domain=DNS.. ##  域名用于DNS漏出攻击</span><br><span class="line"></span><br><span class="line">--second-order=S.. ## 生成页面的URL搜索为second-order响应</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x08-指纹"><a href="#0x08-指纹" class="headerlink" title="0x08 指纹"></a>0x08 指纹</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Fingerprint（指纹）</span><br><span class="line"></span><br><span class="line">-f  ## 执行检查广泛的DBMS版本指纹</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x09-枚举"><a href="#0x09-枚举" class="headerlink" title="0x09 枚举"></a>0x09 枚举</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">Enumeration（枚举）: 用来列举后端数据库管理系统的信息、表中的结构和数据，还可以运行自己的SQL语句</span><br><span class="line"></span><br><span class="line">-a, ## 检索一切</span><br><span class="line"></span><br><span class="line">-b, ## 检索数据库管理系统的标识</span><br><span class="line"></span><br><span class="line">--current-user ## 检索数据库管理系统的标识</span><br><span class="line"></span><br><span class="line">--current-db ## 检索数据库管理系统当前数据库</span><br><span class="line"></span><br><span class="line">-hostname ## 检索数据库服务器的主机名</span><br><span class="line"></span><br><span class="line">--is-dba ## 检测DBMS当前用户是否DBA</span><br><span class="line"></span><br><span class="line">--users ## 枚举数据库管理系统用户</span><br><span class="line"></span><br><span class="line">--passwords ## 枚举数据库管理系统用户密码哈希</span><br><span class="line"></span><br><span class="line">--privileges ## 枚举数据库管理系统用户的权限</span><br><span class="line"></span><br><span class="line">--roles ## 枚举数据库管理系统用户的角色</span><br><span class="line"></span><br><span class="line">--dbs ## 枚举数据库管理系统数据库</span><br><span class="line"></span><br><span class="line">--tables ## 枚举的DBMS数据库中的表</span><br><span class="line"></span><br><span class="line">--columns ## 枚举DBMS数据库表列</span><br><span class="line"></span><br><span class="line">--schema ## 枚举数据库架构</span><br><span class="line"></span><br><span class="line">--count ## 检索表的条目数</span><br><span class="line"></span><br><span class="line">--dump ## 转储数据库管理系统的数据库中的表项</span><br><span class="line"></span><br><span class="line">--dump-all ## 转储数据库管理系统的数据库中的表项</span><br><span class="line"></span><br><span class="line">--search ## 搜索列（S），表（S）和/或数据库名称（S）</span><br><span class="line"></span><br><span class="line">--comments ## 检索数据库的comments(注释、评论)</span><br><span class="line"></span><br><span class="line">-D DB ## 要进行枚举的数据库名</span><br><span class="line"></span><br><span class="line">-T TBL ## 要进行枚举的数据库表</span><br><span class="line"></span><br><span class="line">-C COL ## 要进行枚举的数据库列</span><br><span class="line"></span><br><span class="line">-X EXCLUDECOL ## 不进行枚举的数据库列</span><br><span class="line"></span><br><span class="line">-U USER ## 用来进行枚举的数据库用户</span><br><span class="line"></span><br><span class="line">--exclude-sysdbs ## 枚举表时排除系统数据库</span><br><span class="line"></span><br><span class="line">--pivot-column=P.. ## 主列名称</span><br><span class="line"></span><br><span class="line">--where=DUMPWHERE ## 使用WHERE条件进行表转储</span><br><span class="line"></span><br><span class="line">--start=LIMITSTART ## 第一个查询输出进入检索</span><br><span class="line"></span><br><span class="line">--stop=LIMITSTOP ## 最后查询的输出进入检索</span><br><span class="line"></span><br><span class="line">--first=FIRSTCHAR ## 第一个查询输出字的字符检索</span><br><span class="line"></span><br><span class="line">--last=LASTCHAR ## 最后查询的输出字字符检索</span><br><span class="line"></span><br><span class="line">--sql-query=QUERY ## 要执行的SQL语句</span><br><span class="line"></span><br><span class="line">--sql-shell ## 提示交互式SQL的shell</span><br><span class="line"></span><br><span class="line">--sql-file=SQLFILE ## 从给定文件执行SQL语句</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x0A-蛮力检查"><a href="#0x0A-蛮力检查" class="headerlink" title="0x0A 蛮力检查"></a>0x0A 蛮力检查</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Brute force（蛮力）: 可以被用来运行蛮力检查</span><br><span class="line"></span><br><span class="line">--common-tables ## 检查存在共同表</span><br><span class="line"></span><br><span class="line">--common-columns ## 检查存在共同列</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x0B-访问操作"><a href="#0x0B-访问操作" class="headerlink" title="0x0B 访问操作"></a>0x0B 访问操作</h2><p><strong>访问文件系统</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">File system access（访问文件系统）:</span><br><span class="line"> 可以被用来访问后端数据库管理系统的底层文件系统</span><br><span class="line"></span><br><span class="line">--file-read=RFILE ## 从后端的数据库管理系统文件系统读取文件</span><br><span class="line"></span><br><span class="line">--file-write=WFILE ## 编辑后端的数据库管理系统文件系统上的本地文件</span><br><span class="line"></span><br><span class="line">--file-dest=DFILE ## 后端的数据库管理系统写入文件的绝对路径</span><br></pre></td></tr></table></figure>
+
+<p><strong>操作系统访问</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Operating system access（操作系统访问）: 可以用于访问后端数据库管理系统的底层操作系统</span><br><span class="line"></span><br><span class="line">--os-cmd=OSCMD ## 执行操作系统命令</span><br><span class="line"></span><br><span class="line">--os-shell ## 交互式的操作系统的shell</span><br><span class="line"></span><br><span class="line">--os-pwn ## 获取一个OOB shell，meterpreter或VNC</span><br><span class="line"></span><br><span class="line">--os-smbrelay ## 一键获取一个OOB shell，meterpreter或VNC</span><br><span class="line"></span><br><span class="line">--os-bof ## 存储过程缓冲区溢出利用</span><br><span class="line"></span><br><span class="line">--priv-esc Database process user privilege escalation</span><br><span class="line">## 数据库进程用户权限提升</span><br><span class="line"></span><br><span class="line">--msf-path=MSFPATH ## 本地的安装路径</span><br><span class="line"></span><br><span class="line">--tmp-path=TMPPATH ## 远程临时文件目录的绝对路径</span><br></pre></td></tr></table></figure>
+
+<p><strong>Windows注册表访问</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Windows registry access（Windows注册表访问）: 可以被用来访问后端数据库管理系统Windows注册表。</span><br><span class="line"></span><br><span class="line">--reg-read ## 读一个Windows注册表项值</span><br><span class="line"></span><br><span class="line">--reg-add ## 写一个Windows注册表项值数据</span><br><span class="line"></span><br><span class="line">--reg-del ## 删除Windows注册表键值</span><br><span class="line"></span><br><span class="line">--reg-key=REGKEY ## Windows注册表键</span><br><span class="line"></span><br><span class="line">--reg-value=REGVAL ##  Windows注册表项值</span><br><span class="line"></span><br><span class="line">--reg-data=REGDATA ## Windows注册表键值数据</span><br><span class="line"></span><br><span class="line">--reg-type=REGTYPE ## Windows注册表项值类型</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x0C-常用参数"><a href="#0x0C-常用参数" class="headerlink" title="0x0C 常用参数"></a>0x0C 常用参数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">General : 可以用来设置一些一般的工作参数</span><br><span class="line"></span><br><span class="line">-s SESSIONFILE ## 保存和恢复检索会话文件的所有数据</span><br><span class="line"></span><br><span class="line">-t TRAFFICFILE ## 记录所有HTTP流量到一个文本文件中</span><br><span class="line"></span><br><span class="line">--batch ## 从不询问用户输入，使用所有默认配置</span><br><span class="line"></span><br><span class="line">--binary-fields=.. ## 具有二进制值的结果字段</span><br><span class="line"></span><br><span class="line">--charset=CHARSET ## 强制用于数据检索的字符编码</span><br><span class="line"></span><br><span class="line">--crawl=CRAWLDEPTH ## 从目标网址开始抓取网站</span><br><span class="line"></span><br><span class="line">--crawl-exclude=.. ## 正则表达式排除网页抓取</span><br><span class="line"></span><br><span class="line">--csv-del=CSVDEL ## 分隔CSV输出中使用的字符</span><br><span class="line"></span><br><span class="line">--dump-format=DU.. ## 转储数据的格式 (CSV (default), HTML or SQLITE)</span><br><span class="line"></span><br><span class="line">--eta ## 显示每个输出的预计到达时间</span><br><span class="line"></span><br><span class="line">--flush-session ## 刷新当前目标的会话文件</span><br><span class="line"></span><br><span class="line">--forms ## 在目标网址上解析和测试表单</span><br><span class="line"></span><br><span class="line">--fresh-queries ## 忽略在会话文件中存储的查询结果</span><br><span class="line"></span><br><span class="line">--hex ## 使用DBMS hex函数进行数据检索</span><br><span class="line"></span><br><span class="line">--output-dir=OUT.. ## 自定义输出目录路径</span><br><span class="line"></span><br><span class="line">--parse-errors ## 解析和显示响应中的DBMS错误消息</span><br><span class="line"></span><br><span class="line">--save=SAVECONFIG ## 保存选项到INI配置文件</span><br><span class="line"></span><br><span class="line">--scope=SCOPE ## 使用正则表达式从提供的代理日志中过滤目标</span><br><span class="line"></span><br><span class="line">--test-filter=TE.. ## 根据有效负载和/或标题(e.g. ROW)选择测试</span><br><span class="line"></span><br><span class="line">--test-skip=TEST.. ## 根据有效负载和/或标题跳过测试（e.g. BENCHMARK）</span><br><span class="line"></span><br><span class="line">--update  ## 更新SqlMap</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x0D-杂项"><a href="#0x0D-杂项" class="headerlink" title="0x0D 杂项"></a>0x0D 杂项</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Miscellaneous（杂项）:</span><br><span class="line"></span><br><span class="line">-z ## 使用简短的助记符 (如 &quot;flu,bat,ban,tec=EU&quot;)</span><br><span class="line"></span><br><span class="line">--alert=ALERT ## 在找到SQL注入时运行主机操作系统命令</span><br><span class="line"></span><br><span class="line">--answers=ANSWERS ## 设置问题答案</span><br><span class="line"></span><br><span class="line">--beep ## 发现SQL 注入时提醒</span><br><span class="line"></span><br><span class="line">--cleanup ## 具体的UDF和表清理DBMS</span><br><span class="line"></span><br><span class="line">--dependencies ## 检查是否缺少（非内核）sqlmap依赖关系</span><br><span class="line"></span><br><span class="line">--disable-coloring ## 禁用控制台输出颜色</span><br><span class="line"></span><br><span class="line">--gpage=GOOGLEPAGE ## 使用Google dork结果指定页码</span><br><span class="line"></span><br><span class="line">--identify-waf ## 对WAF/IPS/IDS保护进行全面测试</span><br><span class="line"></span><br><span class="line">--skip-waf ## 跳过启发式检测WAF/IPS/IDS保护</span><br><span class="line"></span><br><span class="line">--mobile ## 通过HTTP User-Agent标头模仿智能手机</span><br><span class="line"></span><br><span class="line">--offline ## 在离线模式下工作（仅使用会话数据）</span><br><span class="line"></span><br><span class="line">--page-rank  ## Google dork结果显示网页排名（PR）</span><br><span class="line"></span><br><span class="line">--purge-output ## 安全地从输出目录中删除所有内容</span><br><span class="line"></span><br><span class="line">--smart ## 只有在正启发式时才进行彻底测试</span><br><span class="line"></span><br><span class="line">--sqlmap-shell ## 提示交互式 sqlmap shell</span><br><span class="line"></span><br><span class="line">--wizard ## 给初级用户的简单向导界面</span><br></pre></td></tr></table></figure>
+
+<h2 id="0xFF-Reference"><a href="#0xFF-Reference" class="headerlink" title="0xFF Reference"></a>0xFF Reference</h2><ul>
+<li><a href="https://github.com/sqlmapproject/sqlmap/wiki/Usage" target="_blank" rel="noopener">https://github.com/sqlmapproject/sqlmap/wiki/Usage</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Red-Team/" rel="tag"><i class="fa fa-tag"></i>
+
+ Red Team</a>
+          
+            <a href="/tags/Sqlmap/" rel="tag"><i class="fa fa-tag"></i>
+
+ Sqlmap</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/46803/" rel="next" title="端口扫描之Nmap进阶指南">
+                <i class="fa fa-chevron-left"></i> 端口扫描之Nmap进阶指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/16803/" rel="prev" title="Metsploit基础篇">
+                Metsploit基础篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-选项"><span class="nav-text">0x01 选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-目标"><span class="nav-text">0x02 目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-请求"><span class="nav-text">0x03 请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-性能优化"><span class="nav-text">0x04 性能优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-注入"><span class="nav-text">0x05 注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-检测"><span class="nav-text">0x06 检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-技巧"><span class="nav-text">0x07 技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-指纹"><span class="nav-text">0x08 指纹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x09-枚举"><span class="nav-text">0x09 枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0A-蛮力检查"><span class="nav-text">0x0A 蛮力检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0B-访问操作"><span class="nav-text">0x0B 访问操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0C-常用参数"><span class="nav-text">0x0C 常用参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0D-杂项"><span class="nav-text">0x0D 杂项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0xFF-Reference"><span class="nav-text">0xFF Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

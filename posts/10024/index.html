@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,Incident Response,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文总结Linux服务器入侵排查的通用思路与技巧...">
+<meta name="keywords" content="Linux,Incident Response">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux入侵排查实战技巧">
+<meta property="og:url" content="https://l0n9.cc/posts/10024/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文总结Linux服务器入侵排查的通用思路与技巧...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-04-08T14:23:22.627Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux入侵排查实战技巧">
+<meta name="twitter:description" content="本文总结Linux服务器入侵排查的通用思路与技巧...">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/10024/">
+
+
+
+
+
+  <title>Linux入侵排查实战技巧 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/10024/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux入侵排查实战技巧</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-10T22:23:00+08:00">
+                2019-11-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/应急响应/" itemprop="url" rel="index">
+                    <span itemprop="name">应急响应</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文总结Linux服务器入侵排查的通用思路与技巧...</center>
+
+<a id="more"></a>
+
+<h2 id="0x01-系统排查"><a href="#0x01-系统排查" class="headerlink" title="0x01 系统排查"></a>0x01 系统排查</h2><h3 id="1-系统信息"><a href="#1-系统信息" class="headerlink" title="1. 系统信息"></a>1. 系统信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ lscpu             #查看CPU信息</span><br><span class="line"></span><br><span class="line">$ uname -a          #操作系统信息</span><br><span class="line"></span><br><span class="line">$ cat /proc/version #系统版本信息</span><br><span class="line"></span><br><span class="line">$ cat /etc/redhat-release  #查看系统发行版</span><br><span class="line"></span><br><span class="line">$ lsmod             #查看模块信息</span><br><span class="line"></span><br><span class="line">$ lsblk             #列出块设备信息</span><br><span class="line"></span><br><span class="line">$ ifconfig eth0 | grep -w inet  #显示网卡IP信息</span><br><span class="line"></span><br><span class="line">$ curl cip.cc     #查看主机公网IP信息</span><br><span class="line"></span><br><span class="line">$ hostname        #查看系统主机名称</span><br><span class="line"></span><br><span class="line">$ cat /etc/resolv.conf   #DNS配置查看</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-用户账号"><a href="#2-用户账号" class="headerlink" title="2. 用户账号"></a>2. 用户账号</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">(1) 查看系统用户信息</span><br><span class="line"></span><br><span class="line">$ cat /etc/passwd</span><br><span class="line"></span><br><span class="line">用户名:密码加密:用户ID:用户组ID:注释:用户主目录:默认登录shell</span><br><span class="line"></span><br><span class="line">最后一列：/bin/bash表示用户状态可登录; /sbin/nologin表示账户状态不可登录</span><br><span class="line"></span><br><span class="line">(2) 查询超级权限账户: UID为0</span><br><span class="line"></span><br><span class="line">$ awk -F: &apos;&#123;if($3==0)print $1&#125;&apos; /etc/passwd</span><br><span class="line"></span><br><span class="line">(3) 查看可登录账户</span><br><span class="line"></span><br><span class="line">$ grep &apos;/bin/bash&apos; /etc/passwd</span><br><span class="line"></span><br><span class="line">(4) 查看空口令账户</span><br><span class="line"></span><br><span class="line">$ awk -F: &apos;length($2)==0 &#123;print $1&#125;&apos; /etc/shadow</span><br><span class="line"></span><br><span class="line">(5) 登录信息查看</span><br><span class="line"></span><br><span class="line">$ lastlog | more  #查看用户最后登录信息</span><br><span class="line"></span><br><span class="line">$ lastb | more    #显示用户错误的登录信息</span><br><span class="line"></span><br><span class="line">$ last | more     #查看用户最近登录信息</span><br><span class="line"></span><br><span class="line">$ uptime  #查看登陆多久、多少用户，负载</span><br><span class="line"></span><br><span class="line">$ who   #查看当前登录用户（tty本地登陆  pts远程登录）</span><br><span class="line"></span><br><span class="line">$ w     #查看系统信息，想知道某一时刻用户的行为</span><br><span class="line"></span><br><span class="line">  /var/log/wtmp: 存储登录成功的信息</span><br><span class="line"></span><br><span class="line">  /var/log/btmp: 存储登录失败的信息</span><br><span class="line"></span><br><span class="line">  /var/log/utmp: 存储当前正在登录的信息</span><br><span class="line"></span><br><span class="line">(6) 查看除root账号外其他帐号是否存在sudo权限</span><br><span class="line"></span><br><span class="line">$ more /etc/sudoers | grep -v &quot;^#\|^$&quot; | grep &quot;ALL=(ALL)&quot;</span><br><span class="line"></span><br><span class="line">(7) 禁用或删除多余及可疑的帐号</span><br><span class="line"></span><br><span class="line">$ usermod -L user    #禁用帐号，帐号无法登录，/etc/shadow第二栏为!开头</span><br><span class="line"></span><br><span class="line">$ userdel user       #删除user用户</span><br><span class="line"></span><br><span class="line">$ userdel -r user    #将删除user用户，并且将/home目录下的user目录一并删除</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-启动项"><a href="#3-启动项" class="headerlink" title="3. 启动项"></a>3. 启动项</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ cat /etc/init.d/rc.local</span><br><span class="line"></span><br><span class="line">$ cat /etc/rc.local</span><br><span class="line"></span><br><span class="line">$ ls -alt /etc/init.d/ | head</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-定时任务"><a href="#4-定时任务" class="headerlink" title="4. 定时任务"></a>4. 定时任务</h3><p><code>crontab -u &lt;-l, -r, -e&gt;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-u 指定一个用户</span><br><span class="line">-l 列出某个用户的任务计划</span><br><span class="line">-r 删除某个用户的任务</span><br><span class="line">-e 编辑某个用户的任务</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ crontab -u root -l  # 列出root用户的任务计划</span><br><span class="line"></span><br><span class="line">$ ls /etc/cron*       # 查看/etc目录下任务计划相关文件</span><br></pre></td></tr></table></figure>
+
+<p><strong>重点关注目录</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/var/spool/cron/*</span><br><span class="line">/etc/crontab</span><br><span class="line">/etc/cron.d/*</span><br><span class="line">/etc/cron.daily/*</span><br><span class="line">/etc/cron.hourly/*</span><br><span class="line">/etc/cron.monthly/*</span><br><span class="line">/etc/cron.weekly/</span><br><span class="line">/etc/anacrontab</span><br><span class="line">/var/spool/anacron/*</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-进程排查"><a href="#0x02-进程排查" class="headerlink" title="0x02 进程排查"></a>0x02 进程排查</h2><h3 id="1-进程查看"><a href="#1-进程查看" class="headerlink" title="1. 进程查看"></a>1. 进程查看</h3><p><strong>netstat/ss</strong></p>
+<p><code>分析可疑端口、可疑IP、可疑PID及程序进程</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ sudo netstat -ltpe | more   # 查看监听中的网络连接并显示进程ID、进程所有者用户名</span><br><span class="line"></span><br><span class="line">$ sudo netstat -antp | grep &quot;ESTABLISHED&apos;&apos;  # 查看正在通信中的连接信息</span><br><span class="line"></span><br><span class="line">$ sudo netstat -antpe  # -n 和 -e 选项连用，显示进程所有者的用户ID 号</span><br><span class="line"></span><br><span class="line">$ netstat -ts  # 打印出tcp协议下的收发包数量等统计数据</span><br><span class="line"></span><br><span class="line">$ watch -d -n0 &quot;netstat -atnp | grep &quot;ESTA&quot;  # 监视active状态的连接</span><br><span class="line"></span><br><span class="line">$ ss -plat  # 检查哪些进程在监听端口</span><br></pre></td></tr></table></figure>
+
+<p><strong>ps</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ ps -elf | grep pid  # 以长格式显示系统中的进程信息</span><br><span class="line"></span><br><span class="line">$ ps -aux --sort -pcpu | less   # 根据cpu使用率进行排序</span><br><span class="line"></span><br><span class="line">$ ps -aux --sort -pmem | less   # 根据内存使用来升序排序</span><br><span class="line"></span><br><span class="line">$ ps -axjf  # 以树形结构显示进程</span><br></pre></td></tr></table></figure>
+
+<p><strong>top</strong></p>
+<p><code>动态查看进程状态, 可分析CPU占用较高的进程, 排查挖矿木马</code></p>
+<p>实用选项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-c:  显示完整命令</span><br><span class="line"></span><br><span class="line">-d： 设置信息更新时间, 以秒为单位</span><br><span class="line"></span><br><span class="line">-u&lt;用户名&gt;：指定用户名</span><br><span class="line"></span><br><span class="line">-p&lt;进程号&gt;：显示指定进程信息</span><br></pre></td></tr></table></figure>
+
+<p>交互命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">b： 高亮显示当前运行进程</span><br><span class="line"></span><br><span class="line">c： 切换显示命令名称和完整命令行</span><br><span class="line"></span><br><span class="line">M： 根据驻留内存大小进行排序</span><br><span class="line"></span><br><span class="line">P： 根据CPU使用百分比大小进行排序</span><br><span class="line"></span><br><span class="line">T： 根据时间/累计时间进行排序</span><br><span class="line"></span><br><span class="line">i： 忽略闲置和僵死进程，这是一个开关式命令</span><br><span class="line"></span><br><span class="line">s： 改变两次刷新之间的延迟时间（单位为s）</span><br><span class="line"></span><br><span class="line">l： 切换显示平均负载和启动时间信息</span><br><span class="line"></span><br><span class="line">m： 切换显示内存信息</span><br><span class="line"></span><br><span class="line">t： 切换显示进程和CPU状态信息</span><br><span class="line"></span><br><span class="line">w： 将当前设置写入~/.toprc文件中</span><br></pre></td></tr></table></figure>
+
+<p><strong>pstree</strong></p>
+<p><code>以树状图的方式展现进程之间的派生关系</code></p>
+<p>实用选项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-a：显示每个程序的完整指令，包含路径，参数或是常驻服务的标示</span><br><span class="line"></span><br><span class="line">-h：列出树状图时，特别标明现在执行的程序</span><br><span class="line"></span><br><span class="line">-l：采用长列格式显示树状图</span><br><span class="line"></span><br><span class="line">-p：显示程序识别码</span><br><span class="line"></span><br><span class="line">-u：显示用户名称</span><br></pre></td></tr></table></figure>
+
+<p><strong>lsof</strong></p>
+<p><code>查看进程开打的文件，打开文件的进程，进程打开的端口(TCP、UDP)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">$ lsof -p pid   # 查看指定进程ID已打开的内容</span><br><span class="line"></span><br><span class="line">$ lsof -i       # 显示所有连接</span><br><span class="line"></span><br><span class="line">$ lsof -i:port  # 查看与指定端口相关的网络信息</span><br><span class="line"></span><br><span class="line">$ lsof -i@ip    # 查看与指定IP相关的网络信息</span><br><span class="line"></span><br><span class="line">$ lsof -i -sTCP:LISTEN   # 找出正等待连接的端口</span><br><span class="line"></span><br><span class="line">$ lsof -i | grep -i ESTABLISHED  # 找出已经建立的连接</span><br><span class="line"></span><br><span class="line">$ lsof -u user     # 使用-u显示指定用户打开哪些文件</span><br><span class="line"></span><br><span class="line">$ lsof -u ^root    # 查看除指定用户以外的其它所有用户所做的事情</span><br><span class="line"></span><br><span class="line">$ lsof -c command  # 查看指定的命令正在使用的文件和网络连接</span><br><span class="line"></span><br><span class="line">$ lsof | grep deleted       # 查看被删除的文件信息</span><br><span class="line"></span><br><span class="line">$ kill -9 `lsof -t -u user` # 杀死指定用户运行的所有进程</span><br><span class="line"></span><br><span class="line">$ lsof -u user -i @ip       # 显示用户user连接到指定IP所做的一切</span><br><span class="line"></span><br><span class="line">$ lsof +L1   # 显示所有打开的链接数小于1的文件，多表示某个攻击者正尝试通过删除文件入口来隐藏文件内容</span><br></pre></td></tr></table></figure>
+
+<p><strong>/proc 文件系统</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Linux 内核提供了一种通过 proc 文件系统，在运行时访问内核内部数据结构、改变内核设置的机制，它以文件系统的方式为访问系统内核数据的操作提供接口，用户和应用程序可以通过 proc 得到系统的信息</span><br></pre></td></tr></table></figure>
+
+<p>进程相关项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">/proc/N         pid为N的进程信息</span><br><span class="line"></span><br><span class="line">/proc/N/cmdline 进程启动命令</span><br><span class="line"></span><br><span class="line">/proc/N/cwd     链接到进程当前工作目录</span><br><span class="line"></span><br><span class="line">/proc/N/environ 进程环境变量列表</span><br><span class="line"></span><br><span class="line">/proc/N/exe     链接到进程的执行命令文件</span><br><span class="line"></span><br><span class="line">/proc/N/fd      包含进程相关的所有的文件描述符</span><br><span class="line"></span><br><span class="line">/proc/N/maps    与进程相关的内存映射信息</span><br><span class="line"></span><br><span class="line">/proc/N/mem     指代进程持有的内存，不可读</span><br><span class="line"></span><br><span class="line">/proc/N/root    链接到进程的根目录</span><br><span class="line"></span><br><span class="line">/proc/N/stat    进程的状态</span><br><span class="line"></span><br><span class="line">/proc/N/statm   进程使用的内存的状态</span><br><span class="line"></span><br><span class="line">/proc/N/status  进程状态信息，比stat/statm更具可读性</span><br><span class="line"></span><br><span class="line">/proc/self      链接到当前正在运行的进程</span><br></pre></td></tr></table></figure>
+
+<p><strong>隐藏进程显示</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">step 1: ps -ef | awk &apos;&#123;print&#125;&apos; | sort -n | uniq &gt;1</span><br><span class="line"></span><br><span class="line">step 2: ls /proc | sort -n | uniq &gt;2</span><br><span class="line"></span><br><span class="line">step 3: diff 1 2</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-进程删除"><a href="#2-进程删除" class="headerlink" title="2. 进程删除"></a>2. 进程删除</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ kill -9 pid     #强制终止进程</span><br><span class="line"></span><br><span class="line">$ killall name    #依据进程名称杀死进程</span><br><span class="line"></span><br><span class="line">$ killall -u user #杀死指定用户的进程</span><br><span class="line"></span><br><span class="line">$ pkill name   #杀死指定进程名的进程</span><br><span class="line"></span><br><span class="line">$ ps -elf | grep &apos;root&apos; | grep &apos;&#123;*&#125;&apos; | grep -v grep | xargs kill -STOP  # 针对因存在守护进程无法删除的情况，可先把进程挂起，查杀守护进程后，再将进程删除</span><br><span class="line"></span><br><span class="line">$ lsattr file / chattr -i file / rm -rf file  #针对设置了不可更改权限的文件，先移除i属性，再进行删除</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-调试分析"><a href="#3-调试分析" class="headerlink" title="3. 调试分析"></a>3. 调试分析</h3><p><strong>strace</strong></p>
+<p><code>跟踪进程执行时的系统调用和所接收的信号,可跟踪用户进程与 Linux内核之间的交互</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">系统调用system call是程序从内核请求服务的一种编程方式，系统调用进入内核，使用trap机制从用户空间切换到内核空间，通过使用glibc系统库完成系统调用</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ strace -p `pidof AliYunDun`  # 依据pid跟踪进程正在进行的系统调用</span><br><span class="line"></span><br><span class="line">$ strace -o trace.log ls testdir/   #将输出记录到文件中</span><br><span class="line"></span><br><span class="line">$ strace -v ls testdir  #在每个系统调用中提供附加信息\</span><br><span class="line"></span><br><span class="line">$ strace -f ls testdir  #对当前正在跟踪的进程创建的任何子进程进行跟踪</span><br><span class="line"></span><br><span class="line">$ strace -e open ls testdir   #使用-e标志跟上系统调用的名称</span><br><span class="line"></span><br><span class="line">$ strace -e write,getdents ls testdir  #查看多个系统调用</span><br><span class="line"></span><br><span class="line">$ strace -t ls testdir/    #查看所有的系统调用的时间戳</span><br><span class="line"></span><br><span class="line">$ strace -r ls testdir/    #显示执行每个系统调用所花费的时间</span><br></pre></td></tr></table></figure>
+
+<p><strong>ltrace</strong></p>
+<p><code>库调用跟踪器,用来跟踪进程调用库函数的情况</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">用法：ltrace [option ...] [command [arg ...]]</span><br><span class="line"></span><br><span class="line">-d  打印调试信息</span><br><span class="line"></span><br><span class="line">-f  跟踪子进程</span><br><span class="line"></span><br><span class="line">-i  打印指令指针，当库调用时</span><br><span class="line"></span><br><span class="line">-p PID  附着在值为PID的进程号上进行ltrace</span><br><span class="line"></span><br><span class="line">-S 显示系统调用</span><br><span class="line"></span><br><span class="line">-T 输出每个调用过程的时间开销</span><br></pre></td></tr></table></figure>
+
+<p><strong>pstack</strong></p>
+<p><code>显示每个进程的栈跟踪</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pstack pid  #pstack 命令必须由相应进程的属主或 root 运行,唯一选项是要检查的进程的 PID</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-服务排查"><a href="#0x03-服务排查" class="headerlink" title="0x03 服务排查"></a>0x03 服务排查</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ chkconfig  --list  #查看系统运行的服务</span><br><span class="line"></span><br><span class="line">  # 0-6表示等级</span><br><span class="line"></span><br><span class="line">  1 单用户模式</span><br><span class="line"></span><br><span class="line">  2 无网络连接的多用户命令模式</span><br><span class="line"></span><br><span class="line">  3 有网络连接的多用户命令模式</span><br><span class="line"></span><br><span class="line">  4 表示不可用</span><br><span class="line"></span><br><span class="line">  5 带图形界面的多用户模式</span><br><span class="line"></span><br><span class="line">  6 重新启动</span><br><span class="line"></span><br><span class="line">$ service --status-all | grep running ｜ more      #显示正在运行的服务</span><br><span class="line"></span><br><span class="line">$ systemctl list-unit-files | grep enabled | more  #列出 systemd 下正在运行服务</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-文件痕迹"><a href="#0x04-文件痕迹" class="headerlink" title="0x04 文件痕迹"></a>0x04 文件痕迹</h2><h3 id="1-敏感目录"><a href="#1-敏感目录" class="headerlink" title="1. 敏感目录"></a>1. 敏感目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1) 临时目录/tmp、/var/tmp、/dev/shm下的文件，目录权限是1777，容易被上传木马文件</span><br><span class="line"></span><br><span class="line">(2) 命令目录/usr/bin、/usr/sbin等下的二进制文件容易被替换，替换后可下载busybox使用被替换命令</span><br><span class="line"></span><br><span class="line">$ ls -alt /usr/bin | head   #按照最新修改时间显示，排查可疑文件</span><br><span class="line"></span><br><span class="line">(3) ~/.ssh、/etc/ssh 经常作为一些后门配置的路径，需重点排查</span><br><span class="line"></span><br><span class="line">$ cat ~/.ssh/authorized_keys  #检查公钥是存在否异常注入</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-时间点查找"><a href="#2-时间点查找" class="headerlink" title="2. 时间点查找"></a>2. 时间点查找</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">列出攻击日志内变动的文件,排查恶意软件</span><br><span class="line"></span><br><span class="line">$ ls --full-time ./  | sed -n &apos;/2019-01-01/p&apos;   #查找当前文件夹下的某个日期产生的文件</span><br><span class="line"></span><br><span class="line">$ find / -ctime 0 -name &quot;.sh&quot;  #查找一天内新增的sh文件</span><br><span class="line"></span><br><span class="line">  -type b/c/d/f/l/p: 查找快设备、字符设备、目录、普通文件、符号链接、管道</span><br><span class="line">  -mtime -n +n     # 按文件更改时间来查找文件，-n 指 n 天以内，+n 指 n 天前</span><br><span class="line">  -atime -n +n     # 按文件访问时间来查找文件，-n 指 n 天以内，+n 指 n 天前</span><br><span class="line">  -ctime -n +n     # 按文件创建时间来查找文件，-n 指 n 天以内，+n 指 n 天前</span><br><span class="line"></span><br><span class="line">$ find /tmp -type f -amin -10 -print  #打印出10分钟内访问的所有文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-文件大小搜索"><a href="#3-文件大小搜索" class="headerlink" title="3. 文件大小搜索"></a>3. 文件大小搜索</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ find / -size -1223124c -size +1223122c -exec ls -id &#123;&#125; \;   #搜索1223123大小的文件，盖茨木马</span><br><span class="line"></span><br><span class="line">$ find /usr/bin -type f -size 2k    # 查找大小等于2KB的文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-特殊文件"><a href="#4-特殊文件" class="headerlink" title="4. 特殊文件"></a>4. 特殊文件</h3><p><strong>webshell匹配</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ find /var/www/ -name &quot;*.php&quot; |xargs egrep &apos;assert|phpspy|c99sh|milw0rm|eval|\(gunerpress|\(base64_decoolcode|spider_bc|shell_exec|passthru|\(\$\_\POST\[|eval \(str_rot13|\.chr\(|\$\&#123;\&quot;\_P|eval\(\$\_R|file_put_contents\(\.\*\$\_|base64_decode&apos;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特殊权限文件查找</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ find /tmp -perm 777   # 打印出权限为777的文件, -perm选项指明find应该只匹配具有特定权限值的文件</span><br><span class="line"></span><br><span class="line">$ find / -type f -user root -print  # 打印出用户root拥有的所有文件, 选项-user USER找出由某个特定用户所拥有的文件</span><br></pre></td></tr></table></figure>
+
+<p><strong>隐藏文件查找</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ls -art /var/www/html | grep &quot;^\.&quot;   # 查找web目录下以&quot;.&quot;开头的具有隐藏属性的文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-SUID程序"><a href="#5-SUID程序" class="headerlink" title="5. SUID程序"></a>5. SUID程序</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ find / -type f -perm -04000 -ls -uid 0 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-二进制文件分析"><a href="#6-二进制文件分析" class="headerlink" title="6. 二进制文件分析"></a>6. 二进制文件分析</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">(1) file: 确定文件类型</span><br><span class="line"></span><br><span class="line">(2) ldd: 打印共享对象依赖关系, 即查询可执行程序所依赖的库和所在路径</span><br><span class="line"></span><br><span class="line">(3) strings: 打印二进制文件中的可打印字符的字符串</span><br><span class="line"></span><br><span class="line">(4) readelf: 显示有关ELF文件的信息</span><br><span class="line"></span><br><span class="line">(5) hexdump: 以 ASCII、十进制、十六进制或八进制显示文件内容</span><br><span class="line"></span><br><span class="line">(6) objdump: 从对象文件中显示信息，读取二进制或可执行文件，并将汇编语言指令转储到屏幕上</span><br><span class="line"></span><br><span class="line">(7) nm: 列出对象文件中的符号，从二进制文件中识别变量和函数</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><a href="http://www.skyfree.org/linux/references/ELF_Format.pdf" target="_blank" rel="noopener">http://www.skyfree.org/linux/references/ELF_Format.pdf</a></p>
+</li>
+<li><p><a href="https://github.com/radareorg/radare2" target="_blank" rel="noopener">https://github.com/radareorg/radare2</a></p>
+</li>
+</ul>
+<h2 id="0x05-日志分析"><a href="#0x05-日志分析" class="headerlink" title="0x05 日志分析"></a>0x05 日志分析</h2><h3 id="1-日志介绍"><a href="#1-日志介绍" class="headerlink" title="1. 日志介绍"></a>1. 日志介绍</h3><p>日志默认存放位置：<code>/var/log/</code></p>
+<p>查看日志配置情况：<code>less /etc/rsyslog.conf</code></p>
+<table>
+<thead>
+<tr>
+<th>日志文件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/var/log/cron</td>
+<td>系统定时任务相关的日志</td>
+</tr>
+<tr>
+<td>/var/log/secure</td>
+<td>记录用户登录验证和授权的信息，涉及账号和密码的程序都会记录</td>
+</tr>
+<tr>
+<td>/var/log/auth.log</td>
+<td>记录系统授权信息，如用户登录和权限机制等</td>
+</tr>
+<tr>
+<td>/var/log/btmp</td>
+<td>记录错误登录日志，这个文件是二进制文件，不能直接vi查看，而要使用lastb命令查看</td>
+</tr>
+<tr>
+<td>/var/log/lastlog</td>
+<td>记录系统中所有用户最后一次登录时间的日志，使用lastlog命令查看</td>
+</tr>
+<tr>
+<td>/var/log/wtmp</td>
+<td>永久记录所有用户的登录、注销信息，同时记录系统的启动、重启、关机事件，使用last命令来查看</td>
+</tr>
+<tr>
+<td>/var/log/utmp</td>
+<td>记录当前已经登录的用户信息，用w,who,users等命令来查询</td>
+</tr>
+<tr>
+<td>/var/log/dmesg</td>
+<td>记录系统在开机时内核自检的信息</td>
+</tr>
+<tr>
+<td>/var/log/messages</td>
+<td>记录系统启动后的信息和错误日志</td>
+</tr>
+</tbody></table>
+<h3 id="2-登录分析"><a href="#2-登录分析" class="headerlink" title="2. 登录分析"></a>2. 登录分析</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) 登录成功IP统计</span><br><span class="line"></span><br><span class="line">$ grep -i Accepted /var/log/secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br><span class="line"></span><br><span class="line">(2) 查看登录成功的日期、用户名、IP</span><br><span class="line"></span><br><span class="line">$ grep &quot;Accepted&quot; /var/log/secure | awk &apos;&#123;print $1,$2,$3,$9,$11&#125;&apos;</span><br><span class="line"></span><br><span class="line">(3) 定位有多少IP在爆破主机的root帐号</span><br><span class="line"></span><br><span class="line">$ grep &quot;Failed password for root&quot; /var/log/secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Web日志分析"><a href="#3-Web日志分析" class="headerlink" title="3. Web日志分析"></a>3. Web日志分析</h3><p><strong>Apache 日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) apache日志文件位置</span><br><span class="line">/var/log/httpd/access.log     # Red Hat/CentOS Apache访问日志位置</span><br><span class="line">/var/log/apache2/access.log   # Debian/Ubuntu Apache访问日志文件位置</span><br><span class="line"></span><br><span class="line">(2) 日志位置定位</span><br><span class="line"></span><br><span class="line">$ grep -i CustomLog /etc/httpd/conf/httpd.conf</span><br><span class="line"></span><br><span class="line">$ locate access.log access_log | grep httpd</span><br><span class="line"></span><br><span class="line">$ locate access.log access_log | grep apache</span><br></pre></td></tr></table></figure>
+
+<p><strong>Nginx 日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">日志定位</span><br><span class="line"></span><br><span class="line">$ yum install mlocate &amp;&amp; updatedb  #安装locate所在文件包并更新搜索数据库</span><br><span class="line"></span><br><span class="line">$ locate access.log | grep nginx   #定位nginx访问日志</span><br><span class="line"></span><br><span class="line">$ locate error.log | grep nginx    #定位nginx错误日志</span><br><span class="line"></span><br><span class="line">$ grep &apos;access.log&apos; `locate nginx.conf` #根据配置文件定位日志</span><br></pre></td></tr></table></figure>
+
+<p><strong>日志分析技巧</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">(1) 列出当天访问次数最多的10个IP</span><br><span class="line"></span><br><span class="line">$ awk -F &apos;-&apos; &apos;&#123;print $1&#125;&apos; log_file | uniq -c | sort -rn | head -10</span><br><span class="line"></span><br><span class="line">(2) 查看当天有多少个IP访问</span><br><span class="line"></span><br><span class="line">$ awk &apos;&#123;print $1&#125;&apos; log_file | sort -u | wc -l</span><br><span class="line"></span><br><span class="line">(3) 查看每一个IP访问了多少个页面：</span><br><span class="line"></span><br><span class="line">$ awk &apos;&#123;++S[$1]&#125; END &#123;for (a in S) print a,S[a]&#125;&apos; log_file</span><br><span class="line"></span><br><span class="line">(4) 将每个IP访问的页面数进行从小到大排序：</span><br><span class="line"></span><br><span class="line">$ awk &apos;&#123;++S[$1]&#125; END &#123;for (a in S) print S[a],a&#125;&apos; log_file | sort -n</span><br><span class="line"></span><br><span class="line">(5) 查看某一个IP访问了哪些页面：</span><br><span class="line"></span><br><span class="line">$ grep ^1.1.1.1 log_file| awk &apos;&#123;print $1,$7&#125;&apos;</span><br><span class="line"></span><br><span class="line">(6) 去掉搜索引擎统计当天的页面</span><br><span class="line"></span><br><span class="line">$ awk &apos;&#123;print $12,$1&#125;&apos; log_file | grep ^\&quot;Mozilla | awk &apos;&#123;print $2&#125;&apos; |sort | uniq | wc -l</span><br><span class="line"></span><br><span class="line">(7) 查看2018年11月11日11时这一个小时内有多少IP访问</span><br><span class="line"></span><br><span class="line">awk &apos;&#123;print $4,$1&#125;&apos; log_file | grep 11/Nov/2018:11 | awk &apos;&#123;print $2&#125;&apos;| sort -u | wc -l</span><br><span class="line"></span><br><span class="line">(8) IP 统计</span><br><span class="line"></span><br><span class="line">$ grep &apos;11/Nov/2018&apos; /tmp/myid.access.log | awk &apos;&#123;print $1&#125;&apos; | awk -F&apos;.&apos; &apos;&#123;print $1&quot;.&quot;$2&quot;.&quot;$3&quot;.&quot;$4&#125;&apos; | sort | uniq -c | sort -r -n | head -n 10</span><br><span class="line"></span><br><span class="line">(9) 网段统计</span><br><span class="line"></span><br><span class="line">$ cat /www/logs/www/access.2018-11-11.log | awk &apos;&#123;print $1&#125;&apos; | awk -F&apos;.&apos; &apos;&#123;print $1&quot;.&quot;$2&quot;.&quot;$3&quot;.0&quot;&#125;&apos; | sort | uniq -c | sort -r -n | head -n 20</span><br><span class="line"></span><br><span class="line">(10) 统计浏览器</span><br><span class="line"></span><br><span class="line">$ cat /www/logs/example.com/access.2018-11-11.log | grep -v -E &apos;MSIE|Firefox|Chrome|Opera|Safari|Gecko|Maxthon&apos; | sort | uniq -c | sort -r -n | head -n 100 | more</span><br><span class="line"></span><br><span class="line">(11) URL访问量统计</span><br><span class="line"></span><br><span class="line">$ cat /www/logs/access.2018-11-11.log | awk &apos;&#123;print $7&#125;&apos; | egrep &apos;\?|&amp;&apos; | sort | uniq -c | sort -rn | more</span><br><span class="line"></span><br><span class="line">(12) 删除一个月前日志</span><br><span class="line"></span><br><span class="line">$ rm -f /www/logs/access.log.$(date -d &apos;-1 month&apos; +&apos;%Y-%m&apos;)*</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x06-工具总结"><a href="#0x06-工具总结" class="headerlink" title="0x06 工具总结"></a>0x06 工具总结</h2><h3 id="1-Busybox"><a href="#1-Busybox" class="headerlink" title="1. Busybox"></a>1. Busybox</h3><p><a href="https://busybox.net/" target="_blank" rel="noopener"><strong>Busybox</strong></a> <em>静态编译，可检测劫持了动态链接库的隐藏病毒</em></p>
+<p>安装运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://busybox.net/downloads/binaries/1.30.0-i686/busybox</span><br><span class="line"></span><br><span class="line">$ chmod +x busybox</span><br><span class="line"></span><br><span class="line">$ ./busybox commond</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Rootkit查杀"><a href="#2-Rootkit查杀" class="headerlink" title="2. Rootkit查杀"></a>2. Rootkit查杀</h3><p><a href="http://www.chkrootkit.org" target="_blank" rel="noopener"><strong>chkrootkit</strong></a> <em>Linux下rootkit检测工具</em></p>
+<p>下载运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ wget ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz</span><br><span class="line"></span><br><span class="line">$ tar zxf chkrootkit.tar.gz</span><br><span class="line"></span><br><span class="line">$ cd chkrootkit-*</span><br><span class="line"></span><br><span class="line">$ make sense</span><br><span class="line"></span><br><span class="line">$ cd ..</span><br><span class="line"></span><br><span class="line">$ cp -r chkrootkit- /usr/local/chkrootkit</span><br><span class="line"></span><br><span class="line">$ rm -r chkrootkit-</span><br><span class="line"></span><br><span class="line">$ /usr/local/chkrootkit/chkrootkit</span><br></pre></td></tr></table></figure>
+
+<p><a href="ttp://rkhunter.sourceforge.net" target="_blank" rel="noopener"><strong>rkhunter</strong></a> <em>一款用于检测Liunx系统是否感染rootkit的工具</em></p>
+<p>下载运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://jaist.dl.sourceforge.net/project/rkhunter/rkhunter/1.4.6/rkhunter-1.4.6.tar.gz</span><br><span class="line"></span><br><span class="line">$ tar zxvf rkhunter-1.4.6.tar.gz</span><br><span class="line"></span><br><span class="line">$ cd rkhunter-1.4.4</span><br><span class="line"></span><br><span class="line">$ ./install.sh --install</span><br></pre></td></tr></table></figure>
+
+<p>rootkit检测</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ rkhunter –checkall #执行rootkit预定库，来检测本地系统文件</span><br><span class="line"></span><br><span class="line">$ rkhunter --checkall --skip-keypress  #--skip-keyperss参数来自动持续检测，一直到结束</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-病毒查杀"><a href="#3-病毒查杀" class="headerlink" title="3. 病毒查杀"></a>3. 病毒查杀</h3><p><a href="http://www.clamav.net/download.html" target="_blank" rel="noopener"><strong>ClamAV</strong></a> <em>Linux平台上的开源反病毒引擎，病毒库较丰富，更新频率高</em></p>
+<p>下载运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ yum install epel-release -y</span><br><span class="line"></span><br><span class="line">$ yum -y install clamav</span><br><span class="line"></span><br><span class="line">$ freshclam   # 更新病毒库</span><br><span class="line"></span><br><span class="line">$ clamscan -r /opt   # 扫描目录</span><br></pre></td></tr></table></figure>
+
+<p>病毒库更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ cd /var/lib/clamav</span><br><span class="line">$ wget http://database.clamav.net/main.cvd</span><br><span class="line">$ wget http://database.clamav.net/daily.cvd</span><br><span class="line">$ wget http://database.clamav.net/bytecode.cvd</span><br><span class="line"> </span><br><span class="line">$ chown clamav:clamav  *</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-威胁取证"><a href="#4-威胁取证" class="headerlink" title="4.  威胁取证"></a>4.  威胁取证</h3><ul>
+<li><p>virustotal: <a href="https://www.virustotal.com/gui/home" target="_blank" rel="noopener">https://www.virustotal.com/gui/home</a></p>
+</li>
+<li><p>threatbook: <a href="https://x.threatbook.cn/" target="_blank" rel="noopener">https://x.threatbook.cn/</a></p>
+</li>
+<li><p>redqueen: <a href="https://redqueen.tj-un.com/IntelHome.html" target="_blank" rel="noopener">https://redqueen.tj-un.com/IntelHome.html</a></p>
+</li>
+</ul>
+<h3 id="5-webshell查杀"><a href="#5-webshell查杀" class="headerlink" title="5. webshell查杀"></a>5. webshell查杀</h3><ul>
+<li><p><a href="https://www.rfxn.com/projects/linux-malware-detect/" target="_blank" rel="noopener">linux-malware-detect</a> <em>a malware scanner for Linux released</em></p>
+</li>
+<li><p><a href="http://shelldetector.com/" target="_blank" rel="noopener">Web Shell Detector</a> <em>find and identify php/cgi(perl)/asp/aspx shells</em></p>
+</li>
+<li><p><a href="https://scanner.baidu.com/#" target="_blank" rel="noopener">WEBDIR+</a> <em>百度OpenRASP团队推出的一款WebShell检测引擎</em></p>
+</li>
+<li><p><a href="http://webshell.cdxy.me/" target="_blank" rel="noopener">http://webshell.cdxy.me/</a> <em>Deep Learning model for PHP webshell detection</em></p>
+</li>
+<li><p><a href="https://www.shellpub.com/" target="_blank" rel="noopener">https://www.shellpub.com/</a> <em>河马，专注webshell查杀研究</em></p>
+</li>
+<li><p><a href="http://edr.sangfor.com.cn/backdoor_detection.html" target="_blank" rel="noopener">http://edr.sangfor.com.cn/backdoor_detection.html</a> <em>深信服Webshell检测工具</em></p>
+</li>
+</ul>
+<h3 id="6-审计检查"><a href="#6-审计检查" class="headerlink" title="6. 审计检查"></a>6. 审计检查</h3><p><a href="https://github.com/CISOfy/lynis" target="_blank" rel="noopener"><strong>Lynis</strong></a>：<em>用于UNIX系统的安全审计工具</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ lynis show commands  # 查看 Lynis 中所有可用的命令</span><br><span class="line"></span><br><span class="line">$ lynis audit system  # 审计系统的安全状况，返回一份详细的报告</span><br><span class="line">  Lynis 使用颜色编码使报告更容易解读</span><br><span class="line">  绿色：一切正常</span><br><span class="line">  黄色：跳过、未找到，可能有个建议</span><br><span class="line">  红色：你可能需要仔细看看这个</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-工具合集"><a href="#7-工具合集" class="headerlink" title="7. 工具合集"></a>7. 工具合集</h3><p><a href="https://www.rfxn.com/" target="_blank" rel="noopener">R-FX NETWORKS</a> | <a href="https://github.com/meirwah/awesome-incident-response/blob/master/README_ch.md" target="_blank" rel="noopener">Awesome-incident-response</a> | <a href="https://github.com/rshipp/awesome-malware-analysis" target="_blank" rel="noopener">Awesome-malware-analysis</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i>
+
+ Linux</a>
+          
+            <a href="/tags/Incident-Response/" rel="tag"><i class="fa fa-tag"></i>
+
+ Incident Response</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/10235/" rel="next" title="弱口令及爆破技术浅析">
+                <i class="fa fa-chevron-left"></i> 弱口令及爆破技术浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/10128/" rel="prev" title="Windows应急响应指南">
+                Windows应急响应指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-系统排查"><span class="nav-text">0x01 系统排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-系统信息"><span class="nav-text">1. 系统信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-用户账号"><span class="nav-text">2. 用户账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-启动项"><span class="nav-text">3. 启动项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-定时任务"><span class="nav-text">4. 定时任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-进程排查"><span class="nav-text">0x02 进程排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-进程查看"><span class="nav-text">1. 进程查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-进程删除"><span class="nav-text">2. 进程删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-调试分析"><span class="nav-text">3. 调试分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-服务排查"><span class="nav-text">0x03 服务排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-文件痕迹"><span class="nav-text">0x04 文件痕迹</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-敏感目录"><span class="nav-text">1. 敏感目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-时间点查找"><span class="nav-text">2. 时间点查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-文件大小搜索"><span class="nav-text">3. 文件大小搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-特殊文件"><span class="nav-text">4. 特殊文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-SUID程序"><span class="nav-text">5. SUID程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-二进制文件分析"><span class="nav-text">6. 二进制文件分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-日志分析"><span class="nav-text">0x05 日志分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-日志介绍"><span class="nav-text">1. 日志介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-登录分析"><span class="nav-text">2. 登录分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Web日志分析"><span class="nav-text">3. Web日志分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-工具总结"><span class="nav-text">0x06 工具总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Busybox"><span class="nav-text">1. Busybox</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Rootkit查杀"><span class="nav-text">2. Rootkit查杀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-病毒查杀"><span class="nav-text">3. 病毒查杀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-威胁取证"><span class="nav-text">4.  威胁取证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-webshell查杀"><span class="nav-text">5. webshell查杀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-审计检查"><span class="nav-text">6. 审计检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-工具合集"><span class="nav-text">7. 工具合集</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

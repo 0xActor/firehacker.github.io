@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="如切如磋，如琢如磨...    Threat IntelligenceTalos | Unit42 | FireEye | FortiGuard ｜ X-Force | Check Point Trendmicro ｜ Securelist | McAfee ｜ ThreatBook | RedQueen 360 Netlab | Qianxin-TI ｜ Tencent Security | S">
+<meta property="og:type" content="website">
+<meta property="og:title" content="L0n9">
+<meta property="og:url" content="https://l0n9.cc/security/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="如切如磋，如琢如磨...    Threat IntelligenceTalos | Unit42 | FireEye | FortiGuard ｜ X-Force | Check Point Trendmicro ｜ Securelist | McAfee ｜ ThreatBook | RedQueen 360 Netlab | Qianxin-TI ｜ Tencent Security | S">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-01-25T15:01:31.808Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="L0n9">
+<meta name="twitter:description" content="如切如磋，如琢如磨...    Threat IntelligenceTalos | Unit42 | FireEye | FortiGuard ｜ X-Force | Check Point Trendmicro ｜ Securelist | McAfee ｜ ThreatBook | RedQueen 360 Netlab | Qianxin-TI ｜ Tencent Security | S">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/security/">
+
+
+
+
+
+  <title> | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline"></h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <blockquote class="blockquote-center">如切如磋，如琢如磨...</blockquote>
+
+<center>
+
+<h2 id="Threat-Intelligence"><a href="#Threat-Intelligence" class="headerlink" title="Threat Intelligence"></a>Threat Intelligence</h2><p><a href="https://blog.talosintelligence.com/" target="_blank" rel="noopener">Talos</a> | <a href="https://unit42.paloaltonetworks.com/" target="_blank" rel="noopener">Unit42</a> | <a href="https://www.fireeye.com/blog/threat-research.html" target="_blank" rel="noopener">FireEye</a> | <a href="https://fortiguard.com/" target="_blank" rel="noopener">FortiGuard</a> ｜ <a href="https://securityintelligence.com/category/x-force/" target="_blank" rel="noopener">X-Force</a> | <a href="https://research.checkpoint.com/" target="_blank" rel="noopener">Check Point</a></p>
+<p><a href="https://blog.trendmicro.com/" target="_blank" rel="noopener">Trendmicro</a> ｜ <a href="https://securelist.com/" target="_blank" rel="noopener">Securelist</a> | <a href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/" target="_blank" rel="noopener">McAfee</a> ｜ <a href="https://x.threatbook.cn/nodev4/vb4/uCenter?userID=f6ec9a044a604a53856557a66bde4f2c" target="_blank" rel="noopener">ThreatBook</a> | <a href="https://redqueen.tj-un.com/IntelHome.html" target="_blank" rel="noopener">RedQueen</a></p>
+<p><a href="https://blog.netlab.360.com/" target="_blank" rel="noopener">360 Netlab</a> | <a href="https://ti.qianxin.com/blog/" target="_blank" rel="noopener">Qianxin-TI</a> ｜ <a href="https://s.tencent.com/research/report/" target="_blank" rel="noopener">Tencent Security</a> | <a href="https://sec.sangfor.com/wiki-safe-events" target="_blank" rel="noopener">Sangfor Security</a></p>
+<h2 id="Red-Team"><a href="#Red-Team" class="headerlink" title="Red Team"></a>Red Team</h2><p><a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK™</a> ｜ <a href="https://blog.cobaltstrike.com/" target="_blank" rel="noopener">Cobalt Strike</a> | <a href="https://bluescreenofjeff.com/" target="_blank" rel="noopener">bluescreenofjeff</a></p>
+<p> <a href="https://www.ired.team/" target="_blank" rel="noopener">iRed.team</a> | <a href="https://www.hackingarticles.in/" target="_blank" rel="noopener">Hacking Articles</a> | <a href="https://adsecurity.org/" target="_blank" rel="noopener">ADsecurity</a> | <a href="https://3gstudent.github.io/3gstudent.github.io/" target="_blank" rel="noopener">3gstudent</a></p>
+<p><a href="https://www.offensive-security.com/metasploit-unleashed/" target="_blank" rel="noopener">Metasploit Reference </a> | <a href="https://osint-labs.org/apt/" target="_blank" rel="noopener">OSINT-Labs-APT</a> | <a href="https://micro8.gitbook.io/micro8/" target="_blank" rel="noopener">Micro8系列</a></p>
+<p><a href="https://github.com/yeyintminthuhtut/Awesome-Red-Teaming/blob/master/README_CN.md" target="_blank" rel="noopener">Awesome-Red-Teaming</a> | <a href="https://github.com/zer0yu/Awesome-CobaltStrike" target="_blank" rel="noopener">Awesome-CobaltStrike</a> | <a href="https://github.com/infosecn1nja/Red-Teaming-Toolkit" target="_blank" rel="noopener">Red-Teaming-Toolkit</a></p>
+<h2 id="SecPaper"><a href="#SecPaper" class="headerlink" title="SecPaper"></a>SecPaper</h2><p><a href="https://wooyun.js.org/" target="_blank" rel="noopener">Wooyun Drops</a> | <a href="http://www.91ri.org/" target="_blank" rel="noopener">91ri.org</a> | <a href="https://paper.seebug.org" target="_blank" rel="noopener">Seebug Paper</a> ｜ <a href="https://xz.aliyun.com/" target="_blank" rel="noopener">先知社区</a></p>
+<p><a href="https://www.secpulse.com/" target="_blank" rel="noopener">Secpulse</a> | <a href="https://www.sec-wiki.com/" target="_blank" rel="noopener">SecWiki</a> | <a href="https://www.4hou.com/" target="_blank" rel="noopener">RoalTalk</a> ｜ <a href="http://wiki.ioin.in/" target="_blank" rel="noopener">Sec-News</a> | <a href="https://www.anquanke.com/" target="_blank" rel="noopener">anquanke</a></p>
+<h2 id="SecNews"><a href="#SecNews" class="headerlink" title="SecNews"></a>SecNews</h2><p><a href="https://thehackernews.com/" target="_blank" rel="noopener">The Hacker News</a> | <a href="https://threatpost.com/" target="_blank" rel="noopener">Threatpost</a> | <a href="https://gbhackers.com/" target="_blank" rel="noopener">GBHackers</a> ｜ <a href="http://hackernews.cc/" target="_blank" rel="noopener">Hacker News</a></p>
+<h2 id="Web-Security"><a href="#Web-Security" class="headerlink" title="Web Security"></a>Web Security</h2><p><a href="https://portswigger.net/blog" target="_blank" rel="noopener">PortSwigger Blog</a> | <a href="https://www.acunetix.com/blog/" target="_blank" rel="noopener">Acunetix</a> | <a href="https://cheatsheetseries.owasp.org/" target="_blank" rel="noopener">OWASP Cheat Sheet Series</a></p>
+<p><a href="https://github.com/swisskyrepo/PayloadsAllTheThings" target="_blank" rel="noopener">PayloadsAllTheThings</a> | <a href="https://websec.ca/kb/sql_injection" target="_blank" rel="noopener">SQL Injection Pocket Reference</a></p>
+<p><a href="https://nmap.org/book/man.html" target="_blank" rel="noopener">Nmap Guide</a> | <a href="https://developer.mozilla.org/zh-CN/docs/Web/Security" target="_blank" rel="noopener">MDN Web Security</a> | <a href="https://websec.readthedocs.io/zh/latest/index.html#" target="_blank" rel="noopener">Learn-Web-Hacking</a></p>
+<h2 id="Reverse-Engineering"><a href="#Reverse-Engineering" class="headerlink" title="Reverse Engineering"></a>Reverse Engineering</h2><p><a href="https://www.hex-rays.com/blog/" target="_blank" rel="noopener">Hex-Rays Blog</a> | <a href="https://reverse.put.as/" target="_blank" rel="noopener">osxreverser</a> | <a href="http://www.fuzzysecurity.com/index.html" target="_blank" rel="noopener">fuzzysecurity</a> | <a href="https://blog.quarkslab.com/index.html" target="_blank" rel="noopener">Quarkslab’s Blog</a></p>
+<p><a href="https://www.pediy.com/kssd/index.html" target="_blank" rel="noopener">Pediy KSSD</a> | <a href="https://beginners.re/RE4B-CN-partial/html/RE4B-CN-partial.html" target="_blank" rel="noopener">Reverse engineering for beginners</a> | <a href="http://blog.k3170makan.com/" target="_blank" rel="noopener">Keith Makan</a></p>
+<h2 id="Malware-Analysis"><a href="#Malware-Analysis" class="headerlink" title="Malware Analysis"></a>Malware Analysis</h2><p><a href="https://blog.malwarebytes.com/" target="_blank" rel="noopener">Malwarebytes</a> | <a href="https://www.malwaretech.com/" target="_blank" rel="noopener">MalwareTech</a> | <a href="http://www.rootkitanalytics.com/" target="_blank" rel="noopener">rootkitanalytics</a> | <a href="https://www.kernelmode.info/forum/" target="_blank" rel="noopener">Kernelmode.info</a></p>
+<p><a href="https://labs.bitdefender.com/" target="_blank" rel="noopener">Bitdefender</a> | <a href="https://malshare.com/" target="_blank" rel="noopener">MalShare</a> | <a href="https://github.com/ytisf/theZoo" target="_blank" rel="noopener">theZoo</a> | <a href="https://cuckoosandbox.org/" target="_blank" rel="noopener">Cuckoo</a> | <a href="https://github.com/Tencent/HaboMalHunter" target="_blank" rel="noopener">HaboMalHunter</a> | <a href="https://github.com/volatilityfoundation/volatility" target="_blank" rel="noopener">Volatility</a></p>
+<h2 id="Vulner-Exploits"><a href="#Vulner-Exploits" class="headerlink" title="Vulner/Exploits"></a>Vulner/Exploits</h2><p><a href="http://cve.mitre.org/" target="_blank" rel="noopener">CVE</a> | <a href="https://www.exploit-db.com/" target="_blank" rel="noopener">Exploit-db</a> | <a href="https://cn.0day.today/" target="_blank" rel="noopener">0day Today</a> | <a href="https://packetstormsecurity.com/files/tags/exploit/" target="_blank" rel="noopener">packetstorm</a> | <a href="https://www.cvedetails.com/" target="_blank" rel="noopener">CVE Details</a></p>
+<p><a href="https://www.openwall.com/lists/" target="_blank" rel="noopener">Openwall</a> | <a href="https://www.securityfocus.com/" target="_blank" rel="noopener">SecurityFocus</a> | <a href="https://www.greyhathacker.net/" target="_blank" rel="noopener">Greyhathacker</a> | <a href="https://msrc-blog.microsoft.com/" target="_blank" rel="noopener">MSRC</a> | <a href="https://sploitus.com/" target="_blank" rel="noopener">Sploitus</a></p>
+<h2 id="Threat-Detection"><a href="#Threat-Detection" class="headerlink" title="Threat Detection"></a>Threat Detection</h2><p><a href="https://github.com/osquery/osquery" target="_blank" rel="noopener">Osquery</a> | <a href="https://github.com/ossec/ossec-hids" target="_blank" rel="noopener">OSSEC</a> | <a href="https://github.com/wazuh/wazuh" target="_blank" rel="noopener">Wazuh</a> | <a href="https://github.com/zeek/zeek" target="_blank" rel="noopener">Zeek</a> | <a href="https://github.com/OISF/suricata" target="_blank" rel="noopener">Suricata</a> | <a href="https://github.com/snort3/snort3" target="_blank" rel="noopener">Snort</a> | <a href="https://github.com/ntop/ntopng" target="_blank" rel="noopener">ntopng</a></p>
+<p><a href="https://github.com/virustotal/yara" target="_blank" rel="noopener">YARA</a> | <a href="https://github.com/Yelp/elastalert" target="_blank" rel="noopener">ElastAlert</a> | <a href="https://github.com/airbnb/streamalert" target="_blank" rel="noopener">StreamAlert</a> ｜ <a href="https://github.com/MISP/MISP" target="_blank" rel="noopener">MISP</a> | <a href="https://github.com/OpenCTI-Platform/opencti" target="_blank" rel="noopener">OpenCTI</a> | <a href="https://github.com/TheHive-Project/TheHive" target="_blank" rel="noopener">TheHive</a></p>
+<p><a href="https://ipot.sec-wiki.com/" target="_blank" rel="noopener">Ipot-sec</a> | <a href="https://github.com/pwnlandia/mhn" target="_blank" rel="noopener">MHN</a> | <a href="https://github.com/telekom-security/tpotce" target="_blank" rel="noopener">T-Pot</a> | <a href="https://github.com/DinoTools/dionaea" target="_blank" rel="noopener">Dionaea</a> | <a href="https://github.com/hacklcx/HFish" target="_blank" rel="noopener">HFish</a> ｜ <a href="https://github.com/cowrie/cowrie" target="_blank" rel="noopener">Cowrie</a> | <a href="https://github.com/desaster/kippo" target="_blank" rel="noopener">Kippo</a></p>
+<h2 id="Blue-Team"><a href="#Blue-Team" class="headerlink" title="Blue Team"></a>Blue Team</h2><p><a href="https://github.com/decalage2/awesome-security-hardening" target="_blank" rel="noopener">Awesome-security-hardening</a> | <a href="https://github.com/meirwah/awesome-incident-response/blob/master/README_ch.md" target="_blank" rel="noopener">Awesome-incident-response</a></p>
+<p><a href="https://github.com/fabacab/awesome-cybersecurity-blueteam" target="_blank" rel="noopener">Awesome-cybersecurity-blueteam</a> | <a href="https://github.com/alphaSeclab/awesome-forensics" target="_blank" rel="noopener">Awesome-forensics</a></p>
+<h2 id="Mise-Resource"><a href="#Mise-Resource" class="headerlink" title="Mise Resource"></a>Mise Resource</h2><p><a href="https://github.com/Hack-with-Github/Awesome-Hacking" target="_blank" rel="noopener">Awesome-Hacking</a> | <a href="http://index-of.es/" target="_blank" rel="noopener">index-of.es</a> | <a href="https://www.hackinn.com/" target="_blank" rel="noopener">Hack Inn</a> | <a href="http://wechat.doonsec.com/" target="_blank" rel="noopener">Doonsec</a> | <a href="https://securitygossip.com/" target="_blank" rel="noopener">GoSSIP</a></p>
+</center>
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Threat-Intelligence"><span class="nav-text">Threat Intelligence</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Red-Team"><span class="nav-text">Red Team</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SecPaper"><span class="nav-text">SecPaper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SecNews"><span class="nav-text">SecNews</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-Security"><span class="nav-text">Web Security</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reverse-Engineering"><span class="nav-text">Reverse Engineering</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Malware-Analysis"><span class="nav-text">Malware Analysis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vulner-Exploits"><span class="nav-text">Vulner/Exploits</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Threat-Detection"><span class="nav-text">Threat Detection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Blue-Team"><span class="nav-text">Blue Team</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mise-Resource"><span class="nav-text">Mise Resource</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

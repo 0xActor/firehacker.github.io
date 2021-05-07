@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Incident Response,Windows,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文总结Windows系统入侵应急响应的实用思路与技巧...">
+<meta name="keywords" content="Incident Response,Windows">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows应急响应指南">
+<meta property="og:url" content="https://l0n9.cc/posts/10128/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文总结Windows系统入侵应急响应的实用思路与技巧...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-01-16T06:49:33.030Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows应急响应指南">
+<meta name="twitter:description" content="本文总结Windows系统入侵应急响应的实用思路与技巧...">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/10128/">
+
+
+
+
+
+  <title>Windows应急响应指南 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/10128/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Windows应急响应指南</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-05T21:32:55+08:00">
+                2019-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/应急响应/" itemprop="url" rel="index">
+                    <span itemprop="name">应急响应</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文总结Windows系统入侵应急响应的实用思路与技巧...</center>
+
+<a id="more"></a>
+
+<h2 id="0x01-系统排查"><a href="#0x01-系统排查" class="headerlink" title="0x01 系统排查"></a>0x01 系统排查</h2><h3 id="1-系统信息"><a href="#1-系统信息" class="headerlink" title="1. 系统信息"></a>1. 系统信息</h3><p>命令行输入<code>msinfo32</code>命令，打开系统信息窗口，可查看本地计算机硬件资源、组件和软件环境信息</p>
+<p>软件环境中包含系统驱动程序、正在运行任务、加载的模块、服务、启动程序等信息</p>
+<h3 id="2-用户账号"><a href="#2-用户账号" class="headerlink" title="2. 用户账号"></a>2. 用户账号</h3><p>系统被入侵后，需排查攻击者是否新建账户、激活系统默认账户、建立隐藏账户(账户名称最后加$)等</p>
+<p><strong>排查方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(1) 命令行查看</span><br><span class="line"></span><br><span class="line">&gt; net user  //收集用户账户信息，无法查看隐藏账户</span><br><span class="line"></span><br><span class="line">&gt; net user username  //查看某个账户详细信息</span><br><span class="line"></span><br><span class="line">(2) 图形界面查看</span><br><span class="line"></span><br><span class="line">a. CMD输入compmgmt.msc(计算机管理) -&gt; 本地用户和组 -&gt; 用户  //可查看隐藏账户</span><br><span class="line"></span><br><span class="line">b. 命令行输入lusermgr.msc，查看用户信息</span><br><span class="line"></span><br><span class="line">(3) wmic 命令</span><br><span class="line"></span><br><span class="line">&gt; wmic useraccount get name,SID  //可查看隐藏账户</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-启动项"><a href="#3-启动项" class="headerlink" title="3. 启动项"></a>3. 启动项</h3><p>病毒后门等常用启动项来实现持久化驻留，检查服务器是否有异常的启动项</p>
+<p><strong>排查方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">(1) 任务管理器查看</span><br><span class="line"></span><br><span class="line">命令行中输入taskmgr命令，任务管理器 -&gt; 启动</span><br><span class="line"></span><br><span class="line">(2) 通过注册表查看</span><br><span class="line"></span><br><span class="line">单击【开始】&gt;【运行】，输入regedit，打开注册表，查看开机启动项是否正常，关注以下注册表项</span><br><span class="line"></span><br><span class="line">  a. HKEY_CURRENT_USER\software\micorsoft\windows\currentversion\run </span><br><span class="line"></span><br><span class="line">  b. HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run </span><br><span class="line"></span><br><span class="line">  c. HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Runonce</span><br><span class="line"></span><br><span class="line">检查右侧是否有启动异常的项目</span><br><span class="line"></span><br><span class="line">(3) 通过组策略查看</span><br><span class="line"></span><br><span class="line">命令行运行gpedit.msc，计算机配置 -&gt; Windows设置 —&gt; 脚本(启动/关机)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-计划任务"><a href="#4-计划任务" class="headerlink" title="4. 计划任务"></a>4. 计划任务</h3><p><strong>检查方法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) 计算机管理</span><br><span class="line"></span><br><span class="line">CMD输入compmgmt.msc【计算机管理】 &gt; 【系统工具】&gt; 【任务计划程序】&gt; 【任务计划程序库】</span><br><span class="line"></span><br><span class="line">(2) schtasks命令</span><br><span class="line"></span><br><span class="line">命令行输入【schtasks】命令，获取任务计划信息；在较旧的系统用【at】命令</span><br><span class="line"></span><br><span class="line">(3) Powershell</span><br><span class="line"></span><br><span class="line">&gt; Get-ScheduledTask  //查看当前系统所有任务计划信息</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-服务自启功"><a href="#5-服务自启功" class="headerlink" title="5. 服务自启功"></a>5. 服务自启功</h3><p><strong>检查方法：</strong> 单击【开始】&gt;【运行】，输入services.msc，查看服务状态和启动类型，检查是否有异常服务</p>
+<h2 id="0x02-进程排查"><a href="#0x02-进程排查" class="headerlink" title="0x02 进程排查"></a>0x02 进程排查</h2><h3 id="1-排查思路"><a href="#1-排查思路" class="headerlink" title="1. 排查思路"></a>1. 排查思路</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; netstat -ano | findstr &quot;ESTABLISHED&quot; //查看目前的网络连接，定位可疑的ESTABLISHED</span><br><span class="line"></span><br><span class="line">&gt; tasklist | findstr “PID”  //根据netstat定位出的pid，再通过tasklist命令排查进程</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-技巧总结"><a href="#2-技巧总结" class="headerlink" title="2. 技巧总结"></a>2. 技巧总结</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">(1) tasklist命令</span><br><span class="line"></span><br><span class="line">  a. 查看端口对应的PID： netstat -ano | findstr “port”</span><br><span class="line"></span><br><span class="line">  ​b. 查看进程对应的PID：tasklist | findstr “PID”</span><br><span class="line"></span><br><span class="line">  c. 显示进程与服务对应关系：tasklist /svc</span><br><span class="line"></span><br><span class="line">  d. 查看加载DLL的进程：tasklist /m | more</span><br><span class="line"></span><br><span class="line">  e. 查看特定DLL的调用情况：tasklist /m DLL名称</span><br><span class="line"></span><br><span class="line">(2) wmic命令</span><br><span class="line"></span><br><span class="line">  a. wmic process list full /format:csv  //以csv格式显示进程所有信息</span><br><span class="line"></span><br><span class="line">  b. wmic process get name,parentprocessid,processid,commandline  /format:csv  //以csv格式显示进程特定列</span><br><span class="line"></span><br><span class="line">  c. wmic process where process=[pid] get parentprocessid  //以pid的值为条件获取其父进程pid</span><br><span class="line"></span><br><span class="line">  d. wmic process where processid=[pid] delete  //删除指定pid的进程</span><br><span class="line"></span><br><span class="line">  e. wmic process where name=&quot;trojan.exe&quot; call terminate  //删除指定进程名的进程</span><br><span class="line"></span><br><span class="line">(3) PowerShell</span><br><span class="line"></span><br><span class="line">PowerShell可查看存在守护进程的进程，查询时调用Wmi对象</span><br><span class="line"></span><br><span class="line">&gt; Get-WmiObject Win32_Process | select Name,ProcessId,ParentProcessId,Path,CommandLine  //查看进程名、进程id，父进程id、进程路径、进程命令行等信息</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-文件排查"><a href="#0x03-文件排查" class="headerlink" title="0x03 文件排查"></a>0x03 文件排查</h2><h3 id="1-敏感目录"><a href="#1-敏感目录" class="headerlink" title="1. 敏感目录"></a>1. 敏感目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">(1) 各个盘下temp目录</span><br><span class="line"></span><br><span class="line">恶意程序运行时投放出的文件(释放子体)多存放于路径相对固定的临时目录</span><br><span class="line"></span><br><span class="line">(2) 用户Recent文件</span><br><span class="line"></span><br><span class="line">Recent文件主要存储最近运行文件的快捷方式，可分析最近运行的文件来排查可疑文件</span><br><span class="line"></span><br><span class="line">【开始】&gt;【运行】，输入【%UserProfile%\Recent】，分析Recent文件</span><br><span class="line"></span><br><span class="line">(3) 预读取文件夹</span><br><span class="line"></span><br><span class="line">Prefetch为预读取文件夹，用于存放系统已访问过的文件预读取信息，扩展名为pf</span><br><span class="line"></span><br><span class="line">【开始】&gt;【运行】，输入【%SystemRoot%\Prefetch\】，排查Prefetch文件夹</span><br><span class="line"></span><br><span class="line">(4) Amcache.hve文件</span><br><span class="line"></span><br><span class="line">可查询应用程序的执行路径、上次执行的时间以及SHA1值</span><br><span class="line"></span><br><span class="line">【开始】&gt;【运行】，输入【%SystemRoot%\appcompat\Programs\】，排查Amcache.hve文件夹</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-时间点查找"><a href="#2-时间点查找" class="headerlink" title="2. 时间点查找"></a>2. 时间点查找</h3><p>入侵事件发生后，需优先确认时间发生的时间点，排查时间点前后的文件变动情况</p>
+<p><strong>排查技巧</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">(1) forfiles命令</span><br><span class="line"></span><br><span class="line">FORFILES [/P pathname] [/M searchmask] [/S]</span><br><span class="line">         [/C command] [/D [+ | -] &#123;yyyy/MM/dd | dd&#125;]</span><br><span class="line"></span><br><span class="line">描述:</span><br><span class="line">    选择一个文件(或一组文件)并在那个文件上</span><br><span class="line">    执行一个命令。这有助于批处理作业。</span><br><span class="line"></span><br><span class="line">参数列表:</span><br><span class="line">    /P    pathname      表示开始搜索的路径。默认文件夹是当前工作的</span><br><span class="line">                        目录 (.)。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /M    searchmask    根据搜索掩码搜索文件。默认搜索掩码是 &apos;*&apos;。</span><br><span class="line"></span><br><span class="line">    /S                  指导 forfiles 递归到子目录。像 &quot;DIR /S&quot;。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /C    command       表示为每个文件执行的命令。命令字符串应该</span><br><span class="line">                        用双引号括起来。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                        默认命令是 &quot;cmd /c echo @file&quot;。下列变量</span><br><span class="line">                        可以用在命令字符串中:</span><br><span class="line"></span><br><span class="line">                        @file    - 返回文件名。</span><br><span class="line">                        @fname   - 返回不带扩展名的文件名。</span><br><span class="line"></span><br><span class="line">                        @ext     - 只返回文件的扩展名。</span><br><span class="line"></span><br><span class="line">                        @path    - 返回文件的完整路径。</span><br><span class="line">                        @relpath - 返回文件的相对路径。</span><br><span class="line"></span><br><span class="line">                        @isdir   - 如果文件类型是目录，返回 &quot;TRUE&quot;；</span><br><span class="line">                                   如果是文件，返回 &quot;FALSE&quot;。</span><br><span class="line">                        @fsize   - 以字节为单位返回文件大小。</span><br><span class="line"></span><br><span class="line">                        @fdate   - 返回文件上一次修改的日期。</span><br><span class="line"></span><br><span class="line">                        @ftime   - 返回文件上一次修改的时间。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                        要在命令行包括特殊字符，字符请以 0xHH</span><br><span class="line">                        形式使用十六进制代码(例如，0x09 为 tab)。</span><br><span class="line"></span><br><span class="line">                        内部 CMD.exe 命令前面应以 &quot;cmd /c&quot; 开始。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /D    date          选择文件，其上一次修改日期大于或等于 (+)，</span><br><span class="line">                        或者小于或等于 (-) 用 &quot;yyyy/MM/dd&quot; 格式指定的日期;</span><br><span class="line"></span><br><span class="line">                        或选择文件，其上一次修改日期大于或等于 (+)</span><br><span class="line">                        当前日期加 &quot;dd&quot; 天，或者小于或等于 (-) 当前</span><br><span class="line"></span><br><span class="line">                        日期减 &quot;dd&quot; 天。有效的 &quot;dd&quot; 天数可以是</span><br><span class="line">                        0 - 32768 范围内的任何数字。如果没有指定，</span><br><span class="line"></span><br><span class="line">                        &quot;+&quot; 被当作默认符号。</span><br><span class="line"></span><br><span class="line">    /?                  显示此帮助消息。</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x04-日志分析"><a href="#0x04-日志分析" class="headerlink" title="0x04 日志分析"></a>0x04 日志分析</h2><h3 id="1-日志简介"><a href="#1-日志简介" class="headerlink" title="1. 日志简介"></a>1. 日志简介</h3><p>Windows主要有以下三类日志文件：应用程序日志、系统日志和安全日志</p>
+<p><strong>系统日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录操作系统组件产生的事件，主要包括驱动程序、系统组件和应用软件的崩溃以及数据丢失错误等</span><br><span class="line"></span><br><span class="line">默认位置：%SystemRoot%\System32\Winevt\Logs\System.evtx</span><br></pre></td></tr></table></figure>
+
+<p><strong>安全日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录系统的安全审计事件，包含各种类型的登录日志、对象访问日志、进程追踪日志、特权使用、帐号管理、策略变更、系统事件。默认设置下，安全性日志是关闭的，管理员可以使用组策略来启动安全性日志，或者在注册表中设置审核策略</span><br><span class="line"></span><br><span class="line">默认位置：%SystemRoot%\System32\Winevt\Logs\Security.evtx</span><br></pre></td></tr></table></figure>
+
+<p><strong>应用日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">包含由应用程序或系统程序记录的事件，主要记录程序运行方面的事件，例如数据库程序可以在应用程序日志中记录文件错误。如果某个应用程序出现崩溃情况，可以从程序事件日志中找到相应的记录</span><br><span class="line"></span><br><span class="line">默认位置：%SystemRoot%\System32\Winevt\Logs\Application.evtx</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-日志事件ID"><a href="#2-日志事件ID" class="headerlink" title="2. 日志事件ID"></a>2. 日志事件ID</h3><p>对于Windows事件日志分析，不同的EVENT ID代表了不同的意义，摘录一些常见的安全事件的说明</p>
+<table>
+<thead>
+<tr>
+<th>事件ID</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4624</td>
+<td>登录成功</td>
+</tr>
+<tr>
+<td>4625</td>
+<td>登录失败</td>
+</tr>
+<tr>
+<td>4634</td>
+<td>注销成功</td>
+</tr>
+<tr>
+<td>4647</td>
+<td>用户启动的注销</td>
+</tr>
+<tr>
+<td>4672</td>
+<td>使用超级用户（如管理员）进行登录</td>
+</tr>
+<tr>
+<td>4720</td>
+<td>创建用户</td>
+</tr>
+</tbody></table>
+<p>每个成功登录的事件都会标记一个登录类型，不同登录类型代表不同的方式：</p>
+<table>
+<thead>
+<tr>
+<th>登录类型</th>
+<th>描述</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>交互式登录（Interactive）</td>
+<td>用户在本地进行登录</td>
+</tr>
+<tr>
+<td>3</td>
+<td>网络（Network）</td>
+<td>最常见的情况就是连接到共享文件夹或共享打印机时</td>
+</tr>
+<tr>
+<td>4</td>
+<td>批处理（Batch）</td>
+<td>通常表明某计划任务启动</td>
+</tr>
+<tr>
+<td>5</td>
+<td>服务（Service）</td>
+<td>每种服务都被配置在某个特定的用户账号下运行</td>
+</tr>
+<tr>
+<td>7</td>
+<td>解锁（Unlock）</td>
+<td>屏保解锁</td>
+</tr>
+<tr>
+<td>8</td>
+<td>网络明文（NetworkCleartext）</td>
+<td>登录的密码在网络上是通过明文传输的，如FTP</td>
+</tr>
+<tr>
+<td>9</td>
+<td>新凭证（NewCredentials）</td>
+<td>使用带/Netonly参数的RUNAS命令运行一个程序</td>
+</tr>
+<tr>
+<td>10</td>
+<td>远程交互，（RemoteInteractive）</td>
+<td>通过终端服务、远程桌面或远程协助访问计算机</td>
+</tr>
+<tr>
+<td>11</td>
+<td>缓存交互（CachedInteractive）</td>
+<td>以一个域用户登录而又没有域控制器可用</td>
+</tr>
+</tbody></table>
+<h3 id="3-日志分析技巧"><a href="#3-日志分析技巧" class="headerlink" title="3. 日志分析技巧"></a>3. 日志分析技巧</h3><p><strong>事件查看器</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">(1) 利用eventlog事件来查看系统账号登录情况</span><br><span class="line"></span><br><span class="line">  a. 在“开始”菜单上，依次指向“所有程序”、“管理工具”，然后单击“事件查看器”；</span><br><span class="line"></span><br><span class="line">  b. 在事件查看器中，单击“安全”，查看安全日志；</span><br><span class="line"></span><br><span class="line">  c. 在安全日志右侧操作中，点击“筛选当前日志”，输入事件ID进行筛选。</span><br><span class="line"></span><br><span class="line">  4624 -- 登录成功</span><br><span class="line">  4625 -- 登录失败</span><br><span class="line">  4634 -- 注销成功 4647 -- 用户启动的注销</span><br><span class="line">  4672 -- 使用超级用户（如管理员）进行登录</span><br><span class="line"></span><br><span class="line">(2) 利用eventlog事件来查看计算机开关机的记录</span><br><span class="line"></span><br><span class="line">  a. 在“开始”菜单上，依次指向“所有程序”、“管理工具”，然后单击“事件查看器”；</span><br><span class="line"></span><br><span class="line">  b. 在事件查看器中，单击“系统”，查看系统日志；</span><br><span class="line"></span><br><span class="line">  c. 在系统日志右侧操作中，点击“筛选当前日志”，输入事件ID进行筛选</span><br><span class="line"></span><br><span class="line">  6006 -- 服务已启动，开机</span><br><span class="line">  6005 -- 服务已停止，关机</span><br><span class="line">  6009 -- 按ctrl、alt、delete键(非正常)关机</span><br></pre></td></tr></table></figure>
+
+<p><strong>Log Parser</strong></p>
+<p>Log Parser是微软公司出品的日志分析工具，功能强大，使用简单，可以分析基于文本的日志文件、XML 文件、CSV（逗号分隔符）文件，以及操作系统的事件日志、注册表、文件系统、Active Directory</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">(1) 基本查询语法</span><br><span class="line"></span><br><span class="line">  Logparser.exe –i:EVT –o:DATAGRID &quot;SELECT * FROM c:\xx.evtx&quot;</span><br><span class="line"></span><br><span class="line">(2) 查询登录成功的事件</span><br><span class="line"></span><br><span class="line">  a. 登录成功的所有事件</span><br><span class="line">  LogParser.exe -i:EVT –o:DATAGRID  &quot;SELECT *  FROM c:\Security.evtx where EventID=4624&quot;</span><br><span class="line"></span><br><span class="line">  b. 指定登录时间范围的事件</span><br><span class="line">  LogParser.exe -i:EVT –o:DATAGRID  &quot;SELECT *  FROM c:\Security.evtx where TimeGenerated&gt;&apos;2018-06-19 23:32:11&apos; and TimeGenerated&lt;&apos;2018-06-20 23:34:00&apos; and EventID=4624&quot;</span><br><span class="line"></span><br><span class="line">  c. 提取登录成功的用户名和IP</span><br><span class="line">  LogParser.exe -i:EVT  –o:DATAGRID  &quot;SELECT EXTRACT_TOKEN(Message,13,&apos; &apos;) as EventType,TimeGenerated as LoginTime,EXTRACT_TOKEN(Strings,5,&apos;|&apos;) as Username,EXTRACT_TOKEN(Message,38,&apos; &apos;) as Loginip FROM c:\Security.evtx where EventID=4624&quot;</span><br><span class="line"></span><br><span class="line">(3) 查询登录失败的事件</span><br><span class="line"></span><br><span class="line">  a. 登录失败的所有事件</span><br><span class="line">  LogParser.exe -i:EVT –o:DATAGRID  &quot;SELECT *  FROM c:\Security.evtx where EventID=4625&quot;</span><br><span class="line"></span><br><span class="line">  b. 提取登录失败用户名进行聚合统计</span><br><span class="line">  LogParser.exe  -i:EVT &quot;SELECT  EXTRACT_TOKEN(Message,13,&apos; &apos;)  as EventType,EXTRACT_TOKEN(Message,19,&apos; &apos;) as user,count(EXTRACT_TOKEN(Message,19,&apos; &apos;)) as Times,EXTRACT_TOKEN(Message,39,&apos; &apos;) as Loginip FROM c:\Security.evtx where EventID=4625 GROUP BY Message&quot;</span><br><span class="line"></span><br><span class="line">(4) 系统历史开关机记录</span><br><span class="line"></span><br><span class="line">  LogParser.exe -i:EVT –o:DATAGRID  &quot;SELECT TimeGenerated,EventID,Message FROM c:\System.evtx where EventID=6005 or EventID=6006&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x05-工具集合"><a href="#0x05-工具集合" class="headerlink" title="0x05 工具集合"></a>0x05 工具集合</h2><h3 id="1-工具箱"><a href="#1-工具箱" class="headerlink" title="1. 工具箱"></a>1. 工具箱</h3><p><a href="https://docs.microsoft.com/zh-cn/sysinternals/downloads/sysinternals-suite" target="_blank" rel="noopener">Sysinternals Suite</a> : <em>微软发布的一套强大的免费工具程序集，共包括将近70个windows工具</em></p>
+<ul>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb664922.aspx" target="_blank" rel="noopener">AccessChk</a> <em>了解特定用户或用户组对文件、目录、注册表项和Windows服务等资源具有哪种访问权限</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb897332.aspx" target="_blank" rel="noopener">AccessEnum</a> <em>显示用户可以用何种访问权限访问您系统中的目录、文件和注册表项，使用此工具可查找权限漏洞</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb963907.aspx" target="_blank" rel="noopener">AdExplorer</a> <em>Active Directory Explorer 是一个高级的 Active Directory (AD) 查看器和编辑器</em></p>
+</li>
+<li><p><a href="https://technet.microsoft.com/en-us/sysinternals/bb963902" target="_blank" rel="noopener">AutoRuns</a> <em>windows启动程序管理工具，可显示系统启动或登录时会自动启动的项目和配置，包括扩展和加载各种Windows进程</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb896655.aspx" target="_blank" rel="noopener">Handle</a> <em>可显示哪些进程打开了哪些文件，以及更多其他信息</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb896656.aspx" target="_blank" rel="noopener">ListDLLs</a> <em>列出所有当前加载的 DLL，包括加载位置及其版本号，2.0版将打印已加载模块的完整路径名</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb896769.aspx" target="_blank" rel="noopener">LogonSessions</a> <em>列出系统中的活动登录会话</em></p>
+</li>
+<li><p><a href="https://technet.microsoft.com/en-us/sysinternals/bb896653" target="_blank" rel="noopener">Process Explorer</a> <em>进程查看器，查看进程的详细信息包括CPU，GPU，IO，线程，句柄，内存</em></p>
+</li>
+<li><p><a href="https://technet.microsoft.com/en-us/sysinternals/bb896645" target="_blank" rel="noopener">Process Monitor</a> <em>一个高级的windows监视器，实时显示文件系统，注册表，网络活动，进程或线程活动</em></p>
+</li>
+<li><p><a href="https://technet.microsoft.com/en-us/sysinternals/bb896649" target="_blank" rel="noopener">PsTools</a> <em>PsTools 套件，可列出本地或远程计算机上运行的进程、远程运行进程、重新启动计算机、转储事件日志，以及执行其他任务</em></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">PsExec——执行远程过程</span><br><span class="line"></span><br><span class="line">PsFile——远程显示打开的文件</span><br><span class="line"></span><br><span class="line">PsGetSid——显示计算机的SID或一个用户</span><br><span class="line"></span><br><span class="line">PsInfo——系统信息列表</span><br><span class="line"></span><br><span class="line">PsKill——杀死进程的名字或进程ID</span><br><span class="line"></span><br><span class="line">PsList——列表详细信息流程</span><br><span class="line"></span><br><span class="line">PsLoggedOn——看谁的本地登录,通过资源共享</span><br><span class="line"></span><br><span class="line">PsLogList -倾倒事件日志记录</span><br><span class="line"></span><br><span class="line">PsPasswd——更改帐户密码</span><br><span class="line"></span><br><span class="line">psp -测试网络性能</span><br><span class="line"></span><br><span class="line">PsService——视图和控制服务</span><br><span class="line"></span><br><span class="line">PsShutdown——关闭,选择重新启动计算机</span><br><span class="line"></span><br><span class="line">PsSuspend——挂起和恢复过程</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb897448.aspx" target="_blank" rel="noopener">RegDelNull</a> <em>扫描并删除包含嵌入空字符的注册表项，标准注册表编辑工具不能删除这种注册表项</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb897445.aspx" target="_blank" rel="noopener">RootkitRevealer</a> <em>扫描系统以找出基于Rootkit的恶意软件</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb897442.aspx" target="_blank" rel="noopener">ShareEnum</a> <em>扫描网络上的文件共享并查看其安全设置，以关闭安全漏洞</em></p>
+</li>
+<li><p><a href="http://technet.microsoft.com/zh-cn/sysinternals/bb897439.aspx" target="_blank" rel="noopener">Strings</a> <em>在二进制映像中搜索 ANSI 和 UNICODE 字符串</em></p>
+</li>
+<li><p><a href="https://technet.microsoft.com/en-us/sysinternals/bb897437" target="_blank" rel="noopener">TcpView</a> <em>显示TCP和UDP端点的详细清单，包括进程名、远程地址和TCP连接的状态</em></p>
+</li>
+</ul>
+<h3 id="2-监控分析"><a href="#2-监控分析" class="headerlink" title="2. 监控分析"></a>2. 监控分析</h3><ul>
+<li><a href="https://www.huorong.cn/" target="_blank" rel="noopener">火绒剑</a>  <em>火绒推出的一款专业的内核级监控分析工具</em></li>
+</ul>
+<h3 id="3-日志分析"><a href="#3-日志分析" class="headerlink" title="3. 日志分析"></a>3. 日志分析</h3><ul>
+<li><p><a href="https://www.microsoft.com/en-us/download/details.aspx?id=24659" target="_blank" rel="noopener">Log Parser</a> <em>微软推出的日志分析工具，可分析多种文件类型的系统事件日志、注册表、文件系统、Active Directory</em></p>
+</li>
+<li><p><a href="https://event-log-explorer.en.softonic.com/" target="_blank" rel="noopener">Event Log Explorer</a> <em>Windows日志分析工具，可用于查看，监视和分析跟事件记录</em></p>
+</li>
+</ul>
+<h3 id="4-病毒查杀"><a href="#4-病毒查杀" class="headerlink" title="4. 病毒查杀"></a>4. 病毒查杀</h3><ul>
+<li><p>卡巴斯基：<a href="http://devbuilds.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe" target="_blank" rel="noopener">http://devbuilds.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe</a></p>
+</li>
+<li><p>火绒安全软件：<a href="https://www.huorong.cn" target="_blank" rel="noopener">https://www.huorong.cn</a></p>
+</li>
+<li><p>360杀毒：<a href="http://sd.360.cn/download_center.html" target="_blank" rel="noopener">http://sd.360.cn/download_center.html</a></p>
+</li>
+<li><p>ESET NOD32 Antivirus: <a href="https://www.eset.com/us/home/antivirus/download/" target="_blank" rel="noopener">https://www.eset.com/us/home/antivirus/download/</a></p>
+</li>
+</ul>
+<h3 id="5-Webshell查杀"><a href="#5-Webshell查杀" class="headerlink" title="5. Webshell查杀"></a>5. Webshell查杀</h3><ul>
+<li><p>百度WEBDIR+：<a href="https://scanner.baidu.com/" target="_blank" rel="noopener">https://scanner.baidu.com/</a></p>
+</li>
+<li><p>河马查杀：<a href="https://www.shellpub.com/" target="_blank" rel="noopener">https://www.shellpub.com/</a></p>
+</li>
+<li><p>Web Shell Detector：<a href="http://www.shelldetector.com/" target="_blank" rel="noopener">http://www.shelldetector.com/</a></p>
+</li>
+<li><p>D盾_Web查杀：<a href="http://www.d99net.net/down/WebShellKill_V2.0.9.zip" target="_blank" rel="noopener">http://www.d99net.net/down/WebShellKill_V2.0.9.zip</a></p>
+</li>
+</ul>
+<h3 id="6-勒索软件解密"><a href="#6-勒索软件解密" class="headerlink" title="6. 勒索软件解密"></a>6. 勒索软件解密</h3><ul>
+<li><p>勒索病毒解密工具收集汇总：<a href="https://github.com/jiansiting/Decryption-Tools" target="_blank" rel="noopener">https://github.com/jiansiting/Decryption-Tools</a></p>
+</li>
+<li><p>[腾讯哈勃]勒索软件专杀工具：<a href="https://habo.qq.com/tool/index" target="_blank" rel="noopener">https://habo.qq.com/tool/index</a></p>
+</li>
+<li><p>[金山毒霸]勒索病毒免疫工具：<a href="http://www.duba.net/dbt/wannacry.html" target="_blank" rel="noopener">http://www.duba.net/dbt/wannacry.html</a></p>
+</li>
+<li><p>[瑞星]解密工具下载：<a href="http://it.rising.com.cn/fanglesuo/index.html" target="_blank" rel="noopener">http://it.rising.com.cn/fanglesuo/index.html</a></p>
+</li>
+<li><p>[卡巴斯基]免费勒索解密器：<a href="https://noransom.kaspersky.com/" target="_blank" rel="noopener">https://noransom.kaspersky.com/</a></p>
+</li>
+<li><p>[Avast]免费勒索软件解密工具：<a href="https://www.avast.com/zh-cn/ransomware-decryption-tools" target="_blank" rel="noopener">https://www.avast.com/zh-cn/ransomware-decryption-tools</a></p>
+</li>
+<li><p>[Emsisoft]免费勒索软件解密工具：<a href="https://www.emsisoft.com/ransomware-decryption-tools/free-download" target="_blank" rel="noopener">https://www.emsisoft.com/ransomware-decryption-tools/free-download</a></p>
+</li>
+<li><p>[nomoreransom]勒索软件解密工具集：<a href="https://www.nomoreransom.org/zh/index.html" target="_blank" rel="noopener">https://www.nomoreransom.org/zh/index.html</a></p>
+</li>
+<li><p>[MalwareHunterTeam]勒索软件解密工具集：<a href="https://id-ransomware.malwarehunterteam.com/" target="_blank" rel="noopener">https://id-ransomware.malwarehunterteam.com/</a></p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Incident-Response/" rel="tag"><i class="fa fa-tag"></i>
+
+ Incident Response</a>
+          
+            <a href="/tags/Windows/" rel="tag"><i class="fa fa-tag"></i>
+
+ Windows</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/10024/" rel="next" title="Linux入侵排查实战技巧">
+                <i class="fa fa-chevron-left"></i> Linux入侵排查实战技巧
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/98821/" rel="prev" title="Linux系统及服务安全加固手册">
+                Linux系统及服务安全加固手册 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-系统排查"><span class="nav-text">0x01 系统排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-系统信息"><span class="nav-text">1. 系统信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-用户账号"><span class="nav-text">2. 用户账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-启动项"><span class="nav-text">3. 启动项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-计划任务"><span class="nav-text">4. 计划任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-服务自启功"><span class="nav-text">5. 服务自启功</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-进程排查"><span class="nav-text">0x02 进程排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-排查思路"><span class="nav-text">1. 排查思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-技巧总结"><span class="nav-text">2. 技巧总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-文件排查"><span class="nav-text">0x03 文件排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-敏感目录"><span class="nav-text">1. 敏感目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-时间点查找"><span class="nav-text">2. 时间点查找</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-日志分析"><span class="nav-text">0x04 日志分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-日志简介"><span class="nav-text">1. 日志简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-日志事件ID"><span class="nav-text">2. 日志事件ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-日志分析技巧"><span class="nav-text">3. 日志分析技巧</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-工具集合"><span class="nav-text">0x05 工具集合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-工具箱"><span class="nav-text">1. 工具箱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-监控分析"><span class="nav-text">2. 监控分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-日志分析"><span class="nav-text">3. 日志分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-病毒查杀"><span class="nav-text">4. 病毒查杀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Webshell查杀"><span class="nav-text">5. Webshell查杀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-勒索软件解密"><span class="nav-text">6. 勒索软件解密</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

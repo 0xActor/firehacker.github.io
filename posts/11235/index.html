@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Threat Detection,HIDS,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文总结大型分布式HIDS自研建设的一些经验及研究心得，持续更新中...">
+<meta name="keywords" content="Threat Detection,HIDS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大型分布式HIDS建设总结">
+<meta property="og:url" content="https://l0n9.cc/posts/11235/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文总结大型分布式HIDS自研建设的一些经验及研究心得，持续更新中...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/agent_data.png">
+<meta property="og:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/threat_detection.png">
+<meta property="og:updated_time" content="2021-04-01T14:15:55.824Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大型分布式HIDS建设总结">
+<meta name="twitter:description" content="本文总结大型分布式HIDS自研建设的一些经验及研究心得，持续更新中...">
+<meta name="twitter:image" content="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/agent_data.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/11235/">
+
+
+
+
+
+  <title>大型分布式HIDS建设总结 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/11235/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">大型分布式HIDS建设总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-08T21:52:20+08:00">
+                2020-12-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/威胁检测/" itemprop="url" rel="index">
+                    <span itemprop="name">威胁检测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文总结大型分布式HIDS自研建设的一些经验及研究心得，持续更新中...</center>
+
+<a id="more"></a>
+
+<h2 id="0x01-核心能力"><a href="#0x01-核心能力" class="headerlink" title="0x01 核心能力"></a>0x01 核心能力</h2><h3 id="1-数据采集能力"><a href="#1-数据采集能力" class="headerlink" title="1. 数据采集能力"></a>1. 数据采集能力</h3><p>Agent端做深入的数据采集(采集深度、数据上下文丰富度)，提高对抗成本</p>
+<pre><code>1）内核态、用户态系统数据
+
+2）容器层数据：Docker、Kubernetes
+
+3）通用服务组件数据及日志：数据库、Web服务器、大数据组件、中间件、开发软件等</code></pre><h3 id="2-检测分析能力"><a href="#2-检测分析能力" class="headerlink" title="2. 检测分析能力"></a>2. 检测分析能力</h3><p>能检测到什么程度的攻击(一般入侵 —&gt; 渗透测试 —&gt; 红队演练 —&gt; APT)</p>
+<p><strong>核心能力</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 入侵对抗：基于网络攻杀链、ATT &amp; CK模型等各个阶段的攻击战术、技术、过程检测与响应</span><br><span class="line"></span><br><span class="line">2. 数据分析：基于特征(IOCs库、TTPs库)、图计算、入侵链路可视化分析、用户和实体行为分析、威胁智能分析、模型智能编排</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-考虑因素"><a href="#0x02-考虑因素" class="headerlink" title="0x02  考虑因素"></a>0x02  考虑因素</h2><h3 id="1-安全性"><a href="#1-安全性" class="headerlink" title="1. 安全性"></a>1. 安全性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) Agent跟Server的配置下发通道安全，数据传输加密</span><br><span class="line"></span><br><span class="line">(2) 配置信息读取写入需要鉴权、配置变更历史需记录</span><br><span class="line"></span><br><span class="line">(3) 不预留包含任何命令执行的功能，服务端操作下发严格鉴权，保证agent低侵入性</span><br><span class="line"></span><br><span class="line">(4) agent更新时，对升级包的完整性进行检测验证，防止被攻击者替换</span><br><span class="line"></span><br><span class="line">(5) 通过system服务自启动、watch守护进程逆行监控，对异常agent下线进行监控和告警</span><br><span class="line"></span><br><span class="line">(6) Agent反调试、防逆向手段，提升攻击者对agent逆向分析难度</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-低损耗"><a href="#2-低损耗" class="headerlink" title="2. 低损耗"></a>2. 低损耗</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">节省资源，占用较少的CPU、内存；可使用cgroup等严格限制资源占用</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-稳定性"><a href="#3-稳定性" class="headerlink" title="3. 稳定性"></a>3. 稳定性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需保证agent长期运行稳定，确保agent本身不影响正常服务及业务</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-高可用"><a href="#3-高可用" class="headerlink" title="3. 高可用"></a>3. 高可用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(1) 需满足数十万服务器量级的IDC规模</span><br><span class="line"></span><br><span class="line">(2) 进程包活、心跳检测、实时获取新指令能力</span><br><span class="line"></span><br><span class="line">(3) 支持分布式部署，并行处理任务，保证数据的一致性，服务器数量规模达到百万级的集群负载能力</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-可控性"><a href="#4-可控性" class="headerlink" title="4. 可控性"></a>4. 可控性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(1) 精确的熔断限流，服务端命令下发响应需控制在分钟级以内</span><br><span class="line"></span><br><span class="line">(2) 服务端能控制agent的启动、终止，当agent出现异常时，也许保证可控</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-部署兼容性"><a href="#5-部署兼容性" class="headerlink" title="5. 部署兼容性"></a>5. 部署兼容性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需满足广泛的部署兼容性、兼容Linux各种版本、支持容器环境等</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-可扩展性"><a href="#6-可扩展性" class="headerlink" title="6. 可扩展性"></a>6. 可扩展性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">系统功能增加、版本更新及维护较为方便，满足可扩展性</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-数据采集"><a href="#0x03-数据采集" class="headerlink" title="0x03 数据采集"></a>0x03 数据采集</h2><h3 id="1-采集维度"><a href="#1-采集维度" class="headerlink" title="1. 采集维度"></a>1. 采集维度</h3><p>依据安全需求、等保合规、威胁检测模型等梳理HIDS需要采集的数据维度、数据项…</p>
+<p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/agent_data.png" alt></p>
+<h3 id="2-技术方案"><a href="#2-技术方案" class="headerlink" title="2. 技术方案"></a>2. 技术方案</h3><p>总结业界成熟的主机入侵检测技术方案、开源项目核心模块…</p>
+<p><strong>(1) eBPF</strong></p>
+<ul>
+<li><p><a href="https://www.kernel.org/doc/html/latest/networking/filter.html#networking-filter" target="_blank" rel="noopener">eBPF</a> <em>Linux内核提供的一种扩展的BPF虚拟机，可用于获取内核运行信息</em></p>
+</li>
+<li><p><a href="https://www.kernel.org/doc/html/v4.16/userspace-api/seccomp_filter.html" target="_blank" rel="noopener">Seccomp BPF</a> <em>使用BPF程序对任意系统调用及其参数进行过滤</em></p>
+</li>
+<li><p><a href="https://github.com/iovisor/bpftrace" target="_blank" rel="noopener">bpftrace</a> <em>eBPF的高级跟踪语言，可实现内核动态跟踪（kprobes）,用户级动态跟踪（uprobes）</em></p>
+</li>
+</ul>
+<p><strong>(2) Audit</strong></p>
+<ul>
+<li><p><a href="https://github.com/linux-audit" target="_blank" rel="noopener">linux-audit</a> <em>Linux安全审计系统，可用于收集记录系统、内核、用户进程发生的行为事件</em></p>
+</li>
+<li><p><a href="https://github.com/slackhq/go-audit" target="_blank" rel="noopener">go-audit</a> <em>Go实现的Linux audit类库，可替代auditd daemon</em></p>
+</li>
+<li><p><a href="https://github.com/elastic/go-libaudit" target="_blank" rel="noopener">go-libaudit</a>  <em>go-libaudit是用于与Linux Audit Framework通信的库</em></p>
+</li>
+</ul>
+<p><strong>(4) sysdig</strong></p>
+<ul>
+<li><a href="https://github.com/draios/sysdig" target="_blank" rel="noopener">sysdig</a> <em>提供深层系统可见性的工具，可对容器进行访问</em></li>
+</ul>
+<p><strong>(5) Capsule8</strong></p>
+<ul>
+<li><a href="https://github.com/capsule8/" target="_blank" rel="noopener">capsule8</a> <em>Linux系统及云环境实时威胁检测防护开源项目</em></li>
+</ul>
+<p><strong>(6) Osquery-events</strong></p>
+<ul>
+<li><a href="https://github.com/osquery/osquery/tree/experimental/osquery/events/linux" target="_blank" rel="noopener">osquery-events</a> <em>Osquery事件监控模块，可持续监控系统事件变化情况</em></li>
+</ul>
+<p><strong>(7)elastic-auditbeat</strong></p>
+<ul>
+<li><a href="https://github.com/elastic/beats/tree/master/auditbeat" target="_blank" rel="noopener">auditbeat</a> <em>用于收集Linux审计框架数据，对消息进行解析和标准化，并监测文件的完整性</em></li>
+</ul>
+<p><strong>(8) grsecurity</strong></p>
+<ul>
+<li><a href="https://grsecurity.net/download" target="_blank" rel="noopener">grsecurity</a> <em>一个用于Linux内核的修补程序，为ACL系统提供了内核模块的支持</em></li>
+</ul>
+<p><strong>(9) snoopy</strong></p>
+<ul>
+<li><a href="https://github.com/a2o/snoopy" target="_blank" rel="noopener">snoopy</a> <em>开源的轻量级lib库, 可以记录系统中所有执行过的命令和参数</em></li>
+</ul>
+<p><strong>(10) inotify-tools</strong></p>
+<ul>
+<li><a href="https://github.com/inotify-tools/inotify-tools" target="_blank" rel="noopener">inotify-tools</a> <em>Linux文件系统事件监控工具套件</em></li>
+</ul>
+<p><strong>(11) Rootkit Detection</strong></p>
+<ul>
+<li><p><a href="https://github.com/nbulischeck/tyton" target="_blank" rel="noopener">tyton</a> <em>Linux内核态rootkit检测工具</em></p>
+</li>
+<li><p><a href="https://www.openwall.com/lkrg/" target="_blank" rel="noopener">LKRG</a> <em>Linux内核运行时防护工具</em></p>
+</li>
+<li><p><a href="http://www.unhide-forensics.info/?Linux" target="_blank" rel="noopener">Unhide</a> <em>可用于检测隐藏进程</em></p>
+</li>
+<li><p><a href="http://rkhunter.sourceforge.net/" target="_blank" rel="noopener">rkhunter</a> <em>Linux用户态rootkit检测工具</em></p>
+</li>
+</ul>
+<h2 id="0x04-检测分析"><a href="#0x04-检测分析" class="headerlink" title="0x04 检测分析"></a>0x04 检测分析</h2><h3 id="1-检测模型"><a href="#1-检测模型" class="headerlink" title="1. 检测模型"></a>1. 检测模型</h3><p><img src="https://blog-1254410573.cos.ap-beijing.myqcloud.com/Image/threat_detection.png" alt></p>
+<p><strong>Refer:</strong> <a href="https://help.aliyun.com/document_detail/191144.html" target="_blank" rel="noopener">https://help.aliyun.com/document_detail/191144.html</a></p>
+<h3 id="2-检测方法"><a href="#2-检测方法" class="headerlink" title="2. 检测方法"></a>2. 检测方法</h3><h4 id="a-误用检测方法"><a href="#a-误用检测方法" class="headerlink" title="a. 误用检测方法"></a>a. 误用检测方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1) 模式匹配法</span><br><span class="line"></span><br><span class="line">通过把收集到的信息与网络入侵和系统误用模式数据库中的已知信息进行比较，从而对违背安全策略的行为进行发现。模式匹配法可以显著地减少系统负担，有较高的检测率和准确率</span><br><span class="line"></span><br><span class="line">2) 专家系统法</span><br><span class="line"></span><br><span class="line">通过将安全专家的知识表示成IF-THEN规则，形成专家知识库，然后，运用推理算法进行检测入侵。专家系统的IF-THEN规则，就是由模式匹配规则组成，即”与或非组合模式匹配规则“，通过组合多个模式匹配规则，来获得单个模式匹配规则所无法取得的效果，主要是针对有特征的入侵行为</span><br><span class="line"></span><br><span class="line">3) 状态转移分析法</span><br><span class="line"></span><br><span class="line">该方法的基本思想是将攻击看成一个连续的、分步骤的并且各个步骤之间有一定的关联的过程。在网络中发生入侵时及时阻断入侵行为，防止可能还会进一步发生的类似攻击行为。在状态转移分析方法中，一个渗透过程可以看作是由攻击者做出的一系列的行为而导致系统从某个初始状态变为最终某个被危害的状态</span><br></pre></td></tr></table></figure>
+
+<h4 id="b-异常检测方法"><a href="#b-异常检测方法" class="headerlink" title="b. 异常检测方法"></a>b. 异常检测方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">1) 基于贝叶斯推理检测法</span><br><span class="line"></span><br><span class="line">通过在任何给定的时刻，测量变量值，推理判断系统是否发生入侵事件</span><br><span class="line"></span><br><span class="line">2) 基于特征选择检测法</span><br><span class="line"></span><br><span class="line">指从一组度量中挑选出能检测入侵的度量，用它来对入侵行为进行预测或分类</span><br><span class="line"></span><br><span class="line">3) 基于贝叶斯网络检测法</span><br><span class="line"></span><br><span class="line">用图形方式表示随机变量之间的关系。通过指定的与邻接节点相关一个小的概率集来计算随机变量的联接概率分布。按给定全部节点组合，所有根节点的先验概率和非根节点概率构成这个集。贝叶斯网络是一个有向图，弧表示父、子结点之间的依赖关系。当随机变量的值变为已知时，就允许将它吸收为证据，为其他的剩余随机变量条件值判断提供计算框架</span><br><span class="line"></span><br><span class="line">4) 基于模式预测的检测法</span><br><span class="line"></span><br><span class="line">事件序列不是随机发生的而是遵循某种可辨别的模式是基于模式预测的异常检测法的假设条件，其特点是事件序列及相互联系被考虑到了，只关心少数相关安全事件是该检测法的最大优点</span><br><span class="line"></span><br><span class="line">5) 基于统计的异常检测法</span><br><span class="line"></span><br><span class="line">根据用户对象的活动为每个用户都建立一个特征轮廓表，通过对当前特征与以前已经建立的特征进行比较，来判断当前行为的异常性。用户特征轮廓表要根据审计记录情况不断更新，其保护去多衡量指标，这些指标值要根据经验值或一段时间内的统计而得到</span><br><span class="line"></span><br><span class="line">6) 基于机器学习检测法</span><br><span class="line"></span><br><span class="line">根据离散数据临时序列学习获得网络、系统和个体的行为特征，并提出了一个实例学习法IBL，IBL是基于相似度，该方法通过新的序列相似度计算将原始数据（如离散事件流和无序的记录）转化成可度量的空间。然后，应用IBL学习技术和一种新的基于序列的分类方法，发现异常类型事件，从而检测入侵行为。其中，成员分类的概率由阈值的选取来决定</span><br><span class="line"></span><br><span class="line">7) 数据挖掘检测法</span><br><span class="line"></span><br><span class="line">数据挖掘的目的是要从海量的数据中提取出有用的数据信息。网络中会有大量的审计记录存在，审计记录大多都是以文件形式存放的。如果靠手工方法来发现记录中的异常现象是远远不够的，所以将数据挖掘技术应用于入侵检测中，可以从审计数据中提取有用的知识，然后用这些知识区检测异常入侵和已知的入侵。采用的方法有KDD算法，其优点是善于处理大量数据的能力与数据关联分析的能力，但是实时性较差</span><br><span class="line"></span><br><span class="line">8) 基于应用模式的异常检测法</span><br><span class="line"></span><br><span class="line">该方法是根据服务请求类型、服务请求长度、服务请求包大小分布计算网络服务的异常值。通过实时计算的异常值和所训练的阈值比较，从而发现异常行为</span><br><span class="line"></span><br><span class="line">9) 基于文本分类的异常检测法</span><br><span class="line"></span><br><span class="line">该方法是将系统产生的进程调用集合转换为“文档”。利用K邻聚类文本分类算法，计算文档的相似性</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-特征库"><a href="#3-特征库" class="headerlink" title="3. 特征库"></a>3. 特征库</h3><ul>
+<li><p><a href="https://osintframework.com/" target="_blank" rel="noopener">https://osintframework.com/</a></p>
+</li>
+<li><p><a href="https://github.com/swisskyrepo/PayloadsAllTheThings" target="_blank" rel="noopener">https://github.com/swisskyrepo/PayloadsAllTheThings</a></p>
+</li>
+<li><p><a href="https://github.com/mitre-attack/attack-navigator" target="_blank" rel="noopener">https://github.com/mitre-attack/attack-navigator</a></p>
+</li>
+<li><p><a href="https://virustotal.github.io/yara/" target="_blank" rel="noopener">https://virustotal.github.io/yara/</a></p>
+</li>
+<li><p><a href="https://github.com/CyberMonitor/APT_CyberCriminal_Campagin_Collections" target="_blank" rel="noopener">APT_CyberCriminal_Campagin_Collections</a></p>
+</li>
+<li><p><a href="https://github.com/smicallef/spiderfoot" target="_blank" rel="noopener">https://github.com/smicallef/spiderfoot</a></p>
+</li>
+<li><p><a href="https://github.com/InQuest/awesome-yara" target="_blank" rel="noopener">https://github.com/InQuest/awesome-yara</a></p>
+</li>
+<li><p><a href="https://github.com/sroberts/awesome-iocs" target="_blank" rel="noopener">https://github.com/sroberts/awesome-iocs</a></p>
+</li>
+<li><p><a href="https://github.com/KasperskyLab/klara" target="_blank" rel="noopener">https://github.com/KasperskyLab/klara</a></p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Threat-Detection/" rel="tag"><i class="fa fa-tag"></i>
+
+ Threat Detection</a>
+          
+            <a href="/tags/HIDS/" rel="tag"><i class="fa fa-tag"></i>
+
+ HIDS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/20996/" rel="next" title="攻击视角之网络威胁框架演进">
+                <i class="fa fa-chevron-left"></i> 攻击视角之网络威胁框架演进
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/20001/" rel="prev" title="钓鱼邮件攻击技术研究">
+                钓鱼邮件攻击技术研究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-核心能力"><span class="nav-text">0x01 核心能力</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-数据采集能力"><span class="nav-text">1. 数据采集能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-检测分析能力"><span class="nav-text">2. 检测分析能力</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-考虑因素"><span class="nav-text">0x02  考虑因素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-安全性"><span class="nav-text">1. 安全性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-低损耗"><span class="nav-text">2. 低损耗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-稳定性"><span class="nav-text">3. 稳定性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-高可用"><span class="nav-text">3. 高可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-可控性"><span class="nav-text">4. 可控性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-部署兼容性"><span class="nav-text">5. 部署兼容性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-可扩展性"><span class="nav-text">6. 可扩展性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-数据采集"><span class="nav-text">0x03 数据采集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-采集维度"><span class="nav-text">1. 采集维度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-技术方案"><span class="nav-text">2. 技术方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-检测分析"><span class="nav-text">0x04 检测分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-检测模型"><span class="nav-text">1. 检测模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-检测方法"><span class="nav-text">2. 检测方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#a-误用检测方法"><span class="nav-text">a. 误用检测方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#b-异常检测方法"><span class="nav-text">b. 异常检测方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-特征库"><span class="nav-text">3. 特征库</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

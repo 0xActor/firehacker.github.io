@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,Hardening,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文总结Linux系统及服务组件安全加固方法...">
+<meta name="keywords" content="Linux,Hardening">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统及服务安全加固手册">
+<meta property="og:url" content="https://l0n9.cc/posts/98821/index.html">
+<meta property="og:site_name" content="L0n9">
+<meta property="og:description" content="本文总结Linux系统及服务组件安全加固方法...">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-03-27T11:07:01.588Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统及服务安全加固手册">
+<meta name="twitter:description" content="本文总结Linux系统及服务组件安全加固方法...">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://l0n9.cc/posts/98821/">
+
+
+
+
+
+  <title>Linux系统及服务安全加固手册 | L0n9</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">L0n9</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-攻防">
+          <a href="/security/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-navicon"></i> <br>
+            
+            攻防
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/98821/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统及服务安全加固手册</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-10T22:23:00+08:00">
+                2020-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/主机攻防/" itemprop="url" rel="index">
+                    <span itemprop="name">主机攻防</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>本文总结Linux系统及服务组件安全加固方法...</center>
+
+<a id="more"></a>
+
+<h2 id="0x01-Linux-系统加固"><a href="#0x01-Linux-系统加固" class="headerlink" title="0x01 Linux 系统加固"></a>0x01 Linux 系统加固</h2><h3 id="1-账号和口令"><a href="#1-账号和口令" class="headerlink" title="1. 账号和口令"></a>1. 账号和口令</h3><h4 id="1-1-禁用或删除无用账号"><a href="#1-1-禁用或删除无用账号" class="headerlink" title="1.1 禁用或删除无用账号"></a>1.1 禁用或删除无用账号</h4><p>减少系统无用账号，降低安全风险</p>
+<p><strong>操作步骤</strong></p>
+<ul>
+<li>使用命令 <code>userdel &lt;用户名&gt;</code> 删除不必要的账号</li>
+<li>使用命令 <code>passwd -l &lt;用户名&gt;</code> 锁定不必要的账号</li>
+<li>使用命令 <code>passwd -u &lt;用户名&gt;</code> 解锁必要的账号</li>
+</ul>
+<h4 id="1-2-检查特殊账号"><a href="#1-2-检查特殊账号" class="headerlink" title="1.2 检查特殊账号"></a>1.2 检查特殊账号</h4><p>检查是否存在空口令和root权限的账号</p>
+<p><strong>操作步骤</strong>    </p>
+<ol>
+<li>查看空口令和root权限账号，确认是否存在异常账号：</li>
+</ol>
+<ul>
+<li>使用命令 <code>awk -F: &#39;($2==&quot;&quot;)&#39; /etc/shadow</code> 查看空口令账号</li>
+<li>使用命令 <code>awk -F: &#39;($3==0)&#39; /etc/passwd</code> 查看UID为零的账号</li>
+</ul>
+<ol start="2">
+<li>加固空口令账号：</li>
+</ol>
+<ul>
+<li>使用命令 <code>passwd &lt;用户名&gt;</code>为空口令账号设定密码</li>
+<li>确认UID为零的账号只有root账号</li>
+</ul>
+<h4 id="1-3-添加口令策略"><a href="#1-3-添加口令策略" class="headerlink" title="1.3 添加口令策略"></a>1.3 添加口令策略</h4><pre><code>加强口令的复杂度等，降低被猜解的可能性</code></pre><p><strong>操作步骤</strong></p>
+<ol>
+<li><p>使用命令 <code>vi /etc/login.defs</code>修改配置文件</p>
+<pre><code>PASS_MAX_DAYS 90     #新建用户的密码最长使用天数
+PASS_MIN_DAYS 0       #新建用户的密码最短使用天数
+PASS_WARN_AGE 7     #新建用户的密码到期提前提醒天数</code></pre></li>
+<li><p>使用chage命令修改用户设置</p>
+<pre><code>chage -m 0 -M 30 -E 2000-01-01 -W 7 &lt;用户名&gt;</code></pre><p> 表示将此用户的密码最长使用天数设为30，最短使用天数设为0，密码2000年1月1日过期，过期前七天警告用户</p>
+</li>
+<li><p>设置连续输错三次密码，账号锁定五分钟</p>
+<p> 使用命令 <code>vi /etc/pam.d/common-auth</code>修改配置文件，在配置文件中添加 <code>auth required pam_tally.so onerr=fail deny=3 unlock_time=300</code></p>
+</li>
+</ol>
+<h4 id="1-4-限制用户su"><a href="#1-4-限制用户su" class="headerlink" title="1.4 限制用户su"></a>1.4 限制用户su</h4><pre><code>限制能su到root的用户</code></pre><p><strong>操作步骤</strong></p>
+<p>使用命令 <code>vi /etc/pam.d/su</code>修改配置文件，在配置文件中添加行</p>
+<p>只允许test组用户su到root，则添加<code>auth required pam_wheel.so group=test</code></p>
+<h4 id="1-5-禁止root用户直接登录"><a href="#1-5-禁止root用户直接登录" class="headerlink" title="1.5 禁止root用户直接登录"></a>1.5 禁止root用户直接登录</h4><pre><code>限制root用户直接登录</code></pre><p><strong>操作步骤</strong></p>
+<ol>
+<li>创建普通权限账号并配置密码,防止无法远程登录;</li>
+<li>使用命令 <code>vi /etc/ssh/sshd_config</code>修改配置文件将PermitRootLogin的值改成no，并保存，然后使用<code>service sshd restart</code>重启服务</li>
+</ol>
+<h3 id="2-服务加固"><a href="#2-服务加固" class="headerlink" title="2. 服务加固"></a>2. 服务加固</h3><h4 id="2-1-关闭不必要的服务"><a href="#2-1-关闭不必要的服务" class="headerlink" title="2.1 关闭不必要的服务"></a>2.1 关闭不必要的服务</h4><pre><code>关闭不必要的服务(如普通服务和xinetd服务)，降低风险</code></pre><p><strong>操作步骤</strong></p>
+<p>使用命令<code>systemctl disable &lt;服务名&gt;</code>设置服务在开机时不自动启动</p>
+<p>CentOS 6可以使用命令<code>chkconfig --level &lt;init级别&gt; &lt;服务名&gt; off</code>设置服务在指定init级别下开机时不自动启动。</p>
+<h4 id="2-2-SSH服务安全"><a href="#2-2-SSH服务安全" class="headerlink" title="2.2 SSH服务安全"></a>2.2 SSH服务安全</h4><pre><code>对SSH服务进行安全加固，防止暴力破解成功</code></pre><p><strong>操作步骤</strong></p>
+<p>使用命令 <code>vim /etc/ssh/sshd_config</code>编辑配置文件</p>
+<pre><code>1. 不允许root账号直接登录系统: 设置 PermitRootLogin 的值为 no
+2. 修改SSH使用的协议版本: 设置 Protocol 的版本为 2
+3. 修改允许密码错误次数（默认6次）: 设置 MaxAuthTries 的值为 3
+配置文件修改完成后，重启sshd服务生效。</code></pre><h3 id="3-文件系统"><a href="#3-文件系统" class="headerlink" title="3. 文件系统"></a>3. 文件系统</h3><h4 id="3-1-设置umask值"><a href="#3-1-设置umask值" class="headerlink" title="3.1 设置umask值"></a>3.1 设置umask值</h4><pre><code>设置默认的umask值，增强安全性</code></pre><p><strong>操作步骤</strong></p>
+<p>使用命令 <code>vi /etc/profile</code> 修改配置文件，添加行 <code>umask 027</code>， 即新创建的文件属主拥有读写执行权限，同组用户拥有读和执行权限，其他用户无权限。</p>
+<h4 id="3-2-设置登录超时"><a href="#3-2-设置登录超时" class="headerlink" title="3.2 设置登录超时"></a>3.2 设置登录超时</h4><p>设置系统登录后，连接超时时间，增强安全性</p>
+<p><strong>操作步骤</strong></p>
+<p>使用命令 <code>vi /etc/profile</code> 修改配置文件，将以 <code>TMOUT=</code>开头的行注释，设置为<code>TMOUT=180</code>，即超时时间为三分钟</p>
+<h3 id="4-日志"><a href="#4-日志" class="headerlink" title="4. 日志"></a>4. 日志</h3><h4 id="4-1-syslogd日志"><a href="#4-1-syslogd日志" class="headerlink" title="4.1 syslogd日志"></a>4.1 syslogd日志</h4><p>启用日志功能，并配置日志记录</p>
+<p><strong>操作步骤</strong></p>
+<p>Linux系统默认启用以下类型日志：</p>
+<pre><code>系统日志（默认）/var/log/messages
+cron日志（默认）/var/log/cron
+安全日志（默认）/var/log/secure
+注意：部分系统可能使用`syslog-ng`日志，配置文件为：`/etc/syslog-ng/syslog-ng.conf`</code></pre><h4 id="4-2-登录和操作日志"><a href="#4-2-登录和操作日志" class="headerlink" title="4.2 登录和操作日志"></a>4.2 登录和操作日志</h4><p>通过脚本代码实现记录所有用户的登录操作日志，防止出现安全事件后无据可查</p>
+<p><strong>操作步骤</strong></p>
+<p>运行 <code>[root@xxx /]# vim /etc/profile</code>打开配置文件</p>
+<p>在配置文件中输入以下内容：</p>
+<pre><code>history
+USER=`whoami`
+USER_IP=`who -u am i 2&gt;/dev/null| awk &apos;{print $NF}&apos;|sed -e &apos;s/[()]//g&apos;`
+if [ &quot;$USER_IP&quot; = &quot;&quot; ]; then
+USER_IP=`hostname`
+fi
+if [ ! -d /var/log/history ]; then
+mkdir /var/log/history
+chmod 777 /var/log/history
+fi
+if [ ! -d /var/log/history/${LOGNAME} ]; then
+mkdir /var/log/history/${LOGNAME}
+chmod 300 /var/log/history/${LOGNAME}
+fi
+export HISTSIZE=4096
+DT=`date +&quot;%Y%m%d_%H:%M:%S&quot;`
+export HISTFILE=&quot;/var/log/history/${LOGNAME}/${USER}@${USER_IP}_$DT&quot;
+chmod 600 /var/log/history/${LOGNAME}/*history* 2&gt;/dev/null</code></pre><p>运行<code>[root@xxx /]# source /etc/profile</code> 加载配置生效</p>
+<p>注意： <code>/var/log/history</code> 是记录日志的存放位置，可以自定义</p>
+<p>通过上述步骤，可以在<code>/var/log/history</code>目录下以每个用户为名新建一个文件夹，每次用户退出后都会产生以用户名、登录IP、时间的日志文件，包含此用户本次的所有操作（root用户除外）</p>
+<h2 id="0x02-Rsync-服务安全加固"><a href="#0x02-Rsync-服务安全加固" class="headerlink" title="0x02 Rsync 服务安全加固"></a>0x02 Rsync 服务安全加固</h2><p>Rsync 是一个通过检查文件的时间戳和大小，来跨计算机系统高效地传输和同步文件的工具</p>
+<p>通常情况下，管理程序在启动 Rsync 服务后，会直接运行传输任务。如果 Rsync 服务未经过安全加固，则很容易出现未授权访问等安全问题；其直接后果是传输数据裸露在互联网上，可以被任何人访问获取，带来严重的数据泄露风险</p>
+<p>建议在使用 Rsync 服务端时，对 Rsync 服务进行安全加固，保障数据安全</p>
+<h3 id="1-隐藏-module-信息"><a href="#1-隐藏-module-信息" class="headerlink" title="1. 隐藏 module 信息"></a>1. 隐藏 module 信息</h3><p>将配置文件修改为以下内容：</p>
+<pre><code>list = false</code></pre><h3 id="2-使用权限控制"><a href="#2-使用权限控制" class="headerlink" title="2. 使用权限控制"></a>2. 使用权限控制</h3><p>将不需要写入权限的 module 设置为只读：</p>
+<pre><code>read only = true</code></pre><h3 id="3-限制网络访问"><a href="#3-限制网络访问" class="headerlink" title="3. 限制网络访问"></a>3. 限制网络访问</h3><p>使用 安全组策略 或白名单，限制允许访问主机的 IP 地址</p>
+<pre><code>hosts allow = 10.10.10.10</code></pre><h3 id="4-启用账户认证"><a href="#4-启用账户认证" class="headerlink" title="4. 启用账户认证"></a>4. 启用账户认证</h3><p>只允许指定的用户，使用指定的密码，来调用 Rsync 服务</p>
+<p><strong>服务端配置</strong></p>
+<pre><code>auth users = ottocho
+secrets file = /etc/rsyncd.secrets</code></pre><p>在文件 <code>/etc/rsyncd.secrets</code> 中写入使用的账号密码(可自行选择)，格式为：<code>username:password</code>，支持多行</p>
+<p>注意：密码要求满足强密码策略，必须是 8 位以上，且包括大小写字母、数字、特殊字符的字符串；此处的 password 使用明文</p>
+<p><strong>客户端配置</strong></p>
+<p>在客户端，使用<code>--password-file=/etc/rsyncd.secrets</code> 参数，在 <code>/etc/rsyncd.secrets</code>中写入密码</p>
+<pre><code>Rsync -av --password-file=/etc/rsyncd.secrets test.host.com::files /des/path</code></pre><p>在上述 /etc/rsyncd.secrets 密码文件中，用户或用户组必须和实际使用者保持一致，且权限必须是 600</p>
+<h3 id="5-数据加密传输"><a href="#5-数据加密传输" class="headerlink" title="5. 数据加密传输"></a>5. 数据加密传输</h3><p>Rsync 默认不支持加密传输，如果需要使用 Rsync 传输重要性很高的数据，可以使用 SSH 模式</p>
+<p>Rsync 支持以下两种同步模式：</p>
+<ul>
+<li>当源路径或目的路径的主机名后面包含一个冒号分隔符时，Rsync 使用 SSH 传输</li>
+<li>当源路径或目的路径的主机名后面包含两个冒号，或使用 Rsync://URL 时，Rsync 使用 TCP 直接连接 Rsync daemon</li>
+</ul>
+<p>在配置好 SSH 后，推荐参照以下方式来使用：</p>
+<pre><code>Rsync -av test.host.com:/path/to/files /des/path</code></pre><h2 id="0x03-NFS-服务安全加固"><a href="#0x03-NFS-服务安全加固" class="headerlink" title="0x03  NFS 服务安全加固"></a>0x03  NFS 服务安全加固</h2><p>NFS（Network File System）是 FreeBSD 支持的一种文件系统，它允许网络中的计算机之间通过 TCP/IP 网络共享资源。不正确的配置和使用 NFS，会带来安全问题</p>
+<p><strong>缺陷总结</strong></p>
+<p>NFS 的不安全性，主要体现于以下 4 个方面:</p>
+<pre><code>1）缺少访问控制机制
+2）没有真正的用户验证机制，只针对 RPC/Mount 请求进行过程验证
+3）较早版本的 NFS 可以使未授权用户获得有效的文件句柄
+4）在 RPC 远程调用中, SUID 程序具有超级用户权限</code></pre><h3 id="1-配置共享目录（-etc-exports）"><a href="#1-配置共享目录（-etc-exports）" class="headerlink" title="1. 配置共享目录（/etc/exports）"></a>1. 配置共享目录（/etc/exports）</h3><p>使用 anonuid，anongid 配置共享目录，这样可以使挂载到 NFS 服务器的客户机仅具有最小权限。不要使用 no_root_squash</p>
+<h3 id="2-使用网络访问控制"><a href="#2-使用网络访问控制" class="headerlink" title="2. 使用网络访问控制"></a>2. 使用网络访问控制</h3><p>使用 安全组策略 或 iptable 防火墙限制能够连接到 NFS 服务器的机器范围</p>
+<pre><code>iptables -A INPUT -i eth0 -p TCP -s 172.16.0.0/12 --dport 111 -j ACCEPT
+iptables -A INPUT -i eth0 -p UDP -s 172.16.0.0/12 --dport 111 -j ACCEPT
+iptables -A INPUT -i eth0 -p TCP -s 10.0.0.0/8 --dport 111 -j ACCEPT
+iptables -A INPUT -i eth0 -p UDP -s 10.0.0.0/8 --dport 111 -j ACCEPT</code></pre><h3 id="3-账号验证"><a href="#3-账号验证" class="headerlink" title="3. 账号验证"></a>3. 账号验证</h3><p>使用 Kerberos V5 作为登录验证系统，要求所有访问人员使用账号登录，提高安全性</p>
+<h3 id="4-设置-NFSD-的-COPY-数目"><a href="#4-设置-NFSD-的-COPY-数目" class="headerlink" title="4. 设置 NFSD 的 COPY 数目"></a>4. 设置 NFSD 的 COPY 数目</h3><p>在 Linux 中，NFSD 的 COPY 数目定义在启动文件 <code>/etc/rc.d/init.d/nfs</code> 中，默认值为 8</p>
+<p>最佳的 COPY 数目一般取决于可能的客户机数目。可以通过测试来找到 COPY 数目的近似最佳值，并手动设置该参数</p>
+<h3 id="5-选择传输协议"><a href="#5-选择传输协议" class="headerlink" title="5. 选择传输协议"></a>5. 选择传输协议</h3><p>对于不同的网络情况，有针对地选择 UDP 或 TCP 传输协议。传输协议可以自动选择，也可以手动设置</p>
+<pre><code>mount -t nfs -o sync,tcp,noatime,rsize=1024,wsize=1024 EXPORT_MACHINE:/EXPORTED_DIR /DIR</code></pre><p>UDP 协议传输速度快，非连接传输时便捷，但其传输稳定性不如 TCP，当网络不稳定或者黑客入侵时很容易使 NFS 性能大幅降低，甚至导致网络瘫痪。一般情况下，使用 TCP 的 NFS 比较稳定，使用 UDP 的 NFS 速度较快</p>
+<ul>
+<li>在机器较少，网络状况较好的情况下，使用 UDP 协议能带来较好的性能。</li>
+<li>当机器较多，网络情况复杂时，推荐使用 TCP 协议（V2 只支持 UDP 协议）。</li>
+<li>在局域网中使用 UDP 协议较好，因为局域网有比较稳定的网络保证，使用 UDP 可以带来更好的性能</li>
+<li>在广域网中推荐使用 TCP 协议，TCP 协议能让 NFS 在复杂的网络环境中保持最好的传输稳定性</li>
+</ul>
+<h3 id="6-限制客户机数量"><a href="#6-限制客户机数量" class="headerlink" title="6. 限制客户机数量"></a>6. 限制客户机数量</h3><p>修改 <code>/etc/hosts.allow</code> 和 <code>/etc/hosts.deny</code> 来限制客户机数量</p>
+<pre><code>/etc/hosts.allow
+portmap: 192.168.0.0/255.255.255.0 : allow
+portmap: 140.116.44.125 : allow
+/etc/hosts.deny
+portmap: ALL : deny</code></pre><h3 id="7-改变默认的-NFS-端口"><a href="#7-改变默认的-NFS-端口" class="headerlink" title="7. 改变默认的 NFS 端口"></a>7. 改变默认的 NFS 端口</h3><p>NFS 默认使用的是 111 端口，使用 port 参数可以改变这个端口值。改变默认端口值能够在一定程度上增强安全性</p>
+<h3 id="8-配置-nosuid-和-noexec"><a href="#8-配置-nosuid-和-noexec" class="headerlink" title="8. 配置 nosuid 和 noexec"></a>8. 配置 nosuid 和 noexec</h3><p>SUID (Set User ID) 或 SGID (Set Group ID) 程序可以让普通用户以超过自己权限来执行。很多 SUID/SGID 可执行程序是必须的，但也可能被一些恶意的本地用户利用，获取本不应有的权限</p>
+<p>尽量减少所有者是 root，或是在 root 组中却拥有 SUID/SGID 属性的文件。可以删除这样的文件或更改其属性，如：</p>
+<ul>
+<li><p>使用 nosuid 选项禁止 set-UID 程序在 NFS 服务器上运行，可以在 /etc/exports 加入一行：</p>
+<pre><code>/www www.abc.com(rw, root_squash, nosuid)</code></pre></li>
+<li><p>使用 noexec 禁止直接执行其中的二进制文件。</p>
+</li>
+</ul>
+<h2 id="0x04-Apache-服务安全加固"><a href="#0x04-Apache-服务安全加固" class="headerlink" title="0x04 Apache 服务安全加固"></a>0x04 Apache 服务安全加固</h2><h3 id="1-用户设置"><a href="#1-用户设置" class="headerlink" title="1. 用户设置"></a>1. 用户设置</h3><p><strong>1. 以专门的用户帐号和用户组运行 Apache 服务</strong></p>
+<p>根据需要，为 Apache 服务创建用户及用户组。如果没有设置用户和组，则新建用户，并在 Apache 配置文件中进行指定。</p>
+<p>1）创建 Apache 用户组。</p>
+<pre><code>groupadd apache</code></pre><p>2）创建 Apache 用户并加入 Apache 用户组。</p>
+<pre><code>useradd apache –g apache</code></pre><p>3）将下面两行设置参数加入 Apache 配置文件 httpd.conf 中：</p>
+<pre><code>User apache    Group apache</code></pre><p><strong>2. 检查 httpd.conf 配置文件中是否允许使用非专用账户（如 root 用户）运行 Apache 服务</strong></p>
+<p>默认设置一般即符合要求。Linux 系统中默认使用 apache 或者 nobody 用户，Unix 系统默认使用 daemon 用户</p>
+<h3 id="2-授权设置"><a href="#2-授权设置" class="headerlink" title="2. 授权设置"></a>2. 授权设置</h3><p><strong>1. 严格控制 Apache 主目录的访问权限，非超级用户不能修改该目录中的内容</strong></p>
+<p>Apache 的主目录对应于 Apache Server配置文件 httpd.conf 中的 Server Root 控制项，应设置为：</p>
+<pre><code>Server Root /usr/local/apache</code></pre><ul>
+<li>判定条件： 非超级用户不能修改该目录中的内容。</li>
+<li>检测操作： 尝试进行修改，看是否能修改该目录中的内容。</li>
+</ul>
+<p>该目录一般设置为 /etc/httpd 目录，默认情况下属主为 root 用户，其它用户不能修改该目录中的文件。默认设置一般即符合要求。</p>
+<p><strong>2. 严格设置配置文件和日志文件的权限，防止未授权访问</strong></p>
+<ul>
+<li>执行<code>chmod 600 /etc/httpd/conf/httpd.conf</code>命令设置配置文件为属主可读写，其他用户无读写权限。</li>
+<li>执行<code>chmod 644 /var/log/httpd/.log</code>命令设置日志文件为属主可读写，其他用户拥有只读权限。</li>
+</ul>
+<p>注意：<code>/etc/httpd/conf/httpd.conf</code>配置文件的默认权限是644，可根据需要修改权限为600。  <code>/var/log/httpd/.log</code>日志文件的默认权限为644，默认设置即符合要求。</p>
+<h3 id="3-日志设置"><a href="#3-日志设置" class="headerlink" title="3. 日志设置"></a>3. 日志设置</h3><p>Apache 设备应配置日志功能，对运行错误、用户访问等事件进行记录，记录内容包括时间，用户使用的 IP 地址等内容。</p>
+<p>修改 httpd.conf 配置文件，设置日志记录文件、记录内容、记录格式。</p>
+<p><strong>错误日志：</strong></p>
+<pre><code>LogLevel notice #日志的级别    ErrorLog /…/logs/error_log #日志的保存位置(错误日志)</code></pre><p><strong>访问日志：</strong></p>
+<pre><code>LogFormat %h %l %u %t \”%r\” %&gt;s %b “%{Accept}i\”%{Referer}i\” \”%{User-Agent}i\””    combined    CustomLog /…/logs/access_log combined (访问日志)</code></pre><p><strong>注意：</strong></p>
+<ul>
+<li><code>ErrorLog</code>指令设置错误日志文件名和位置。错误日志是最重要的日志文件。Apache httpd 程序将在这个文件中存放诊断信息和处理请求中出现的错误。若要将错误日志传送到 Syslog，则执行ErrorLog syslog命令。</li>
+<li><code>CustomLog</code>指令指定了保存日志文件的具体位置以及日志的格式。访问日志中会记录服务器所处理的所有请求。</li>
+<li><code>LogFormat</code>命令用于设置日志格式，建议设置为 combined 格式。</li>
+<li><code>LogLevel</code>命令用于调整记录在错误日志中的信息的详细程度，建议设置为 notice。日志的级别，默认是 warn 级别，notice 级别比较详细，但在实际中由于日志会占用大量硬盘空间。</li>
+</ul>
+<h3 id="4-禁止访问外部文件"><a href="#4-禁止访问外部文件" class="headerlink" title="4. 禁止访问外部文件"></a>4. 禁止访问外部文件</h3><p><code>禁止 Apache 访问 Web 目录之外的任何文件</code></p>
+<p><strong>1. 修改 httpd.conf 配置文件</strong></p>
+<pre><code>Order Deny,Allow    Deny from all</code></pre><p><strong>2. 设置可访问的目录</strong></p>
+<pre><code>Order Allow,Deny    Allow from /web</code></pre><p>说明： 其中 /web 为网站根目录</p>
+<p><strong>3. 默认配置如下，可根据业务需要进行设置</strong></p>
+<pre><code>Options FollowSymLinks    AllowOverride None</code></pre><h3 id="5-禁止目录浏览"><a href="#5-禁止目录浏览" class="headerlink" title="5. 禁止目录浏览"></a>5. 禁止目录浏览</h3><p>目录浏览会导致明显信息泄露或下载，建议禁止 Apache 列表显示文件。在 /etc/httpd/httpd.conf 配置文件中删除 Options 的 Indexes 设置即可</p>
+<p><strong>1. 修改 httpd.conf 配置文件</strong></p>
+<pre><code>#Options Indexes FollowSymLinks #删掉Indexes    Options FollowSymLinks    AllowOverride None    Order allow,deny    Allow from all</code></pre><p>将Options Indexes FollowSymLinks中的Indexes去掉，就可以禁止 Apache 显示该目录结构。Indexes的作用就是当该目录下没有 index.html 文件时，自动显示目录结构</p>
+<p><strong>2. 重新启动 Apache 服务</strong></p>
+<h3 id="6-错误页面重定向"><a href="#6-错误页面重定向" class="headerlink" title="6. 错误页面重定向"></a>6. 错误页面重定向</h3><p>Apache 错误页面重定向功能可以防止敏感信息泄露。</p>
+<p><strong>1. 修改 httpd.conf 配置文件</strong></p>
+<pre><code>ErrorDocument 400 /custom400.html    ErrorDocument 401 /custom401.html    ErrorDocument 403 /custom403.html    ErrorDocument 404 /custom404.html    ErrorDocument 405 /custom405.html    ErrorDocument 500 /custom500.html</code></pre><p>注意： Customxxx.html 为要设置的错误页面</p>
+<p><strong>2. 重新启动 Apache 服务</strong></p>
+<p>注意： 此项配置需要应用系统设有错误页面，或者不在 httpd 中设置，而完全由业务逻辑实现</p>
+<h3 id="7-拒绝服务防范"><a href="#7-拒绝服务防范" class="headerlink" title="7. 拒绝服务防范"></a>7. 拒绝服务防范</h3><p>根据业务需要，合理设置 session 时间，防止拒绝服务攻击</p>
+<p><strong>1. 修改 httpd.conf 配置文件</strong></p>
+<p>Timeout 10 #客户端与服务器端建立连接前的时间间隔    KeepAlive On    KeepAliveTimeout 15 #限制每个 session 的保持时间是 15 秒。此处为建议值，具体的参数值需要根据现实际情况设定</p>
+<p><strong>2. 重新启动 Apache 服务</strong></p>
+<p>注意： 默认值为Timeout 120，KeepAlive Off，KeepAliveTimeout 15，该项设置涉及性能调整</p>
+<h3 id="8-隐藏-Apache-版本号"><a href="#8-隐藏-Apache-版本号" class="headerlink" title="8. 隐藏 Apache 版本号"></a>8. 隐藏 Apache 版本号</h3><p>隐藏 Apache 的版本号及其它敏感信息</p>
+<p><strong>1. 修改 httpd.conf 配置文件：</strong></p>
+<pre><code>ServerSignature Off ServerTokens Prod</code></pre><h3 id="9-关闭-TRACE功能"><a href="#9-关闭-TRACE功能" class="headerlink" title="9. 关闭 TRACE功能"></a>9. 关闭 TRACE功能</h3><p>关闭 TRACE 功能，防止 TRACE 方法被访问者恶意利用。</p>
+<p>在 /etc/httpd/conf/httpd.conf 配置文件中添加以下设置参数：</p>
+<pre><code>TraceEnable Off</code></pre><p>注意： 该参数适用于 Apache 2.0 以上版本</p>
+<h3 id="10-禁用-CGI"><a href="#10-禁用-CGI" class="headerlink" title="10. 禁用 CGI"></a>10. 禁用 CGI</h3><p>如果服务器上不需要运行 CGI 程序，建议禁用 CGI</p>
+<p>如果没有CGI程序，可以修改 /etc/httpd/conf/httpd.conf 配置文件，把 cgi-bin 目录的配置和模块都进行注释。</p>
+<pre><code>#LoadModule cgi_module modules/mod_cgi.so#ScriptAlias /cgi-bin/ “/var/www/cgi-bin/##AllowOverride None# Options None#Order allow,deny#Allow from all#</code></pre><h3 id="11-绑定监听地址"><a href="#11-绑定监听地址" class="headerlink" title="11. 绑定监听地址"></a>11. 绑定监听地址</h3><p>服务器有多个 IP 地址时，只监听提供服务的 IP 地址</p>
+<p><strong>1. 执行以下命令查看是否绑定 IP 地址</strong></p>
+<pre><code>cat /etc/httpd/conf/httpd.conf|grep Listen</code></pre><p><strong>2. 修改 /etc/httpd/conf/httpd.conf 配置文件</strong></p>
+<pre><code>Listen x.x.x.x:80</code></pre><p>监听功能默认监听所有地址，如果服务器只有一个 IP 地址可不修改该项设置，如果有多个 IP 可根据需要进行设置</p>
+<h3 id="12-删除缺省安装的无用文件"><a href="#12-删除缺省安装的无用文件" class="headerlink" title="12. 删除缺省安装的无用文件"></a>12. 删除缺省安装的无用文件</h3><p>删除缺省安装的无用文件</p>
+<ul>
+<li><p>删除缺省 HTML 文件：</p>
+<pre><code>rm -rf /usr/local/apache2/htdocs/</code></pre></li>
+<li><p>删除缺省的 CGI 脚本：</p>
+<pre><code>rm –rf /usr/local/apache2/cgi-bin/</code></pre></li>
+<li><p>删除 Apache 说明文件：</p>
+<pre><code>rm –rf /usr/local/apache2/manual</code></pre></li>
+<li><p>删除源代码文件：</p>
+<pre><code>rm -rf /path/to/httpd-2.2.4*</code></pre></li>
+<li><p>删除 CGI</p>
+</li>
+</ul>
+<p>可根据实际情况删除，一般情况下 /var/www/html /var/www/cgi-bin 默认就是空的。</p>
+<p>注意： 根据安装步骤不同和版本不同，某些目录或文件可能不存在或位置不同</p>
+<h3 id="13-禁用非法-HTTP-方法"><a href="#13-禁用非法-HTTP-方法" class="headerlink" title="13. 禁用非法 HTTP 方法"></a>13. 禁用非法 HTTP 方法</h3><p>禁用 PUT、DELETE 等危险的 HTTP 方法</p>
+<p>修改 httpd.conf 配置文件，只允许 get、post 方法</p>
+<pre><code>Order Allow,Deny  Deny from all</code></pre><p>可根据需要进行设置，如果需要用到 PUT 或 Delete 等 HTTP 方法的话，在<code>/etc/httpd/conf/httpd.conf</code>配置文件中相应添加即可</p>
+<h2 id="0x05-Tomcat-服务安全加固"><a href="#0x05-Tomcat-服务安全加固" class="headerlink" title="0x05 Tomcat 服务安全加固"></a>0x05 Tomcat 服务安全加固</h2><p>通常 Tomcat 后台管理的 URL 地址为 <a href="http://iP:8080/manager/html/" target="_blank" rel="noopener">http://iP:8080/manager/html/</a></p>
+<p>Tomcat服务默认启用了管理后台功能，使用该后台可直接上传 war 文件包对站点进行部署和管理。如果管理后台存在空口令或者弱口令的漏洞，使得黑客可以利用该漏洞直接上传 Webshell 脚本导致服务器沦陷</p>
+<h3 id="1-网络访问控制"><a href="#1-网络访问控制" class="headerlink" title="1. 网络访问控制"></a>1. 网络访问控制</h3><ul>
+<li><p>如果业务不需要使用 Tomcat 管理后台管理业务代码，建议使用安全组防火墙功能对管理后台 URL 地址进行拦截，或直接将 Tomcat 部署目录中 webapps 文件夹中的 manager、host-manager 文件夹全部删除，并注释 Tomcat 目录中 conf 文件夹中的 tomcat-users.xml 文件中的所有代码</p>
+</li>
+<li><p>如果业务系统确实需要使用 Tomcat 管理后台进行业务代码的发布和管理，建议为 Tomcat 管理后台配置强口令，并修改默认 admin 用户，且密码长度不低于10位，必须包含大写字母、特殊符号、数字组合</p>
+</li>
+</ul>
+<h3 id="2-开启-Tomcat-的访问日志"><a href="#2-开启-Tomcat-的访问日志" class="headerlink" title="2. 开启 Tomcat 的访问日志"></a>2. 开启 Tomcat 的访问日志</h3><p>修改 conf/server.xml 文件，将下列代码取消注释：</p>
+<pre><code>&lt;Valve className=&quot;org.apache.catalina.valves.AccessLogValve&quot; directory=&quot;logs&quot;   
+prefix=&quot;localhost_access_log.&quot; suffix=&quot;.txt&quot; pattern=&quot;common&quot; resolveHosts=&quot;false&quot;/&gt;</code></pre><p>启用访问日志功能，重启 Tomcat 服务后，在 tomcat_home/logs 文件夹中就可以看到访问日志</p>
+<h3 id="3-Tomcat-默认帐号安全"><a href="#3-Tomcat-默认帐号安全" class="headerlink" title="3. Tomcat 默认帐号安全"></a>3. Tomcat 默认帐号安全</h3><p>修改 Tomcat 安装目录 conf 下的 tomcat-user.xml 文件，重新设置复杂口令并保存文件。重启 Tomcat 服务后，新口令即生效</p>
+<h3 id="4-修改默认访问端口"><a href="#4-修改默认访问端口" class="headerlink" title="4. 修改默认访问端口"></a>4. 修改默认访问端口</h3><p>修改 conf/server.xml 文件把默认的 8080 访问端口改成其它端口</p>
+<h3 id="5-重定向错误页面"><a href="#5-重定向错误页面" class="headerlink" title="5. 重定向错误页面"></a>5. 重定向错误页面</h3><p>修改访问 Tomcat 错误页面的返回信息，在 webapps\manger 目录中创建相应的401.html、404.htm、500.htm 文件，然后在 conf/web.xml 文件的最后一行之前添加下列代码：</p>
+<pre><code>&lt;error-page&gt;  
+                    &lt;error-code&gt;401&lt;/error-code&gt;      
+                    &lt;location&gt;/401.htm&lt;/location&gt;  
+            &lt;/error-page&gt;  
+            &lt;error-page&gt;  
+                    &lt;error-code&gt;404&lt;/error-code&gt;  
+                    &lt;location&gt;/404.htm&lt;/location&gt;  
+            &lt;/error-page&gt;  
+            &lt;error-page&gt;  
+                    &lt;error-code&gt;500&lt;/error-code&gt;  
+                    &lt;location&gt;/500.htm&lt;/location&gt;  
+            &lt;/error-page&gt;</code></pre><h3 id="6-禁止列出目录"><a href="#6-禁止列出目录" class="headerlink" title="6. 禁止列出目录"></a>6. 禁止列出目录</h3><p>在web.xml文件中，防止直接访问目录时由于找不到默认页面，而列出目录下的文件的情况</p>
+<p><param-name>listings</param-name><br><param-value>false</param-value></p>
+<h3 id="7-删除文档和示例程序"><a href="#7-删除文档和示例程序" class="headerlink" title="7. 删除文档和示例程序"></a>7. 删除文档和示例程序</h3><p>删除 webapps 目录下的 docs、examples、manager、ROOT、host-manager 文件夹</p>
+<h2 id="0x06-MySQL-服务安全加固"><a href="#0x06-MySQL-服务安全加固" class="headerlink" title="0x06 MySQL 服务安全加固"></a>0x06 MySQL 服务安全加固</h2><h3 id="1-帐号安全"><a href="#1-帐号安全" class="headerlink" title="1. 帐号安全"></a>1. 帐号安全</h3><p><strong>1. 禁止 Mysql 以管理员帐号权限运行</strong></p>
+<p>以普通帐户安全运行 mysqld，禁止以管理员帐号权限运行 MySQL 服务。在 /etc/my.cnf 配置文件中进行以下设置。</p>
+<pre><code>[mysql.server]
+user=mysql</code></pre><p><strong>2. 避免不同用户间共享帐号</strong></p>
+<p>参考以下步骤</p>
+<p>1) 创建用户</p>
+<pre><code>mysql&gt; mysql&gt; insert into
+mysql.user(Host,User,Password,ssl_cipher,x509_issuer,x509_sub ject) values(&quot;localhost&quot;,&quot;pppadmin&quot;,password(&quot;passwd&quot;),&apos;&apos;,&apos;&apos;,&apos;&apos;);</code></pre><p>执行以上命令可以创建一个 phplamp 用户</p>
+<p>2) 使用该用户登录 MySQL 服务</p>
+<pre><code>mysql&gt;exit;
+@&gt;mysql -u phplamp -p
+@&gt;输入密码
+mysql&gt;登录成功</code></pre><p><strong>3. 删除无关帐号</strong></p>
+<p>DROP USER 语句可用于删除一个或多个 MySQL 账户。使用 DROP USER 命令时，必须确保当前账号拥有 MySQL 数据库的全局 CREATE USER 权限或 DELETE 权限。账户名称的用户和主机部分分别与用户表记录的 User 和 Host 列值相对应</p>
+<p>执行DROP USER user;语句，可以取消一个账户和其权限，并删除来自所有授权表的帐户权限记录</p>
+<h3 id="2-口令安全"><a href="#2-口令安全" class="headerlink" title="2. 口令安全"></a>2. 口令安全</h3><p>检查账户默认密码和弱密码。口令长度需要至少八位，并包括数字、小写字母、大写字母和特殊符号四类中的至少两种类型，且五次以内不得设置相同的口令。密码应至少每 90 天进行一次更换</p>
+<p>可以通过执行以下命令修改密码</p>
+<pre><code>mysql&gt; update user set password=password(&apos;test!p3&apos;) where user=&apos;root&apos;;
+mysql&gt; flush privileges;</code></pre><h3 id="3-授权"><a href="#3-授权" class="headerlink" title="3. 授权"></a>3. 授权</h3><p>在数据库权限配置能力范围内，根据用户的业务需要，配置其所需的最小权限</p>
+<p><strong>1. 查看数据库授权情况</strong></p>
+<pre><code>mysql&gt; use mysql;
+mysql&gt; select * from user;
+mysql&gt;select * from db;
+mysql&gt;select * from host;
+mysql&gt;select * from tables_priv;
+mysql&gt;select * from columns_priv;</code></pre><p><strong>2. 通过 revoke 命令回收不必要的或危险的授权</strong></p>
+<pre><code>mysql&gt; help revoke
+Name: &apos;REVOKE&apos;
+Description:
+Syntax:
+REVOKE
+priv_type [(column_list)]
+[, priv_type [(column_list)]] ...
+ON [object_type]
+{
+*
+| *.*
+| db_name.*
+| db_name.tbl_name
+| tbl_name
+| db_name.routine_name
+}
+FROM user [, user] ...</code></pre><h3 id="4-开启日志审计功能"><a href="#4-开启日志审计功能" class="headerlink" title="4. 开启日志审计功能"></a>4. 开启日志审计功能</h3><p>数据库应配置日志功能，便于记录运行状况和操作行为</p>
+<p><strong>MySQL服务日志类型</strong></p>
+<pre><code>错误日志： -log-err
+查询日志： -log （可选）
+慢查询日志： -log-slow-queries （可选）
+更新日志： -log-update
+二进制日志： -log-bin</code></pre><p>找到 MySQL 的安装目录，在 my.ini 配置文件中增加上述所需的日志类型参数，保存配置文件后，重启 MySQL 服务即可启用日志功能。例如，</p>
+<pre><code>#Enter a name for the binary log. Otherwise a default name will be used.
+#log-bin=
+#Enter a name for the query log file. Otherwise a default name will be used.
+#log=
+#Enter a name for the error log file. Otherwise a default name will be used.
+log-error=
+#Enter a name for the update log file. Otherwise a default name will be used.
+#log-update=</code></pre><p>该参数中启用错误日志。如果您需要启用其他的日志，只需把对应参数前面的 “#” 删除即可。</p>
+<p><strong>日志查询操作说明</strong></p>
+<ul>
+<li>执行show variables like ‘log_%’;命令可查看所有的 log。</li>
+<li>执行show variables like ‘log_bin’;命令可查看具体的 log</li>
+</ul>
+<h3 id="5-安装最新补丁"><a href="#5-安装最新补丁" class="headerlink" title="5. 安装最新补丁"></a>5. 安装最新补丁</h3><p>确保系统安装了最新的安全补丁</p>
+<p>注意： 在保证业务及网络安全的前提下，并经过兼容性测试后，安装更新补丁</p>
+<h3 id="6-远程访问控制"><a href="#6-远程访问控制" class="headerlink" title="6. 远程访问控制"></a>6. 远程访问控制</h3><p>禁止网络连接，防止猜解密码攻击、溢出攻击、和嗅探攻击。</p>
+<p>注意： 仅限于应用和数据库在同一台主机的情况。</p>
+<p>如果数据库不需要远程访问，可以禁止远程 TCP/IP 连接，通过在 MySQL 服务器的启动参数中添加<code>--skip-networking</code>参数使 MySQL 服务不监听任何 TCP/IP 连接，增加安全性。</p>
+<p>您可以使用 安全组 进行内外网访问控制，建议不要将数据库高危服务对互联网开放。</p>
+<h3 id="7-IP-访问控制"><a href="#7-IP-访问控制" class="headerlink" title="7.  IP 访问控制"></a>7.  IP 访问控制</h3><p>通过数据库所在操作系统的防火墙限制，实现只有信任的 IP 才能通过监听器访问数据库。</p>
+<pre><code>mysql&gt; GRANT ALL PRIVILEGES ON db.*
+·-&gt; -&gt; TO 用户名@&apos;IP子网/掩码&apos;;</code></pre><h3 id="8-连接数设置"><a href="#8-连接数设置" class="headerlink" title="8. 连接数设置"></a>8. 连接数设置</h3><p>根据您的机器性能和业务需求，设置最大、最小连接数</p>
+<p>在 MySQL 配置文件（my.conf 或 my.ini）的 [mysqld] 配置段中添加<code>max_connections = 1000</code>，保存配置文件，重启 MySQL 服务后即可生效。</p>
+<h2 id="0x07-Redis-服务安全加固"><a href="#0x07-Redis-服务安全加固" class="headerlink" title="0x07 Redis 服务安全加固"></a>0x07 Redis 服务安全加固</h2><p><strong>漏洞描述</strong></p>
+<p>Redis 因配置不当存在未授权访问漏洞，可以被攻击者恶意利用</p>
+<p>在特定条件下，如果 Redis 以 root 身份运行，黑客可以给 root 账号写入 SSH 公钥文件，直接通过 SSH 登录受害服务器，从而获取服务器权限和数据。一旦入侵成功，攻击者可直接添加账号用于 SSH 远程登录控制服务器，给用户的 Redis 运行环境以及 Linux 主机带来安全风险，如删除、泄露或加密重要数据，引发勒索事件等</p>
+<p><strong>受影响范围</strong></p>
+<p>在 Redis 客户端，尝试无账号登录 Redis：</p>
+<pre><code>root@kali:~# redis-cli -h 10.16.10.2
+redis 10.16.10.2:6379&amp;gt; keys *</code></pre><p>从登录结果可以看出，该 Redis 服务对公网开放，且未启用认证</p>
+<h3 id="1-网络层加固"><a href="#1-网络层加固" class="headerlink" title="1.网络层加固"></a>1.网络层加固</h3><p><strong>指定 Redis 服务使用的网卡</strong></p>
+<p>默认情况下，Redis 监听 127.0.0.1。如果仅仅是本地通信，请确保监听在本地</p>
+<p>这种方式可以在一定程度上缓解 Redis 未授权访问的风险（例外情况下，如果 Redis 以 root 用户运行，攻击者借助已有的 webshell，就可以利用该 Redis 来反弹 shell 以实现提权）</p>
+<p>在 redis.conf 文件中找到 # bind 127.0.0.1，将前面的 # 去掉，然后保存</p>
+<p><strong>注意：</strong></p>
+<ol>
+<li><p>该操作需要重启 Redis 才能生效。</p>
+</li>
+<li><p>修改后只有本机才能访问 Redis，也可以指定访问源 IP 来访问 Redis</p>
+<p> bind 192.168.1.100 10.0.0.1</p>
+</li>
+</ol>
+<h3 id="2-设置防火墙策略"><a href="#2-设置防火墙策略" class="headerlink" title="2.设置防火墙策略"></a>2.设置防火墙策略</h3><p>如果正常业务中 Redis 服务需要被其他服务器来访问，可以通过 iptables 策略，仅允许指定的 IP 来访问 Redis 服务</p>
+<pre><code>iptables -A INPUT -s x.x.x.x -p tcp --dport 6379 -j ACCEPT</code></pre><h3 id="3-账号与认证"><a href="#3-账号与认证" class="headerlink" title="3.账号与认证"></a>3.账号与认证</h3><p><strong>设置访问密码</strong></p>
+<p>在 redis.conf 中找到 requirepass 字段，去掉其注释，并在后面填上需要的密码。Redis 客户端也需要使用此密码来访问 Redis 服务。</p>
+<p>打开 /etc/redis/redis.conf 配置文件:</p>
+<pre><code>requirepass MLDk$*091e8331lcfs</code></pre><p>确保密码的复杂度，配置完毕后重启服务即可生效</p>
+<h3 id="4-服务运行权限最小化"><a href="#4-服务运行权限最小化" class="headerlink" title="4.服务运行权限最小化"></a>4.服务运行权限最小化</h3><p><strong>修改 Redis 服务运行账号</strong></p>
+<p>请以较低权限账号运行 Redis 服务，并禁用该账号的登录权限。以下操作创建了一个无 home 目录权限，且无法登录的普通账号：</p>
+<pre><code>useradd -M -s /sbin/nologin [username]</code></pre><p><strong>注意</strong>：该操作需要重启 Redis 才能生效</p>
+<h3 id="5-服务细粒度授权"><a href="#5-服务细粒度授权" class="headerlink" title="5.服务细粒度授权"></a>5.服务细粒度授权</h3><p><strong>隐藏重要命令</strong></p>
+<p>Redis 无权限分离，其管理员账号和普通账号无明显区分。攻击者登录后可执行任意操作，因此需要隐藏以下重要命令：<code>FLUSHDB, FLUSHALL, KEYS,PEXPIRE, DEL, CONFIG, SHUTDOWN, BGREWRITEAOF, BGSAVE, SAVE, SPOP, SREM, RENAME,DEBUG, EVAL</code></p>
+<p>另外，在 Redis 2.8.1 及 Redis 3.x （低于 3.0.2） 版本下存在 EVAL 沙箱逃逸漏洞，攻击者可通过该漏洞执行任意 Lua 代码。</p>
+<p>下述配置将 <code>config/flushdb/flushall</code> 设置为空，即禁用该命令；也可设置为一些复杂的、难以猜测的名字。</p>
+<pre><code>rename-command CONFIG &quot;&quot;
+rename-command flushall &quot;&quot;
+rename-command flushdb &quot;&quot;
+rename-command shutdown shotdown_test</code></pre><p>保存后，执行 <code>/etc/init.d/redis-server restart</code> 重启生效</p>
+<h3 id="6-安全补丁"><a href="#6-安全补丁" class="headerlink" title="6.安全补丁"></a>6.安全补丁</h3><p>定期关注最新软件版本，并及时升级 Redis 到最新版，防止新漏洞被恶意利用。</p>
+<h2 id="0x08-Elasticsearch服务安全加固"><a href="#0x08-Elasticsearch服务安全加固" class="headerlink" title="0x08 Elasticsearch服务安全加固"></a>0x08 Elasticsearch服务安全加固</h2><p>Elasticsearch 是一个基于 Lucene 的搜索服务，它提供了 RESTful web 接口的分布式、多用户全文搜索引擎 。Elasticsearch 是用 Java 开发的，并作为 Apache 许可条款下的开放源码发布，是第二大最流行的企业搜索引擎</p>
+<p>Elasticsearch 应用于云计算中，具有实时搜索、稳定、可靠、快速、安装使用方便等优势；但也存在一些安全隐患：默认安装完成后，Elasticsearch 可以使用 9200 端口通告 web 的方式访问查看数据信息</p>
+<p><strong>漏洞详情</strong></p>
+<p>Elasticsearch 中存在以下高危漏洞</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th align="left">CVE</th>
+<th align="left">受影响版本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程命令执行</td>
+<td align="left">CVE-2014-3120</td>
+<td align="left">-</td>
+<td>Elasticsearch 的脚本执行 (scripting) 功能，可以很方便地对查询出来的数据进行再加工处理。但是，其使用的 MVEL 脚本引擎没有做过任何防护（或者沙盒包装），可以直接执行任意代码</td>
+</tr>
+<tr>
+<td>远程代码执行</td>
+<td align="left">-</td>
+<td align="left">1.3.0-1.3.7，1.4.0-1.4</td>
+<td>Elasticsearch 使用 Groovy 作为脚本语言，虽然加入了沙盒进行控制，危险的代码会被拦截。但是由于沙盒限制不严格，仅通过黑白名单来判断，导致攻击者可以绕过沙盒，执行远程代码</td>
+</tr>
+<tr>
+<td>未授权访问</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td>Elasticsearch 在安装了 River 机制之后可以同步多种数据库数据（包括关系型的MySQL、MongoDB 等）。如果 <a href="http://localhost:9200/cat/indices" target="_blank" rel="noopener">http://localhost:9200/cat/indices</a> 中 indices 包含了 _river，则代表 Elasticsearch 已安装 River 机制。而通过泄露的 <a href="http://localhost:9200/_rvier/_search" target="_blank" rel="noopener">http://localhost:9200/_rvier/_search</a> URL 地址，攻击者可以获取到敏感信息</td>
+</tr>
+</tbody></table>
+<p><strong>漏洞成因与危害</strong></p>
+<p>由于 Elasticsearch 的 HTTP 连接没有提供任何的权限控制措施，一旦部署在公共网络就容易有<code>数据泄露</code>的风险</p>
+<h3 id="1-使用最新版本"><a href="#1-使用最新版本" class="headerlink" title="1. 使用最新版本"></a>1. 使用最新版本</h3><p>通过<a href="https://www.elastic.co/downloads?spm=a2c4g.11186623.2.10.25913a81D2Cdwa" target="_blank" rel="noopener">Elastic 官网</a>下载 Elasticsearch 的最新版本</p>
+<ul>
+<li>下载完成后，将下载文件的 sha1 值和下载时官网页面提供的 sha1 值进行对比，避免下载过程中被恶意攻击者拦截破坏文件，甚至注入恶意代码</li>
+<li>不要随便安装第三方的插件，插件有可能引入安全漏洞甚至本身自带后门，需谨慎使用</li>
+<li>关注 Elastic 网站，及时更新 Elasticsearch 至最新版本。Elasticsearch 每次版本发布都会优化和改进一部分功能，尤其是安全漏洞的补丁。同时，仔细阅读 Elasticsearch 的版本更新记录</li>
+</ul>
+<p><strong>注意：</strong>更新升级前，建议先进行快照备份，及本地测试</p>
+<h3 id="2-网络访问控制"><a href="#2-网络访问控制" class="headerlink" title="2. 网络访问控制"></a>2. 网络访问控制</h3><p>Elasticsearch 默认端口是 9200</p>
+<ol>
+<li>不要把 Elasticsearch 的 9200 端口服务发布到互联网上</li>
+<li>使用 云安全组防火墙 或本地操作系统防火墙对访问源 IP 进行隔离控制</li>
+</ol>
+<h3 id="3-绑定访问源-IP"><a href="#3-绑定访问源-IP" class="headerlink" title="3. 绑定访问源 IP"></a>3. 绑定访问源 IP</h3><p>进入 config 目录，修改 <code>elasticsearch.yml</code>配置文件中以下参数：</p>
+<p>network.bind_host: 192.168.0.1 # 设置绑定的 IP 地址，可以是 IPv4 或 IPv6 地址，默认为 0.0.0.0</p>
+<p>network.publish_host: 192.168.0.1 # 设置其它节点和该节点交互的 IP 地址，如果不设置它会自动判断，值必须是个真实的 IP 地址</p>
+<p>network.host: 192.168.0.1 # 同时设置上述两个参数：bind_host 和 publish_host。</p>
+<h3 id="4-修改默认端口"><a href="#4-修改默认端口" class="headerlink" title="4. 修改默认端口"></a>4. 修改默认端口</h3><p>进入 config 目录，修改<code>elasticsearch.yml</code> 配置文件中以下参数：</p>
+<p>ransport.tcp.port: 9300  # 设置节点间交互的 TCP 端口，默认是 9300。<br>transport.tcp.compress: true  # 设置是否压缩 TCP 传输时的数据，默认为 false，即不压缩。<br>http.port: 9200  # 设置对外服务的 HTTP 端口，默认为 9200。</p>
+<h3 id="5-关闭-HTTP-访问"><a href="#5-关闭-HTTP-访问" class="headerlink" title="5. 关闭 HTTP 访问"></a>5. 关闭 HTTP 访问</h3><p>进入 config 目录，修改 elasticsearch.yml 配置文件中以下参数：</p>
+<p>http.enabled: false  #是否使用 HTTP 协议对外提供服务，默认为 true，即开启</p>
+<h3 id="6-使用-Shield-安全插件"><a href="#6-使用-Shield-安全插件" class="headerlink" title="6. 使用 Shield 安全插件"></a>6. 使用 Shield 安全插件</h3><p>Shield 是 Elastic 公司为 Elasticsearch 开发的一个安全插件。在安装此插件后，Shield 会拦截所有对 Elasticsearch 的请求，并进行认证与加密，保障 Elasticsearch 及相关系统的安全性。Shield 是商业插件，需要 Elasticsearch 的商业许可。第一次安装许可的时候，会提供 30 天的免费试用权限。30 天后，Shield 将会屏蔽 clusterhealth, cluster stats, index stats 等 API，其余功能不受影响</p>
+<p><strong>1. 用户认证</strong></p>
+<p>使用 Shield 可以定义一系列已知的用户，并用其认证用户请求。这些用户存在于抽象的“域”中。一个“域”可以是下面几种类型：</p>
+<ul>
+<li>LDAP 服务</li>
+<li>ActiveDirectory 服务</li>
+<li>本地 esusers 配置文件（类似 /etc/passwd)</li>
+</ul>
+<p><strong>2. 权限控制</strong></p>
+<p>Shield 的权限控制包含下面几种元素：</p>
+<pre><code>1）被保护的资源 SecuredResource：权限所应用到的对象，比如某个 index，cluster 等。
+2）特权 Priviliege：角色对对象可以执行的一种或多种操作，比如 read，write 等。还可以是 indicies:/data/read/perlocate 等对某种对象特有的操作。
+3）许可 Permissions：对被保护的资源拥有的一个或多个特权，如 read on the&quot;products&quot; index。
+4）角色 Role：一组许可的集成，具有独立的名称。
+5）用户 Users：用户实体，可以被赋予多种角色，他们可以对被保护的资源执行相应角色所拥有的各种特权</code></pre><p><strong>3. 安装 Shield</strong></p>
+<p>执行安装步骤前，请确保满足以下安装环境条件：</p>
+<ul>
+<li>安装了 Java7 或更新版本</li>
+<li>您将 Elasticsearch 1.5.0+ 解压安装到了本机上。如果您使用 APT 或 YUM 安装，默认的安装目录可能在 /usr/share/elasticsearch</li>
+</ul>
+<p>参照以下步骤完成安装：</p>
+<p>1）进入 Elasticsearch 安装目录：</p>
+<pre><code>cd /usr/share/elasticsearch</code></pre><p>2）安装 Elasticsearch 许可插件：</p>
+<pre><code>bin/plugin -i elasticsearch/license/latest</code></pre><p>3）安装 Shield 插件：</p>
+<pre><code>bin/plugin -i elasticsearch/shield/latest</code></pre><p>4）将 Shield 配置文件移动或链接至 /etc/elasticsearch/shield 目录中：</p>
+<pre><code>ln -s /usr/share/elasticsearch/config/shield /etc/elasticsearch/shield</code></pre><p>说明：Elasticsearch 服务在启动时会在 /etc/elasticsearch/shield 目录下寻找 Shield 配置文件，而这些配置文件在安装 Shield 时会出现在 /usr/share/elasticsearch/config/shield 中，因此需要将配置文件移动或链接至该目录</p>
+<p>5）重启 Elasticsearch 服务：</p>
+<pre><code>service elasticsearch restart</code></pre><p>6）新建一个 Elasticsearch 管理员账户，填写新密码：</p>
+<pre><code>bin/shield/esusers
+useradd es_admin -r admin</code></pre><p>7）直接使用 RESTFUL API 访问 Elasticsearch 的请求都会被拒绝：</p>
+<pre><code>curl -XGET &apos;http://localhost:9200/&apos;</code></pre><p>需要在请求中添加用户名和密码：</p>
+<pre><code>curl -u es_admin -XGET &apos;http://localhost:9200/&apos;</code></pre><p>refer:</p>
+<ul>
+<li><a href="https://www.elastic.co/cn/downloads/shield?spm=a2c4g.11186623.2.12.25913a81D2Cdwa" target="_blank" rel="noopener">Shield 官方安装指南</a></li>
+</ul>
+<h3 id="7-修改默认集群名称"><a href="#7-修改默认集群名称" class="headerlink" title="7. 修改默认集群名称"></a>7. 修改默认集群名称</h3><p>Elasticsearch 默认的集群名称是 elasticsearch，请在您的生产环境中将其修改成其他名称。确保在不同的环境和不同的集群下使用不同的名称；并且在监控集群节点时，如果有未知节点加入，一定要及时预警。</p>
+<h3 id="8-不要以-root-身份运行"><a href="#8-不要以-root-身份运行" class="headerlink" title="8. 不要以 root 身份运行"></a>8. 不要以 root 身份运行</h3><p>不要以 root 身份来运行 Elasticsearch，不要和其他服务共用相同的用户，并把用户的权限最小化</p>
+<p>应用示例：</p>
+<pre><code>sudo -u es-user ES_JAVA_OPTS=&quot;-Xms1024m -Xmx1024m&quot;
+/opt/elasticsearch/bin/elasticsearc</code></pre><h3 id="9-正确设置数据目录"><a href="#9-正确设置数据目录" class="headerlink" title="9. 正确设置数据目录"></a>9. 正确设置数据目录</h3><p>请确保为 Elasticsearch 的目录分配了合理的读写权限，避免使用共享文件系统。确保只有 Elasticsearch 的启动用户才有权访问目录。日志目录也需要正确配置，避免泄露敏感信息。</p>
+<h3 id="10-定期进行备份"><a href="#10-定期进行备份" class="headerlink" title="10. 定期进行备份"></a>10. 定期进行备份</h3><p>使用 Elasticsearch 提供的备份还原机制，定期对 Elasticsearch 的数据进行快照备份。</p>
+<h3 id="11-禁用批量删除索引"><a href="#11-禁用批量删除索引" class="headerlink" title="11. 禁用批量删除索引"></a>11. 禁用批量删除索引</h3><p>Elasticsearch 支持使用全部（_all）和通配符（*）来批量删除索引。在生产环境，该操作存在一定风险，你可以通过设置 action.destructive_requires_name: true 参数来禁用它。</p>
+<h3 id="12-启用日志记录功能"><a href="#12-启用日志记录功能" class="headerlink" title="12. 启用日志记录功能"></a>12. 启用日志记录功能</h3><p>Elasticsearch 的 config 文件夹里面有两个配置文件：</p>
+<ul>
+<li>elasticsearch.yml：基本配置文件。</li>
+<li>logging.yml：日志配置文件。由于 Elasticsearch 使用 log4j 来记录日志的，logging.yml 中的设置请按普通 log4j 配置文件进行设置。</li>
+</ul>
+<p>启用日志功能需要修改 elasticsearch.yml 配置文件：</p>
+<p>path.logs: /path/to/logs  # 设置日志文件的存储路径，默认是 Elasticsearch 根目录下的 logs 文件夹</p>
+<h2 id="0x09-Memcached-服务安全加固"><a href="#0x09-Memcached-服务安全加固" class="headerlink" title="0x09 Memcached 服务安全加固"></a>0x09 Memcached 服务安全加固</h2><p><strong>漏洞描述</strong></p>
+<p>Memcached是一套常用的key-value缓存系统，由于它本身没有权限控制模块，所以对公网开放的Memcached服务很容易被攻击者扫描发现，攻击者通过命令交互可直接读取Memcached中的敏感信息</p>
+<p><strong>修复方案</strong></p>
+<p>Memcached默认没有启用安全功能，建议用户在使用时进行安全加固</p>
+<h3 id="1-定期升级"><a href="#1-定期升级" class="headerlink" title="1. 定期升级"></a>1. 定期升级</h3><p>使用官方最新版本Memcached</p>
+<h3 id="2-配置访问控制"><a href="#2-配置访问控制" class="headerlink" title="2. 配置访问控制"></a>2. 配置访问控制</h3><p>建议用户不要将服务发布到互联网上而被黑客利用，可以通过ECS安全组规则或iptables配置访问控制规则。例如，在Linux环境中运行命令<code>iptables -A INPUT -p tcp -s 192.168.0.2 —dport 11211 -j ACCEPT</code>，在iptables中添加此规则只允许192.168.0.2这个IP对11211端口进行访问</p>
+<h3 id="3-绑定监听IP"><a href="#3-绑定监听IP" class="headerlink" title="3. 绑定监听IP"></a>3. 绑定监听IP</h3><p>如果Memcached没有在公网开放的必要，可在Memcached启动时指定绑定的IP地址为 127.0.0.1。例如，在Linux环境中运行以下命令：</p>
+<p>memcached -d -m 1024 -u memcached -l 127.0.0.1 -p 11211 -c 1024 -P /tmp/memcached.pid</p>
+<h3 id="4-使用最小化权限账号"><a href="#4-使用最小化权限账号" class="headerlink" title="4. 使用最小化权限账号"></a>4. 使用最小化权限账号</h3><p>使用普通权限账号运行，指定Memcached用户。例如，在Linux环境中运行以下命令来运行Memcached：</p>
+<pre><code>memcached -d -m 1024 -u memcached -l 127.0.0.1 -p 11211 -c 1024 -P /tmp/memcached.pid</code></pre><h3 id="5-启用认证功能"><a href="#5-启用认证功能" class="headerlink" title="5. 启用认证功能"></a>5. 启用认证功能</h3><p>Memcached本身没有做验证访问模块,Memcached从1.4.3版本开始，能支持SASL认证。<a href="http://www.postfix.org/SASL_README.html?spm=a2c4g.11186623.2.12.791a713fWaA9QS#saslauthd" target="_blank" rel="noopener">SASL认证详细配置手册</a></p>
+<h3 id="6-修改默认端口"><a href="#6-修改默认端口" class="headerlink" title="6. 修改默认端口"></a>6. 修改默认端口</h3><p>修改默认11211监听端口为11222端口。在Linux环境中运行以下命令：</p>
+<pre><code>memcached -d -m 1024 -u memcached -l 127.0.0.1 -p 11222 -c 1024 -P /tmp/memcached.pid</code></pre><p><strong>Memcached命令参数说明</strong></p>
+<pre><code>-d 是指启动一个守护进程。
+-m 是指分配给Memcached使用的内存数量，单位是MB，以上为1024MB。
+-u 是指运行Memcached的用户，推荐使用单独普通权限用户Memcached，而不要使用root权限账户。
+-l 是指监听的服务器IP地址，例如指定服务器的IP地址为127.0.0.1。
+-p 是用来设置Memcached的监听端口，默认端口为11211。建议设置1024以上的端口。
+-c 是指最大运行的并发连接数，默认是1024。可按照您服务器的负载量来设定。
+-P 是指设置保存Memcached的pid文件，例如保存在 /tmp/memcached.pid 位置。</code></pre><h3 id="7-备份数据"><a href="#7-备份数据" class="headerlink" title="7. 备份数据"></a>7. 备份数据</h3><p>为避免数丢失，升级前请做好备份，或者建立ECS硬盘快照</p>
+<h3 id="8-主机基线检查"><a href="#8-主机基线检查" class="headerlink" title="8. 主机基线检查"></a>8. 主机基线检查</h3><p>主机检测及防护: 使用HIDS自动检测不安全的配置项；Memcached漏洞的检测和防护</p>
+<h2 id="0x0A-Docker服务安全加固"><a href="#0x0A-Docker服务安全加固" class="headerlink" title="0x0A Docker服务安全加固"></a>0x0A Docker服务安全加固</h2><h3 id="1-加固主机操作系统"><a href="#1-加固主机操作系统" class="headerlink" title="1. 加固主机操作系统"></a>1. 加固主机操作系统</h3><p>在部署前需要对服务器操作系统进行安全加固，例如，更新所有软件补丁、配置强密码、关闭不必要的服务端口等。</p>
+<h3 id="2-使用强制访问控制策略"><a href="#2-使用强制访问控制策略" class="headerlink" title="2. 使用强制访问控制策略"></a>2. 使用强制访问控制策略</h3><p>启用强制访问控制（Mandatory Access Control (MAC)），根据业务场景的具体分析，对Docker中使用的各种资源设置访问控制。</p>
+<p>启用AppAamor功能：</p>
+<p>启用SElinux功能：</p>
+<h3 id="3-配置网络访问控制策略"><a href="#3-配置网络访问控制策略" class="headerlink" title="3. 配置网络访问控制策略"></a>3. 配置网络访问控制策略</h3><p>根据实际应用，对需要外网访问的端口（例如<strong>管理界面、API 2375端口</strong>等重要端口）、需要与外网交互的网络地址、端口、协议等进行梳理，使用iptables或<a href="https://help.aliyun.com/document_detail/25475.htm" target="_blank" rel="noopener">ECS安全组策略</a>对网络的出入设置严格的访问控制。</p>
+<h3 id="4-不要使用root用户运行"><a href="#4-不要使用root用户运行" class="headerlink" title="4. 不要使用root用户运行"></a>4. 不要使用root用户运行</h3><p>在软件使用中，有一些必须由root用户才能够进行的操作。但从安全角度，您需要将这一部分操作与仅使用普通用户权限即可执行的操作分离解耦。</p>
+<p>在编写dockerfile时，您可以使用类似如下的命令创建一个普通权限用户，并设置创建的UID为以后运行程序的用户：</p>
+<p>Docker命令参考：</p>
+<ul>
+<li><a href="https://docs.docker.com/reference/builder/#user" target="_blank" rel="noopener">https://docs.docker.com/reference/builder/#user</a></li>
+<li><a href="https://docs.docker.com/reference/builder/#run" target="_blank" rel="noopener">https://docs.docker.com/reference/builder/#run</a></li>
+</ul>
+<h3 id="5-禁止使用特权"><a href="#5-禁止使用特权" class="headerlink" title="5. 禁止使用特权"></a>5. 禁止使用特权</h3><p>默认情况下，Docker容器是没有特权的，一个容器不允许访问任何设备；但当使用<code>--privileged</code>选项时，则该容器将能访问所有设备。</p>
+<p>例如，当打开<code>--privileged</code>选项后，您就可以对Host中<code>/dev/</code>下的所有设备进行操作。但如果不是必须对host上的所有设备进行访问的话，您可以使用<code>--device</code>仅添加需要操作的设备。</p>
+<h3 id="6-控制Docker容器资源配额"><a href="#6-控制Docker容器资源配额" class="headerlink" title="6. 控制Docker容器资源配额"></a>6. 控制Docker容器资源配额</h3><p><strong>控制CPU份额</strong></p>
+<ul>
+<li>Docker提供<code>–cpu-shares</code>参数，用于在创建容器时指定容器所使用的CPU份额值</li>
+</ul>
+<p>使用示例： 当使用命令<code>docker run -tid –cpu-shares 100 ubuntu:stress</code>创建容器时，则最终生成的cgroup的CPU份额配置可以下面的文件中找到。</p>
+<p><code>cpu-shares</code>的值不能保证可以获得1个vcpu或者多少GHz的CPU资源，仅仅只是一个弹性的加权值</p>
+<ul>
+<li>Docker提供了<code>–cpu-period</code>、<code>–cpu-quota</code>两个参数，用来控制容器可以分配到的CPU时钟周期。<br><code>–cpu-period</code>用来指定容器对CPU的使用要在多长时间内做一次重新分配，而<code>–cpu-quota</code>是用来指定在这个周期内，最多可以有多少时间用来运行这个容器。与<code>–cpu-shares</code>不同的是，这种配置是指定一个绝对值，而且没有弹性在里面，容器对CPU资源的使用绝对不会超过配置的值。<br><code>cpu-period</code>和<code>cpu-quota</code>的单位为微秒（μs）。<code>cpu-period</code>的最小值为1000微秒，最大值为1秒（10^6 μs），默认值为0.1秒（100000 μs）。<code>cpu-quota</code>的值默认为-1，表示不做控制。<br>举例说明，如果容器进程需要每1秒使用单个CPU的0.2秒时间，可以将<code>cpu-period</code>设置为1000000（即1秒），cpu-quota设置为200000（0.2秒）。当然，在多核情况下，如果允许容器进程需要完全占用两个CPU，则可以将<code>cpu-period</code>设置为100000（即0.1秒），<code>cpu-quota</code>设置为200000（0.2秒）。<br>使用示例：使用如下命令来创建容器<code>docker run -tid –cpu-period 100000 –cpu-quota 200000 ubuntu</code>。</li>
+</ul>
+<p><strong>控制CPU内核</strong></p>
+<p>对于多核CPU的服务器，使用<code>–cpuset-cpus</code>和<code>–cpuset-mems</code>参数，可以限定容器运行使用哪些CPU内核和内存节点。</p>
+<p>该功能可以对需要高性能计算的容器进行性能最优的配置，对具有NUMA拓扑（具有多CPU、多内存节点）的服务器尤其有用。而如果服务器只有一个内存节点，则<code>–cpuset-mems</code>的配置基本上不会有明显效果。</p>
+<p>使用示例：使用命令<code>docker run -tid –name cpu1 –cpuset-cpus 0-2 ubuntu</code>，表示创建的容器只能用0、1、2这三个内核。</p>
+<p><strong>混合使用CPU配额控制参数</strong></p>
+<p>在上述参数中，<code>cpu-shares</code>控制只用在容器竞争同一个内核的时间片时。如果通过<code>cpuset-cpus</code>指定容器A使用内核0，容器B只使用内核1，则在主机上只有这两个容器使用对应内核的情况，它们各自占用全部的内核资源，<code>cpu-shares</code>没有明显效果。</p>
+<p><code>cpu-period</code>、<code>cpu-quota</code>这两个参数一般联合使用。在单核或者通过<code>cpuset-cpus</code>强制容器使用一个CPU内核的情况下，即使<code>cpu-quota</code>超过<code>cpu-period</code>，也不会使容器使用更多的CPU资源。</p>
+<p><code>cpuset-cpus</code>、<code>cpuset-mems</code>只对多核、多内存节点上的服务器有效，并且必须与实际的物理配置匹配，否则也无法达到资源控制的目的。</p>
+<p><strong>控制内存配额</strong></p>
+<p>和CPU控制一样，Docker也提供了若干参数来控制容器的内存使用配额，可以控制容器的swap大小、可用内存大小等。主要有以下参数：</p>
+<ul>
+<li><code>memory-swappiness</code>：控制进程将物理内存交换到swap分区的倾向，默认系数为60。系数越小，就越倾向于使用物理内存。取值范围为0-100。当值为100时，表示尽量使用swap分区；当值为0时，表示禁用容器swap功能。这点不同于宿主机，宿主机swappiness设置为0时，也不会禁用swap。</li>
+<li><code>–kernel-memory</code>：内核内存，不会被交换到swap上。一般情况下，不建议修改，可以直接参考Docker的官方文档。</li>
+<li><code>–memory</code>：设置容器使用的最大内存上限。默认单位为byte，可以使用K、G、M等带单位的字符串。</li>
+<li><code>–memory-reservation</code>：启用弹性的内存共享。当宿主机资源充足时，允许容器尽量多地使用内存，当检测到内存竞争或者低内存时，强制将容器的内存降低到<code>memory-reservation</code>所指定的内存大小。不设置此选项时，有可能出现某些容器长时间占用大量内存，带来性能上的损失。</li>
+<li><code>–memory-swap</code>：等于内存和swap分区大小的总和。设置为-1时，表示swap分区的大小是无限的。默认单位为byte，可以使用K、G、M等带单位的字符串。如果<code>–memory-swap</code>的设置值小于<code>–memory</code>的值，则使用默认值，为<code>–memory-swap</code>值的两倍。</li>
+</ul>
+<h3 id="7-不运行不可信的Docker镜像"><a href="#7-不运行不可信的Docker镜像" class="headerlink" title="7. 不运行不可信的Docker镜像"></a>7. 不运行不可信的Docker镜像</h3><p>不要运行不可信的Docker镜像作为互联网服务器，避免运行不完全理解的Docker镜像作为互联网服务器。</p>
+<h3 id="8-开启日志记录功能"><a href="#8-开启日志记录功能" class="headerlink" title="8. 开启日志记录功能"></a>8. 开启日志记录功能</h3><p>Docker的日志可以分成两类，一类是stdout标准输出，另一类是文件日志。Dockerd支持的日志级别有debug、info、warn、error、fatal，默认的日志级别为info。</p>
+<p>必要的情况下，您需要设置日志级别，这可以通过配置文件，或者启动参数<code>-l</code>或<code>--log-level</code>来完成。</p>
+<p><strong>方法一</strong>：修改配置文件<code>/etc/docker/daemon.json</code>。</p>
+<p><strong>方法二</strong>：使用<code>docker run</code>的时候指定</p>
+<pre><code>`--log-driver=syslog --log-opt syslog-facility=daemon`</code></pre><h3 id="9-定期安全扫描和更新补丁"><a href="#9-定期安全扫描和更新补丁" class="headerlink" title="9. 定期安全扫描和更新补丁"></a>9. 定期安全扫描和更新补丁</h3><p>在生产环境中使用漏洞扫描工具可以检测镜像中的已知漏洞。</p>
+<ul>
+<li>容器通常都不是从头开始构建的，所以一定要进行安全扫描，以便及时发现基础镜像中任何可能存在的漏洞，并及时更新补丁。</li>
+<li>在应用程序交付生命周期中加入漏洞扫描的安全质量控制，防止部署易受攻击的容器。</li>
+</ul>
+<h2 id="0x0B-Kubernetes服务安全加固"><a href="#0x0B-Kubernetes服务安全加固" class="headerlink" title="0x0B Kubernetes服务安全加固"></a>0x0B Kubernetes服务安全加固</h2><h3 id="1-确保镜像无安全漏洞"><a href="#1-确保镜像无安全漏洞" class="headerlink" title="1. 确保镜像无安全漏洞"></a>1. 确保镜像无安全漏洞</h3><p>在部署前，应该确保所有的操作系统软件、Kubernetes软件为官方最新版本，防止部署后因为漏洞造成入侵事件。</p>
+<p>在运维过程中，要不断执行持续安全漏洞扫描（Continuous Security Vulnerability Scanning），因为容器中可能存在包含已知漏洞（CVE）的过时包。新的漏洞每天都会出现，所以这不是一个一次性的工作，对镜像进行持续的安全评估是至关重要的。</p>
+<p>定期对环境进行安全更新，一旦发现运行中容器的漏洞，您应该及时更新镜像并重新部署容器。尽量避免直接更新（例如，<code>apt-update</code>）到正在运行的容器，因为这样打破了镜像与容器的对应关系。</p>
+<p>使用Kubernetes滚动升级功能可以方便地升级容器，该功能允许将镜像升级到最新版本来逐步更新正在运行的容器。</p>
+<h3 id="2-只使用授权镜像"><a href="#2-只使用授权镜像" class="headerlink" title="2. 只使用授权镜像"></a>2. 只使用授权镜像</h3><p>如果无法保证只运行符合组织策略的镜像，那么组织会面临运行脆弱甚至恶意容器的危险。从未知的来源下载和运行镜像是危险的，它相当于在生产服务器上运行未知服务商的软件。</p>
+<p>使用私有镜像存储您的合法镜像，这样能大量减少可能进入到您的环境的镜像数量。建议您将安全评估（如漏洞扫描）加入持续集成（CI）中，使其成为构建流程的一部分。</p>
+<p>持续集成应确保只使用审查通过的代码来构建镜像。当镜像构建成功后，要对它进行安全漏洞扫描，且只有在不存在问题时，才能将镜像推送到私有镜像仓库。在安全评估中失败的镜像不应该被推送到镜像仓库中。</p>
+<p>Kubernetes镜像授权插件的工作已经完成，预计会随Kubernetes 1.4发布。该插件允许阻止未授权镜像的分发，<a href="https://github.com/kubernetes/kubernetes/pull/27129" target="_blank" rel="noopener">单击查看详情</a>。</p>
+<h3 id="3-限制对K8S节点的直接访问"><a href="#3-限制对K8S节点的直接访问" class="headerlink" title="3. 限制对K8S节点的直接访问"></a>3. 限制对K8S节点的直接访问</h3><p>应该限制SSH登录或SSH Key免登录Kubernetes节点，减少对主机资源未授权的访问。应该要求用户使用<code>kubectl exec</code>命令，此命令能够在不访问主机的情况下直接访问容器环境。</p>
+<p>您可以使用Kubernetes授权插件来进一步控制用户对资源的访问。它允许设置对指定命名空间、容器和操作的细粒度访问控制规则。</p>
+<h3 id="4-修改默认端口-1"><a href="#4-修改默认端口-1" class="headerlink" title="4. 修改默认端口"></a>4. 修改默认端口</h3><p>Kubernets API Server进程提供Kuvernetes API。通常情况下，有一个进程运行在单一kubernetes-master节点上。</p>
+<p>默认情况，Kubernetes API Server提供HTTP的两个端口：</p>
+<p><strong>本地主机端口</strong></p>
+<ul>
+<li>HTTP服务默认端口8080，修改标识<code>–insecure-port</code></li>
+<li>默认IP是本地主机，修改标识<code>—insecure-bind-address</code></li>
+<li>在HTTP中没有认证和授权检查</li>
+<li>主机访问受保护</li>
+</ul>
+<p><strong>安全端口</strong></p>
+<ul>
+<li>默认端口6443，修改标识<code>—secure-port</code></li>
+<li>默认IP是首个非本地主机的网络接口，修改标识<code>—bind-address</code> HTTPS服务。</li>
+<li>设置证书和密钥的标识，<code>–tls-cert-file</code>，<code>–tls-private-key-file</code></li>
+<li>认证方式，令牌文件或者客户端证书</li>
+<li>使用基于策略的授权方式</li>
+</ul>
+<p>基于安全考虑，会移除只读端口，使用Service Account代替。</p>
+<h3 id="5-API管理端口访问控制"><a href="#5-API管理端口访问控制" class="headerlink" title="5. API管理端口访问控制"></a>5. API管理端口访问控制</h3><p>在某些配置文件中有一个代理（nginx）作为API Server进程运行在同一台机器上。该代理是HTTPS服务，认证端口是443，访问API Server是本地主机8080端口。在这些配置文件里，Secure Port通常设置为6443。</p>
+<p>您可以使用<a href="https://help.aliyun.com/document_detail/25475.htm" target="_blank" rel="noopener">ECS安全组防火墙规则</a>，限制外部HTTPS通过443端口访问。</p>
+<p>以上都是默认配置，每个云提供商可能会有所不同，您可以根据不同的业务场景灵活配置和调整。</p>
+<h3 id="6-创建资源间的管理界限"><a href="#6-创建资源间的管理界限" class="headerlink" title="6. 创建资源间的管理界限"></a>6. 创建资源间的管理界限</h3><p>限制用户权限的范围可以减少错误或恶意活动的影响。Kubernetes命名空间允许将资源划分为逻辑命名组。在一个命名空间中创建的资源对其他命名空间是隐藏的。</p>
+<p>默认情况下，用户在Kubernetes集群中创建的每个资源运行在名称为“default”的默认空间内。您也可以创建额外的命名空间并附加资源和用户给它们。您可以使用Kubernetes授权插件来创建策略，以便将不同用户的访问请求隔离到不同的命名空间中。</p>
+<p>例如：以下策略将允许”alice”从命名空间”fronto”读取pods。</p>
+<h3 id="7-定义资源配额"><a href="#7-定义资源配额" class="headerlink" title="7. 定义资源配额"></a>7. 定义资源配额</h3><p>运行没有资源限制的容器会将您的系统置于DoS或被其他租户干扰的风险中。为了防止和最小化这些风险，您应该定义资源配额。</p>
+<p>默认情况下，Kubernetes集群中的所有资源没有对CPU和内存的使用限制。您可以创建资源配额策略，并附加到Kubernetes命名空间中来限制Pod对CPU和内存的使用。</p>
+<p>下面的例子将限制命名空间中Pod的数量为4个，CPU使用在1和2之间，内存使用在1GB 和2GB之间。</p>
+<p>在<code>compute-resources.yaml</code>文件中：</p>
+<h3 id="10-API-Server认证与授权"><a href="#10-API-Server认证与授权" class="headerlink" title="10. API Server认证与授权"></a>10. API Server认证与授权</h3><p>API Server权限控制分为三种：Authentication（身份认证）、Authorization（授权）、AdmissionControl（准入控制）。</p>
+<p><strong>身份认证</strong></p>
+<p>当客户端向Kubernetes非只读端口发起API请求时，Kubernetes通过三种方式来认证用户的合法性（即验证用户是否有权限操作API）：证书认证，Token认证，基本信息认证。</p>
+<ul>
+<li><strong>证书认证</strong><br>设置APIServer的启动参数：<code>--client_ca_file=SOMEFILE</code><br>验证被引用的文件中包含的client证书。如果被验证通过，那么这个验证记录中的主体对象将会作为请求的username。</li>
+<li><strong>Token认证</strong><br>设置APIServer的启动参数：<code>--token_auth_file=SOMEFILE</code><br>Token file的格式包含三列：token，username，userid。当使用Token作为验证方式时，需要在对APIServer的HTTP请求中增加一个Header字段<code>Authorization</code>，并将它的值设置为<code>Bearer SOMETOKEN</code>。</li>
+<li><strong>基本信息认证</strong><br>设置APIServer的启动参数：<code>--basic_auth_file=SOMEFILE</code><br>如果更改了文件中的密码，只有重新启动APIServer使其重新生效。该文件的基本格式包含三列：passwork，username，userid。当使用此作为认证方式时，需要在对APIServer的HTTP请求中增加一个Header字段<code>Authorization</code>，并将它的值设置为<code>Basic BASE64ENCODEDUSER:PASSWORD</code>。</li>
+</ul>
+<p><strong>授权</strong></p>
+<p>在Kubernetes中，认证和授权是分开的，而且授权发生在认证完成之后。认证过程是检验发起API请求的用户是不是他所声称的那个人；而授权过程则判断此用户是否有执行该API请求的权限；因此授权是以认证的结果作为基础的。</p>
+<p>Kubernetes授权模块应用于所有对APIServer的HTTP访问请求，而访问只读端口不需要认证和授权过程。APIServer启动时默认将authorization_mode设置为AlwaysAllow模式，即永远允许。</p>
+<p>Kubernetes授权模块检查每个HTTP请求，并提取请求上下文中的所需属性（例如：user，resource kind，namespace）与访问控制规则进行比较。任何一个API请求在被处理前都需要通过一个或多个访问控制规则的验证。</p>
+<p>目前，Kubernetes支持并实现了以下授权模式（authorization_mode），这些授权模式可以通过在APIServer启动时传入参数进行选择。</p>
+<p>AlwaysDeny模式屏蔽所有的请求（一般用于测试）。AlwaysAllow模式允许所有请求，默认APIServer启动时采用的便是AlwaysAllow模式。ABAC（Attribute-Based Access Control，即基于属性的访问控制）模式则允许用户自定义授权访问控制规则。</p>
+<p><strong>ABAC模式</strong></p>
+<p>一个API请求中有4个属性被用于用户授权过程：</p>
+<ul>
+<li><strong>UserName</strong>：String类型，用于标识发起请求的用户。如果不进行认证、授权操作，则该字符串为空。</li>
+<li><strong>ReadOnly</strong>：Bool类型，标识该请求是否仅进行只读操作（GET就是只读操作）。</li>
+<li><strong>Kind</strong>：String类型，用于标识要访问的Kubernetes资源对象的类型。当访问<code>/api/v1beta1/pods</code>等API endpoint时，Kind属性才非空，但访问其他endpoint时，例如<code>/version</code>，<code>/healthz</code>等，Kind属性为空。</li>
+<li><strong>Namespace</strong>：String类型，用于标识要访问的Kubernetes资源对象所在的namespace。</li>
+</ul>
+<p>对于ABAC模式，在APIServer启动时除了需要传入<code>--authorization_mode=ABAC</code>选项外，还需要指定<code>--authorization_policy_file=SOME_FILENAME</code>。<code>authorization_policy_file</code>文件的每一行都是一个JSON对象，该JSON对象是一个没有嵌套的Map数据结构，代表一个访问控制规则对象。一个访问控制规则对象是一个包含以下字段的Map：</p>
+<ul>
+<li>user：<code>--token_auth_file</code>指定的user字符串。</li>
+<li>readonly：true或false。true表明该规则只应用于GET请求。</li>
+<li>kind：Kubernetes内置资源对象类型，例如pods、events等。</li>
+<li>namespace：也可以缩写成ns。</li>
+</ul>
+<p>一个简单的访问控制规则文件如下所示，每一行定义一条规则：</p>
+<p><strong>说明</strong>：缺省的字段与该字段类型的零值（空字符串，0，false等）等价。</p>
+<p>一个授权过程就是一个比较API请求中各属性与访问控制规则文件中对应的各字段是否匹配的一个过程。当APIServer接收到一个API请求时，该请求的各属性就已经确定了，如果有一个属性未被设置，则APIServer将其设为该类型的空值（空字符串，0，false等）。匹配规则如下所示：</p>
+<ul>
+<li>如果API请求中的某个属性为空值，则规定该属性与访问控制规则文件中对应的字段匹配。</li>
+<li>如果访问控制规则的某个字段为空值，则规定该字段与API请求的对应属性匹配。</li>
+<li>如果API请求中的属性值非空且访问控制规则的某个字段值也非空，则将这两个值进行比较，如果相同则匹配，反之则不匹配。</li>
+<li>API请求的属性元组（tuple）会与访问控制规则文件中的所有规则逐条匹配，只要有一条匹配则表示匹配成功，如若不然，则授权失败。</li>
+</ul>
+<h3 id="11-记录所有的日志"><a href="#11-记录所有的日志" class="headerlink" title="11. 记录所有的日志"></a>11. 记录所有的日志</h3><p>Kubernetes提供基于集群的日志，允许将容器活动日志记录到一个日志中心。当集群被创建时，每个容器的标准输出和标准错误都可以通过运行在每个节点上的Fluentd 服务记录到Stackdriver或Elasticsearch中，然后使用Kibana进行查看</p>
+<h2 id="0xFF-参考资源"><a href="#0xFF-参考资源" class="headerlink" title="0xFF 参考资源"></a>0xFF 参考资源</h2><ul>
+<li><a href="https://github.com/trimstray/the-practical-linux-hardening-guide" target="_blank" rel="noopener"></a></li>
+<li><a href="https://www.elastic.co/cn/blog/reinforce-the-security-of-elasticsearch-101" target="_blank" rel="noopener">https://www.elastic.co/cn/blog/reinforce-the-security-of-elasticsearch-101</a></li>
+<li><a href="https://kubernetes.io/blog/2016/08/security-best-practices-kubernetes-deployment/" target="_blank" rel="noopener">https://kubernetes.io/blog/2016/08/security-best-practices-kubernetes-deployment/</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i>
+
+ Linux</a>
+          
+            <a href="/tags/Hardening/" rel="tag"><i class="fa fa-tag"></i>
+
+ Hardening</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/10128/" rel="next" title="Windows应急响应指南">
+                <i class="fa fa-chevron-left"></i> Windows应急响应指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/20996/" rel="prev" title="攻击视角之网络威胁框架演进">
+                攻击视角之网络威胁框架演进 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.png" alt="L0n9">
+            
+              <p class="site-author-name" itemprop="name">L0n9</p>
+              <p class="site-description motion-element" itemprop="description">問道遠兮，求索未止...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/L0n9" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/_L0n9_" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-Linux-系统加固"><span class="nav-text">0x01 Linux 系统加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-账号和口令"><span class="nav-text">1. 账号和口令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-禁用或删除无用账号"><span class="nav-text">1.1 禁用或删除无用账号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-检查特殊账号"><span class="nav-text">1.2 检查特殊账号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-添加口令策略"><span class="nav-text">1.3 添加口令策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-限制用户su"><span class="nav-text">1.4 限制用户su</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-禁止root用户直接登录"><span class="nav-text">1.5 禁止root用户直接登录</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务加固"><span class="nav-text">2. 服务加固</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-关闭不必要的服务"><span class="nav-text">2.1 关闭不必要的服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-SSH服务安全"><span class="nav-text">2.2 SSH服务安全</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-文件系统"><span class="nav-text">3. 文件系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-设置umask值"><span class="nav-text">3.1 设置umask值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-设置登录超时"><span class="nav-text">3.2 设置登录超时</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-日志"><span class="nav-text">4. 日志</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-syslogd日志"><span class="nav-text">4.1 syslogd日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-登录和操作日志"><span class="nav-text">4.2 登录和操作日志</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-Rsync-服务安全加固"><span class="nav-text">0x02 Rsync 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-隐藏-module-信息"><span class="nav-text">1. 隐藏 module 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用权限控制"><span class="nav-text">2. 使用权限控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-限制网络访问"><span class="nav-text">3. 限制网络访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-启用账户认证"><span class="nav-text">4. 启用账户认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-数据加密传输"><span class="nav-text">5. 数据加密传输</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-NFS-服务安全加固"><span class="nav-text">0x03  NFS 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-配置共享目录（-etc-exports）"><span class="nav-text">1. 配置共享目录（/etc/exports）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用网络访问控制"><span class="nav-text">2. 使用网络访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-账号验证"><span class="nav-text">3. 账号验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-设置-NFSD-的-COPY-数目"><span class="nav-text">4. 设置 NFSD 的 COPY 数目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-选择传输协议"><span class="nav-text">5. 选择传输协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-限制客户机数量"><span class="nav-text">6. 限制客户机数量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-改变默认的-NFS-端口"><span class="nav-text">7. 改变默认的 NFS 端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-配置-nosuid-和-noexec"><span class="nav-text">8. 配置 nosuid 和 noexec</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-Apache-服务安全加固"><span class="nav-text">0x04 Apache 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-用户设置"><span class="nav-text">1. 用户设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-授权设置"><span class="nav-text">2. 授权设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-日志设置"><span class="nav-text">3. 日志设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-禁止访问外部文件"><span class="nav-text">4. 禁止访问外部文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-禁止目录浏览"><span class="nav-text">5. 禁止目录浏览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-错误页面重定向"><span class="nav-text">6. 错误页面重定向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-拒绝服务防范"><span class="nav-text">7. 拒绝服务防范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-隐藏-Apache-版本号"><span class="nav-text">8. 隐藏 Apache 版本号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-关闭-TRACE功能"><span class="nav-text">9. 关闭 TRACE功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-禁用-CGI"><span class="nav-text">10. 禁用 CGI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-绑定监听地址"><span class="nav-text">11. 绑定监听地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-删除缺省安装的无用文件"><span class="nav-text">12. 删除缺省安装的无用文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-禁用非法-HTTP-方法"><span class="nav-text">13. 禁用非法 HTTP 方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-Tomcat-服务安全加固"><span class="nav-text">0x05 Tomcat 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-网络访问控制"><span class="nav-text">1. 网络访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-开启-Tomcat-的访问日志"><span class="nav-text">2. 开启 Tomcat 的访问日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Tomcat-默认帐号安全"><span class="nav-text">3. Tomcat 默认帐号安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-修改默认访问端口"><span class="nav-text">4. 修改默认访问端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-重定向错误页面"><span class="nav-text">5. 重定向错误页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-禁止列出目录"><span class="nav-text">6. 禁止列出目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-删除文档和示例程序"><span class="nav-text">7. 删除文档和示例程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-MySQL-服务安全加固"><span class="nav-text">0x06 MySQL 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-帐号安全"><span class="nav-text">1. 帐号安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-口令安全"><span class="nav-text">2. 口令安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-授权"><span class="nav-text">3. 授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-开启日志审计功能"><span class="nav-text">4. 开启日志审计功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-安装最新补丁"><span class="nav-text">5. 安装最新补丁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-远程访问控制"><span class="nav-text">6. 远程访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-IP-访问控制"><span class="nav-text">7.  IP 访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-连接数设置"><span class="nav-text">8. 连接数设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-Redis-服务安全加固"><span class="nav-text">0x07 Redis 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-网络层加固"><span class="nav-text">1.网络层加固</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-设置防火墙策略"><span class="nav-text">2.设置防火墙策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-账号与认证"><span class="nav-text">3.账号与认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-服务运行权限最小化"><span class="nav-text">4.服务运行权限最小化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-服务细粒度授权"><span class="nav-text">5.服务细粒度授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-安全补丁"><span class="nav-text">6.安全补丁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-Elasticsearch服务安全加固"><span class="nav-text">0x08 Elasticsearch服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-使用最新版本"><span class="nav-text">1. 使用最新版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-网络访问控制"><span class="nav-text">2. 网络访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-绑定访问源-IP"><span class="nav-text">3. 绑定访问源 IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-修改默认端口"><span class="nav-text">4. 修改默认端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-关闭-HTTP-访问"><span class="nav-text">5. 关闭 HTTP 访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-使用-Shield-安全插件"><span class="nav-text">6. 使用 Shield 安全插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-修改默认集群名称"><span class="nav-text">7. 修改默认集群名称</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-不要以-root-身份运行"><span class="nav-text">8. 不要以 root 身份运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-正确设置数据目录"><span class="nav-text">9. 正确设置数据目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-定期进行备份"><span class="nav-text">10. 定期进行备份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-禁用批量删除索引"><span class="nav-text">11. 禁用批量删除索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-启用日志记录功能"><span class="nav-text">12. 启用日志记录功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x09-Memcached-服务安全加固"><span class="nav-text">0x09 Memcached 服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-定期升级"><span class="nav-text">1. 定期升级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-配置访问控制"><span class="nav-text">2. 配置访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-绑定监听IP"><span class="nav-text">3. 绑定监听IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-使用最小化权限账号"><span class="nav-text">4. 使用最小化权限账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-启用认证功能"><span class="nav-text">5. 启用认证功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-修改默认端口"><span class="nav-text">6. 修改默认端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-备份数据"><span class="nav-text">7. 备份数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-主机基线检查"><span class="nav-text">8. 主机基线检查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0A-Docker服务安全加固"><span class="nav-text">0x0A Docker服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-加固主机操作系统"><span class="nav-text">1. 加固主机操作系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用强制访问控制策略"><span class="nav-text">2. 使用强制访问控制策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-配置网络访问控制策略"><span class="nav-text">3. 配置网络访问控制策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-不要使用root用户运行"><span class="nav-text">4. 不要使用root用户运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-禁止使用特权"><span class="nav-text">5. 禁止使用特权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-控制Docker容器资源配额"><span class="nav-text">6. 控制Docker容器资源配额</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-不运行不可信的Docker镜像"><span class="nav-text">7. 不运行不可信的Docker镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-开启日志记录功能"><span class="nav-text">8. 开启日志记录功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-定期安全扫描和更新补丁"><span class="nav-text">9. 定期安全扫描和更新补丁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x0B-Kubernetes服务安全加固"><span class="nav-text">0x0B Kubernetes服务安全加固</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-确保镜像无安全漏洞"><span class="nav-text">1. 确保镜像无安全漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-只使用授权镜像"><span class="nav-text">2. 只使用授权镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-限制对K8S节点的直接访问"><span class="nav-text">3. 限制对K8S节点的直接访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-修改默认端口-1"><span class="nav-text">4. 修改默认端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-API管理端口访问控制"><span class="nav-text">5. API管理端口访问控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-创建资源间的管理界限"><span class="nav-text">6. 创建资源间的管理界限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-定义资源配额"><span class="nav-text">7. 定义资源配额</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-API-Server认证与授权"><span class="nav-text">10. API Server认证与授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-记录所有的日志"><span class="nav-text">11. 记录所有的日志</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0xFF-参考资源"><span class="nav-text">0xFF 参考资源</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">L0n9</span>
+
+  
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "./public/search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
