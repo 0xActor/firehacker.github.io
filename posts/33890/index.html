@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="L0n9">
 <meta property="og:description" content="红队(蓝军)是攻击方，在实战化对抗中验证安全防护体系，本文从攻击者视角研究攻防演练中红队进攻击思路、姿势与技战术...">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-05-24T01:42:42.663Z">
+<meta property="og:updated_time" content="2021-05-24T15:04:58.303Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="红队视角之攻击姿势研究">
 <meta name="twitter:description" content="红队(蓝军)是攻击方，在实战化对抗中验证安全防护体系，本文从攻击者视角研究攻防演练中红队进攻击思路、姿势与技战术...">
@@ -511,11 +511,28 @@
 <ul>
 <li><p>WAF绕过：基于规则的WAF可使用语法和协议变形等技巧绕过</p>
 </li>
-<li><p>HIDS/EDR绕过：优先使用无文件的</p>
+<li><p>HIDS/EDR绕过：优先使用无文件的内存马进行控制，绕过HIDS/EDR检测</p>
+</li>
+<li><p>藏匿流量：使用加密信道传输数据和控制权，使用端口复用技术藏匿流量</p>
+</li>
+<li><p>谨慎扫描：切忌内网大规模扫描，特别是针对445、22、3389这些敏感端口，优先利用企业文档、网络链接信息、历史登录信息进行横向扩展</p>
+</li>
+<li><p>混淆免杀：对工具进行代码混淆，并作免杀处理(CS、Mimikatz等)</p>
+</li>
+<li><p>慎用漏洞：入侵系统后，由漏洞利用对系统进行控制的方式转为常规运维方向(ssh登录、运维平台下发命令)，以维持权限</p>
 </li>
 </ul>
 <h2 id="0xFF-参考资源"><a href="#0xFF-参考资源" class="headerlink" title="0xFF 参考资源"></a>0xFF 参考资源</h2><ul>
-<li><a href="https://mp.weixin.qq.com/s/LPnStiRB0OtXByo6DrcH5w" target="_blank" rel="noopener">《实战攻防-企业红蓝对抗实践指南》</a></li>
+<li><p><a href="https://mp.weixin.qq.com/s/LPnStiRB0OtXByo6DrcH5w" target="_blank" rel="noopener">《实战攻防-企业红蓝对抗实践指南》</a></p>
+</li>
+<li><p><a href="https://github.com/klionsec/RedTeamer" target="_blank" rel="noopener">https://github.com/klionsec/RedTeamer</a></p>
+</li>
+<li><p><a href="https://github.com/Yeti-791/APT-Guide" target="_blank" rel="noopener">https://github.com/Yeti-791/APT-Guide</a></p>
+</li>
+<li><p><a href="https://github.com/yeyintminthuhtut/Awesome-Red-Teaming" target="_blank" rel="noopener">https://github.com/yeyintminthuhtut/Awesome-Red-Teaming</a></p>
+</li>
+<li><p><a href="https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki" target="_blank" rel="noopener">https://github.com/bluscreenofjeff/Red-Team-Infrastructure-Wiki</a></p>
+</li>
 </ul>
 
       
