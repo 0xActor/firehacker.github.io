@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="L0n9">
 <meta property="og:description" content="红队(蓝军)是攻击方，在实战化对抗中验证安全防护体系，本文从攻击者视角研究攻防演练中红队进攻击思路、姿势与技战术...">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-05-09T04:36:08.077Z">
+<meta property="og:updated_time" content="2021-05-24T01:42:42.663Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="红队视角之攻击姿势研究">
 <meta name="twitter:description" content="红队(蓝军)是攻击方，在实战化对抗中验证安全防护体系，本文从攻击者视角研究攻防演练中红队进攻击思路、姿势与技战术...">
@@ -447,7 +447,74 @@
 
 <h3 id="9-目标达成"><a href="#9-目标达成" class="headerlink" title="9. 目标达成"></a>9. 目标达成</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过持续的权限提升-内网信息收集-横向移动-维持权限循环，逐步逼近目标，最终完成目标</span><br></pre></td></tr></table></figure>
 
-<h2 id="0x04-攻击技战法"><a href="#0x04-攻击技战法" class="headerlink" title="0x04 攻击技战法"></a>0x04 攻击技战法</h2><h3 id="1-线上-社工持续信息收集"><a href="#1-线上-社工持续信息收集" class="headerlink" title="1. 线上+社工持续信息收集"></a>1. 线上+社工持续信息收集</h3><h3 id="2-边界突破，巧妙利用漏洞"><a href="#2-边界突破，巧妙利用漏洞" class="headerlink" title="2. 边界突破，巧妙利用漏洞"></a>2. 边界突破，巧妙利用漏洞</h3><h3 id="3-自动化工具利用"><a href="#3-自动化工具利用" class="headerlink" title="3. 自动化工具利用"></a>3. 自动化工具利用</h3><h3 id="4-虚拟机逃逸攻击"><a href="#4-虚拟机逃逸攻击" class="headerlink" title="4. 虚拟机逃逸攻击"></a>4. 虚拟机逃逸攻击</h3><h3 id="5-安全设备漏洞挖掘与利用"><a href="#5-安全设备漏洞挖掘与利用" class="headerlink" title="5. 安全设备漏洞挖掘与利用"></a>5. 安全设备漏洞挖掘与利用</h3><h3 id="6-供应链攻击切入"><a href="#6-供应链攻击切入" class="headerlink" title="6. 供应链攻击切入"></a>6. 供应链攻击切入</h3><h3 id="7-邮件钓鱼与社工"><a href="#7-邮件钓鱼与社工" class="headerlink" title="7. 邮件钓鱼与社工"></a>7. 邮件钓鱼与社工</h3><h3 id="8-攻陷VPN，长驱直入"><a href="#8-攻陷VPN，长驱直入" class="headerlink" title="8. 攻陷VPN，长驱直入"></a>8. 攻陷VPN，长驱直入</h3><h3 id="9-隐蔽行踪，攻其不备"><a href="#9-隐蔽行踪，攻其不备" class="headerlink" title="9. 隐蔽行踪，攻其不备"></a>9. 隐蔽行踪，攻其不备</h3><h2 id="0xFF-参考资源"><a href="#0xFF-参考资源" class="headerlink" title="0xFF 参考资源"></a>0xFF 参考资源</h2><ul>
+<h2 id="0x04-攻击技战法"><a href="#0x04-攻击技战法" class="headerlink" title="0x04 攻击技战法"></a>0x04 攻击技战法</h2><h3 id="1-线上-社工持续信息收集"><a href="#1-线上-社工持续信息收集" class="headerlink" title="1. 线上+社工持续信息收集"></a>1. 线上+社工持续信息收集</h3><p><strong>搜集信息种类</strong></p>
+<p>包括分支机构、关联公司、外包公司、投资公司、人员、网络、主机、域名、账户、邮箱<br>、敏感文件/端口/路径等</p>
+<p><strong>信息收集渠道</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">天眼查、企查查</span><br><span class="line"></span><br><span class="line">搜索引擎、社交网络</span><br><span class="line"></span><br><span class="line">ICP备案库、社工库</span><br><span class="line"></span><br><span class="line">Fofa、Shodan</span><br><span class="line"></span><br><span class="line">官方网站、主域名、子域名、BGP归属</span><br></pre></td></tr></table></figure>
+
+<p><strong>信息搜集链</strong></p>
+<p>提前信息搜集 -&gt; 资产持续跟踪 -&gt; 资产指纹识别 -&gt; 社工钓鱼 —&gt; 梳理目标任务</p>
+<ul>
+<li><p>自动化工具：常用于实现对攻击目标资产的持续跟踪，并对临时增加的资产进行蜜罐识别探测</p>
+</li>
+<li><p>资产指纹识别：记录攻击目标资产的详细类型，如CMS、第三方系统、中间件、组件等，以便对应到可进行利用的漏洞</p>
+</li>
+<li><p>核心人员信息：搜索引擎、社交网络等线上信息收集 + 邮件钓鱼、伪装接近关键任务、伪装潜入核心办公区等社工类信息收集</p>
+</li>
+</ul>
+<p><strong>人工/自动化信息搜集和扫描查点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1) 高频探测：口令爆破、重放攻击、爬虫扫描、信息抓取</span><br><span class="line"></span><br><span class="line">(2) 敏感文件探测：Git泄漏、SVN泄露、备份文件泄露等</span><br><span class="line"></span><br><span class="line">(3) 敏感端口探测：22、445、3306、3389、6379、7001、8080等</span><br><span class="line"></span><br><span class="line">(4) 敏感路径探测：网站后台、未授权页面等</span><br><span class="line"></span><br><span class="line">(5) 信息劫持攻击：中间人劫持、DNS劫持等</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-边界突破，巧妙利用漏洞"><a href="#2-边界突破，巧妙利用漏洞" class="headerlink" title="2. 边界突破，巧妙利用漏洞"></a>2. 边界突破，巧妙利用漏洞</h3><p>自动化工具突破 -&gt; 遍历攻击面，逐个系统人工挖掘漏洞</p>
+<p><strong>漏洞利用方式</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) 扫描器产出漏洞利用</span><br><span class="line"></span><br><span class="line">(2) 尝试实用员工账号爆破VPN系统</span><br><span class="line"></span><br><span class="line">(3) 上传WebShell进一步获取控制权</span><br><span class="line"></span><br><span class="line">(4) OA系统/邮箱/VPN人工尝试登录</span><br><span class="line"></span><br><span class="line">(5) 尝试绕过WAF利用漏洞</span><br><span class="line"></span><br><span class="line">(6) 人工注册业务系统账号挖掘漏洞</span><br></pre></td></tr></table></figure>
+
+<p><strong>对抗点</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WAF绕过、IPS对抗、EDR对抗、补丁绕过</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-自动化工具利用"><a href="#3-自动化工具利用" class="headerlink" title="3. 自动化工具利用"></a>3. 自动化工具利用</h3><p><strong>外网</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">扫描器：进行全面信息搜集及资产跟踪一键化漏洞利用工具，外网打点、突破流程、节约时间</span><br></pre></td></tr></table></figure>
+
+<p><strong>内网</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">自动化信息搜集脚本</span><br><span class="line"></span><br><span class="line">漏洞利用/提权/持久化等一键化脚本/工具</span><br></pre></td></tr></table></figure>
+
+<p><strong>远控与免杀</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">通用工具+定制化插件，进行重点漏洞的EXP</span><br><span class="line"></span><br><span class="line">免杀木马，对抗性脚本Payload</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-虚拟机逃逸攻击"><a href="#4-虚拟机逃逸攻击" class="headerlink" title="4. 虚拟机逃逸攻击"></a>4. 虚拟机逃逸攻击</h3><p><strong>攻击思路</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(1) 攻击云管理平台：通过虚拟机攻击管理平台，然后利用管理平台控制所有机器</span><br><span class="line"></span><br><span class="line">(2) 虚拟机逃逸攻击：通过直接从虚拟机立进行逃逸，从而控制宿主机，然后利用宿主机控制其上所有虚拟机</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-安全设备漏洞挖掘与利用"><a href="#5-安全设备漏洞挖掘与利用" class="headerlink" title="5. 安全设备漏洞挖掘与利用"></a>5. 安全设备漏洞挖掘与利用</h3><p>网络环境中，安全/运维/监控设备往往具备多类系统的管理权限，对于攻击者寻找重要靶标系统是重要的攻击路径，可利用安全设备/运维管理设备的安全漏洞进行攻击</p>
+<p><strong>攻击思路</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(1) 提前储备相关安全/运维设备的0Day或1Day，供内网横纵向扩展利用</span><br><span class="line"></span><br><span class="line">(2) 以Server端控agent端，或者先从agent打到Server，再打到其他agent</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-供应链攻击切入"><a href="#6-供应链攻击切入" class="headerlink" title="6. 供应链攻击切入"></a>6. 供应链攻击切入</h3><p>摸排为企业提供服务的供应商，发现安全隐患，作为入侵目标单位的跳板</p>
+<p><strong>切入思路</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(1) 针对特定行业，常用特定软件或者系统进行一定储备和了解</span><br><span class="line"></span><br><span class="line">(2) 面对临时发现的第三方系统，可采取寻找源码，现场审计挖掘0Day的方式攻击</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-邮件钓鱼与社工"><a href="#7-邮件钓鱼与社工" class="headerlink" title="7. 邮件钓鱼与社工"></a>7. 邮件钓鱼与社工</h3><p>社会工程学是通过人际交流的方式获得信息的非技术渗透手段，攻击者利用这种方式往往能取得事半功倍的效果</p>
+<p><strong>社工手段</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(1) 邮件钓鱼</span><br><span class="line"></span><br><span class="line">针对前期采集的人员信息，发送特定主题的钓鱼邮件，如补丁更新、投诉举报、简历投递、安全演习报告等</span><br><span class="line"></span><br><span class="line">(2) 伪装接入网线</span><br><span class="line"></span><br><span class="line">伪装成电信人员进入对方机房检查网络，将笔记本通过网线接入内网直接开始渗透</span><br><span class="line"></span><br><span class="line">(3) 植入电脑木马</span><br><span class="line"></span><br><span class="line">进入目标单位办公区，趁安保等工作人员不注意，向无人值守的办公电脑植入远控木马</span><br><span class="line"></span><br><span class="line">(4) U盘投递</span><br><span class="line"></span><br><span class="line">往目标单位附近投放大量U盘，U盘上带有单位logo，诱骗员工拾取并插入办公电脑</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-攻陷VPN，长驱直入"><a href="#8-攻陷VPN，长驱直入" class="headerlink" title="8. 攻陷VPN，长驱直入"></a>8. 攻陷VPN，长驱直入</h3><p><strong>VPN确立</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1) 利用Web指纹，如特征URL、特征字符等方式，确定目标是否存在特定的VPN</span><br><span class="line"></span><br><span class="line">(2) 通过二级域名爆破的方式，确定常见VPN域名是否存在或启用</span><br><span class="line"></span><br><span class="line">(3) Fofa搜索：通过SSL VPN等常见开源或商业VPN关键词，结合目标信息进行资产搜索，获取VPN目标地址</span><br><span class="line"></span><br><span class="line">(4) 通过目标单位可能泄露的Wiki，如《VPN接入文档》等，寻找对应地址</span><br><span class="line"></span><br><span class="line">(5) 通过VPN域名历史IP解析记录等，寻找可能暴露VPN的IP</span><br></pre></td></tr></table></figure>
+
+<p><strong>用户突破</strong></p>
+<p>通过获取VPN应用普通用户的账号密码进行登录利用，获取权限方式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">(1) 弱口令与暴破撞库</span><br><span class="line"></span><br><span class="line">可利用信息搜集到的企业员工账号信息配合特定生成或常见的弱口令字典，登录成功可直接突破边界，进入内网</span><br><span class="line"></span><br><span class="line">(2) 通用口令</span><br><span class="line"></span><br><span class="line">通过尝试对应设备的默认口令或寻找企业VPN登录说明文档的查找，通用口令可实现多账号权限获取</span><br><span class="line"></span><br><span class="line">(3) 密码泄露</span><br><span class="line"></span><br><span class="line">可通过Github、百度网盘、文库等渠道搜集敏感信息，若员工在相关文档或代码中泄露个人密码，可窃取权限</span><br><span class="line"></span><br><span class="line">(4) 社工钓鱼</span><br><span class="line"></span><br><span class="line">利用邮件、电话、微信等各类钓鱼手法，以获取VPN账号为目的定制一些文案或话术来骗取员工的VPN账号权限</span><br><span class="line"></span><br><span class="line">(5) 账号漏洞</span><br><span class="line"></span><br><span class="line">当VPN应用系统可能存在接口越权或者其他缺陷可导致任意创建VPN账户，即在未授权情况下新建账户，然后利用新建用户的权限接入内网</span><br></pre></td></tr></table></figure>
+
+<p><strong>服务器突破</strong></p>
+<p>通过使用已知的VPN漏洞或寻找溢出漏洞、命令注入攻击等方式，直接获取VPN服务器的最高权限。同时也可以得到VPN的数据库数据，其内部可能包含内网资产信息表、用户账号密码等敏感信息，从而进行后续深入利用。VPN攻击战术如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(1) 网络结构/资产信息: 接近靶标系统，获取核心资产权限、核心资产位置、网络区域关系</span><br><span class="line"></span><br><span class="line">(2) 账户信息：获取内网合法登录权限</span><br><span class="line"></span><br><span class="line">(3) 外联资产：建立大量跳板隧道，提升攻击队容错率</span><br><span class="line"></span><br><span class="line">(4) VPN后门建立及利用</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-隐蔽行踪，攻其不备"><a href="#9-隐蔽行踪，攻其不备" class="headerlink" title="9. 隐蔽行踪，攻其不备"></a>9. 隐蔽行踪，攻其不备</h3><p>隐蔽行踪的要点是要有效躲避安全产品的检测，攻击技巧如下</p>
+<ul>
+<li><p>WAF绕过：基于规则的WAF可使用语法和协议变形等技巧绕过</p>
+</li>
+<li><p>HIDS/EDR绕过：优先使用无文件的</p>
+</li>
+</ul>
+<h2 id="0xFF-参考资源"><a href="#0xFF-参考资源" class="headerlink" title="0xFF 参考资源"></a>0xFF 参考资源</h2><ul>
 <li><a href="https://mp.weixin.qq.com/s/LPnStiRB0OtXByo6DrcH5w" target="_blank" rel="noopener">《实战攻防-企业红蓝对抗实践指南》</a></li>
 </ul>
 
