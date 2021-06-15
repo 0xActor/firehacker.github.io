@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Threat Detection,">
 
 
 
@@ -86,16 +86,18 @@
 
 
 
-<meta name="description" content="問道遠兮，求索未止...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="L0n9">
-<meta property="og:url" content="https://l0n9.cc/tags/Blue-Team/index.html">
+<meta name="description" content="安全的本质在对抗，企业威胁检测体系的建设亦如此，需在持续的安全对抗中演化升级，本文从攻击链演进发展的视角分享企业威胁检测体系建设思路与经验...">
+<meta name="keywords" content="Threat Detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="攻击链视角之企业威胁检测体系浅谈">
+<meta property="og:url" content="https://l0n9.cc/posts/40960/index.html">
 <meta property="og:site_name" content="L0n9">
-<meta property="og:description" content="問道遠兮，求索未止...">
+<meta property="og:description" content="安全的本质在对抗，企业威胁检测体系的建设亦如此，需在持续的安全对抗中演化升级，本文从攻击链演进发展的视角分享企业威胁检测体系建设思路与经验...">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-05-26T14:21:53.301Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="L0n9">
-<meta name="twitter:description" content="問道遠兮，求索未止...">
+<meta name="twitter:title" content="攻击链视角之企业威胁检测体系浅谈">
+<meta name="twitter:description" content="安全的本质在对抗，企业威胁检测体系的建设亦如此，需在持续的安全对抗中演化升级，本文从攻击链演进发展的视角分享企业威胁检测体系建设思路与经验...">
 
 
 
@@ -125,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="https://l0n9.cc/tags/Blue-Team/">
+  <link rel="canonical" href="https://l0n9.cc/posts/40960/">
 
 
 
 
 
-  <title>标签: Blue Team | L0n9</title>
+  <title>攻击链视角之企业威胁检测体系浅谈 | L0n9</title>
   
 
 
@@ -150,7 +152,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -296,52 +298,238 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Blue Team<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/40960/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/posts/10906/" itemprop="url">
-              
-                <span itemprop="name">蓝队视角之防守经验总结</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">攻击链视角之企业威胁检测体系浅谈</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2021-04-24T21:38:56+08:00" content="2021-04-24">
-          04-24
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-16T22:07:41+08:00">
+                2021-05-16
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/威胁检测/" itemprop="url" rel="index">
+                    <span itemprop="name">威胁检测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <center>安全的本质在对抗，企业威胁检测体系的建设亦如此，需在持续的安全对抗中演化升级，本文从攻击链演进发展的视角分享企业威胁检测体系建设思路与经验...</center>
+
+<a id="more"></a>
+<hr>
+<h3 id="一些观念"><a href="#一些观念" class="headerlink" title="一些观念"></a>一些观念</h3><ul>
+<li><p>未知攻，焉知防：不了解攻击，容易陷入“想当然”的黑洞中，颇有”盲人摸象”的感觉</p>
+</li>
+<li><p>网络安全的博弈在于人与人的对抗、对抗的本质在攻防两端能力较量</p>
+</li>
+<li><p>攻击无孔不入，可能来自任何时间、任何地点，采用无限手段，从任意方向完成突破</p>
+</li>
+<li><p>防守者需时刻保持警惕，全方位布防，预防、感知、持续监测、响应、溯源等，建立纵深防御体系</p>
+</li>
+<li><p>单点突破是必然，可拍的是不知道被入侵攻击</p>
+</li>
+</ul>
+<h2 id="攻击篇"><a href="#攻击篇" class="headerlink" title="攻击篇"></a>攻击篇</h2><h3 id="威胁-对手"><a href="#威胁-对手" class="headerlink" title="威胁/对手"></a>威胁/对手</h3><p><strong>对手</strong></p>
+<ul>
+<li><p>脚本小子</p>
+</li>
+<li><p>有经验攻击者</p>
+</li>
+<li><p>APT/攻击团伙</p>
+</li>
+</ul>
+<p><strong>威胁</strong></p>
+<ul>
+<li><p>DDoS</p>
+</li>
+<li><p>勒索攻击</p>
+</li>
+<li><p>蠕虫挖矿</p>
+</li>
+<li><p>数据泄露：外防攻击、内防泄露</p>
+</li>
+</ul>
+<h3 id="攻击链演进"><a href="#攻击链演进" class="headerlink" title="攻击链演进"></a>攻击链演进</h3><p>Cyber Kill Chain</p>
+<p>ATT &amp; CK</p>
+<p>NSA-TCTF</p>
+<h3 id="攻击路径-阶段"><a href="#攻击路径-阶段" class="headerlink" title="攻击路径/阶段"></a>攻击路径/阶段</h3><p>外——&gt;内：打点、边界突破</p>
+<p>内——&gt;内：提权、权限维持、凭证抓取、横向移动</p>
+<p>内——&gt;外：隧道、命令与控制、数据渗出</p>
+<h3 id="攻击思路"><a href="#攻击思路" class="headerlink" title="攻击思路"></a>攻击思路</h3><ul>
+<li><p>正面突破</p>
+</li>
+<li><p>边缘资产迂回攻击</p>
+</li>
+<li><p>第三方/供应链攻击</p>
+</li>
+<li><p>社工突破/人的弱点</p>
+</li>
+</ul>
+<h3 id="攻击技战法"><a href="#攻击技战法" class="headerlink" title="攻击技战法"></a>攻击技战法</h3><ul>
+<li><p>社工/钓鱼</p>
+</li>
+<li><p>网络/安全设备漏洞利用</p>
+</li>
+<li><p>供应链切入</p>
+</li>
+<li><p>VPN攻陷</p>
+</li>
+</ul>
+<h2 id="防守篇"><a href="#防守篇" class="headerlink" title="防守篇"></a>防守篇</h2><p>ASA自适应安全框架</p>
+<p>预防：安全意识；资产管理(边缘、老旧、未知；管理边界不清晰、未统一管理)；敏感信息泄露监控；暴露面资产巡检；高危端口/弱口令/未授权访问；攻击面与风险评估</p>
+<p>防护：防火墙、杀软、WAF、抗D、IPS</p>
+<p>检测：HIDS + 全流量分析(办公网、生产网) + 蜜罐</p>
+<p>响应：自动化运营、海量数据处理、智能编排、响应知识库/工具库</p>
+<p>溯源/反制：欺骗防御、蜜罐、诱饵；化被动为主动(诱饵蜜罐、溯源蜜罐、反制蜜罐)、威胁情报</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Threat-Detection/" rel="tag"><i class="fa fa-tag"></i>
+
+ Threat Detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/33890/" rel="next" title="红队视角之攻击姿势研究">
+                <i class="fa fa-chevron-left"></i> 红队视角之攻击姿势研究
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -349,6 +537,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -369,8 +561,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -409,7 +610,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -448,6 +649,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一些观念"><span class="nav-text">一些观念</span></a></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击篇"><span class="nav-text">攻击篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#威胁-对手"><span class="nav-text">威胁/对手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击链演进"><span class="nav-text">攻击链演进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击路径-阶段"><span class="nav-text">攻击路径/阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击思路"><span class="nav-text">攻击思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击技战法"><span class="nav-text">攻击技战法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防守篇"><span class="nav-text">防守篇</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -576,6 +793,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
