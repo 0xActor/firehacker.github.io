@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Red Team,Tookits,">
 
 
 
@@ -86,16 +86,18 @@
 
 
 
-<meta name="description" content="問道遠兮，求索未止...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="L0n9">
-<meta property="og:url" content="https://l0n9.cc/archives/2021/02/index.html">
+<meta name="description" content="本文梳理实战中红队常用的武器、工具，后续针对此类武器库系统化研究、检测...">
+<meta name="keywords" content="Red Team,Tookits">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红队渗透武器工具库">
+<meta property="og:url" content="https://l0n9.cc/posts/33899/index.html">
 <meta property="og:site_name" content="L0n9">
-<meta property="og:description" content="問道遠兮，求索未止...">
+<meta property="og:description" content="本文梳理实战中红队常用的武器、工具，后续针对此类武器库系统化研究、检测...">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2021-07-17T05:50:58.186Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="L0n9">
-<meta name="twitter:description" content="問道遠兮，求索未止...">
+<meta name="twitter:title" content="红队渗透武器工具库">
+<meta name="twitter:description" content="本文梳理实战中红队常用的武器、工具，后续针对此类武器库系统化研究、检测...">
 
 
 
@@ -125,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="https://l0n9.cc/archives/2021/02/">
+  <link rel="canonical" href="https://l0n9.cc/posts/33899/">
 
 
 
 
 
-  <title>归档 | L0n9</title>
+  <title>红队渗透武器工具库 | L0n9</title>
   
 
 
@@ -150,7 +152,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -296,72 +298,337 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        嗯..! 目前共计 16 篇日志。 继续努力。
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2021">2021</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://l0n9.cc/posts/33899/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="L0n9">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/hexo.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L0n9">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/posts/31890/" itemprop="url">
-              
-                <span itemprop="name">webshell对抗之工具篇</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">红队渗透武器工具库</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2021-02-18T18:54:08+08:00" content="2021-02-18">
-          02-18
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-02T21:54:08+08:00">
+                2021-03-02
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/红队渗透/" itemprop="url" rel="index">
+                    <span itemprop="name">红队渗透</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+      
 
+      
+        <center>本文梳理实战中红队常用的武器、工具，后续针对此类武器库系统化研究、检测...</center>
+
+<a id="more"></a>
+<hr>
+<h2 id="核心工具"><a href="#核心工具" class="headerlink" title="核心工具"></a>核心工具</h2><ul>
+<li><p><a href="https://github.com/rapid7/metasploit-framework" target="_blank" rel="noopener">Metasploit</a></p>
+</li>
+<li><p><a href="https://blog.cobaltstrike.com/" target="_blank" rel="noopener">Cobalt Strike</a></p>
+</li>
+<li><p><a href="https://github.com/EmpireProject/Empire" target="_blank" rel="noopener">PowerShell Empire</a> <em>后期漏洞利用框架</em></p>
+</li>
+<li><p><a href="https://github.com/iagox86/dnscat2" target="_blank" rel="noopener">dnscat2</a> <em>DNS隧道工具</em></p>
+</li>
+<li><p><a href="https://github.com/samratashok/nishang" target="_blank" rel="noopener">Nishang</a> <em>Powershell脚本集合</em></p>
+</li>
+<li><p><a href="https://github.com/n1nj4sec/pupy" target="_blank" rel="noopener">Pupy</a> <em>Python编写跨平台后渗透工具</em></p>
+</li>
+</ul>
+<h2 id="侦查阶段"><a href="#侦查阶段" class="headerlink" title="侦查阶段"></a>侦查阶段</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><ul>
+<li><p><a href="https://github.com/robertdavidgraham/masscan" target="_blank" rel="noopener">Masscan</a> <em>快速端口扫描</em></p>
+</li>
+<li><p><a href="https://github.com/nmap/nmap" target="_blank" rel="noopener">Nmap</a> <em>端口服务指纹识别</em></p>
+</li>
+<li><p><a href="https://github.com/breenmachine/httpscreenshot" target="_blank" rel="noopener">HTTPScreenshot</a></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">使用 Masscan 快速扫描大型网络，并使用 phantomjs 捕捉它检测到的任何网站的屏幕截图</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://github.com/ChrisTruncer/EyeWitness" target="_blank" rel="noopener">EyeWitness</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用 XML 文件的方式输出 nmap 的扫描结果、获取到的 Web 页面截图、RDP 服务器信息以及 VNC 服务器信息</span><br></pre></td></tr></table></figure>
+
+<h3 id="搜索引擎"><a href="#搜索引擎" class="headerlink" title="搜索引擎"></a>搜索引擎</h3><ul>
+<li><p><a href="https://www.shodan.io/" target="_blank" rel="noopener">Shodan</a></p>
+</li>
+<li><p><a href="https://censys.io/" target="_blank" rel="noopener">Censys.io</a></p>
+</li>
+<li><p><a href="https://www.zoomeye.org/" target="_blank" rel="noopener">ZoomEye</a></p>
+</li>
+<li><p><a href="https://fofa.so/" target="_blank" rel="noopener">Fofa</a></p>
+</li>
+<li><p><a href="https://cn.gobies.org/" target="_blank" rel="noopener">Goby</a></p>
+</li>
+</ul>
+<h3 id="SSL证书解析"><a href="#SSL证书解析" class="headerlink" title="SSL证书解析"></a>SSL证书解析</h3><ul>
+<li><a href="https://github.com/cheetz/sslScrape" target="_blank" rel="noopener">sslScrape</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">利用 Masscan 快速扫描大型网络，当识别到443端口的服务，就会在 SSL 证书中提取主机名</span><br></pre></td></tr></table></figure>
+
+<h3 id="子域名发现"><a href="#子域名发现" class="headerlink" title="子域名发现"></a>子域名发现</h3><ul>
+<li><a href="https://github.com/leebaird/discover" target="_blank" rel="noopener">Discover Scripts</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">结合了Kali Linux 上的所有的子域名侦察工具</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://github.com/guelfoweb/knock" target="_blank" rel="noopener">Knock</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python编写，通过一个 wordlist 来枚举目标域中的子域名</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><a href="https://github.com/Plazmaz/Sublist3r" target="_blank" rel="noopener">Sublist3r</a></p>
+</li>
+<li><p><a href="https://github.com/TheRook/subbrute" target="_blank" rel="noopener">SubBrute</a></p>
+</li>
+</ul>
+<p><strong>子域名字典</strong></p>
+<ul>
+<li><a href="http://bit.ly/2qwxrxB" target="_blank" rel="noopener">http://bit.ly/2qwxrxB</a></li>
+</ul>
+<h3 id="Git敏感信息"><a href="#Git敏感信息" class="headerlink" title="Git敏感信息"></a>Git敏感信息</h3><ul>
+<li><a href="https://github.com/trufflesecurity/truffleHog" target="_blank" rel="noopener">Truffle Hog</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">扫描不同的提交历史记录和分支来获取高机密的密钥，并输出它们</span><br></pre></td></tr></table></figure>
+
+<h2 id="云存储枚举"><a href="#云存储枚举" class="headerlink" title="云存储枚举"></a>云存储枚举</h2><ul>
+<li><p><a href="https://github.com/bbb31/slurp" target="_blank" rel="noopener">slurp</a> <em>S3 存储桶 枚举</em></p>
+</li>
+<li><p><a href="https://digi.ninja/files/bucket_finder_1.1.tar.bz2" target="_blank" rel="noopener">Bucket Finder</a></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查找不同的 bucket，还会从这些 bucket 中下载所有的内容进行分析</span><br></pre></td></tr></table></figure>
+
+<h3 id="子域名劫持"><a href="#子域名劫持" class="headerlink" title="子域名劫持"></a>子域名劫持</h3><ul>
+<li><p><a href="https://github.com/anshumanbh/tko-subs" target="_blank" rel="noopener">tko-subs</a></p>
+</li>
+<li><p><a href="https://github.com/nahamsec/HostileSubBruteforcer" target="_blank" rel="noopener">HostileSubBruteforcer</a></p>
+</li>
+<li><p><a href="https://github.com/JordyZomer/autoSubTakeover" target="_blank" rel="noopener">autoSubTakeover</a></p>
+</li>
+</ul>
+<h3 id="电子邮件"><a href="#电子邮件" class="headerlink" title="电子邮件"></a>电子邮件</h3><ul>
+<li><a href="http://simplysecurity.github.io/SimplyEmail/" target="_blank" rel="noopener">SimplyEmail</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">输出公司的 email 地址格式和有效用户列表</span><br></pre></td></tr></table></figure>
+
+<h2 id="Web漏洞利用"><a href="#Web漏洞利用" class="headerlink" title="Web漏洞利用"></a>Web漏洞利用</h2><h3 id="基本工具"><a href="#基本工具" class="headerlink" title="基本工具"></a>基本工具</h3><ul>
+<li><p><a href="https://portswigger.net/burp" target="_blank" rel="noopener">Burp Suite</a></p>
+</li>
+<li><p><a href="http://bit.ly/2IVNaO2" target="_blank" rel="noopener">OWASP ZAP</a></p>
+</li>
+<li><p><a href="https://wappalyzer.com/" target="_blank" rel="noopener">Wappalyzer</a></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">可以检测内容管理系统，电子商务平台，Web 框架，服务器软件，分析工具等等</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://builtwith.com/" target="_blank" rel="noopener">BuiltWith</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网站分析工具，返回它在页面上可以找到的所有技术</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://github.com/RetireJS/retire.js/" target="_blank" rel="noopener">Retire.JS</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">扫描 Web 应用程序所使用的易受攻击的 JavaScript 库</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="https://github.com/OJ/gobuster" target="_blank" rel="noopener">GoBuster</a> </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">轻量级、快速的目录和子域名爆破工具</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a href="http://beefproject.com/" target="_blank" rel="noopener">BeEF</a> <em>浏览器综合渗透框架</em></li>
+</ul>
+<h3 id="XSS利用"><a href="#XSS利用" class="headerlink" title="XSS利用"></a>XSS利用</h3><ul>
+<li><p><a href="https://xsshunter.com/" target="_blank" rel="noopener">XSSHunter</a> <em>Blind XSS漏洞验证</em></p>
+</li>
+<li><p><a href="https://github.com/Varbaek/xsser" target="_blank" rel="noopener">xsser</a> <em>通过 XSS 获取 Shell</em></p>
+</li>
+</ul>
+<h3 id="注入攻击"><a href="#注入攻击" class="headerlink" title="注入攻击"></a>注入攻击</h3><ul>
+<li><p><a href="http://sqlmap.org/" target="_blank" rel="noopener">SQLMap</a></p>
+</li>
+<li><p><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/SQL%20Injection" target="_blank" rel="noopener">PayloadsAllTheThings/SQL Injection/</a></p>
+</li>
+<li><p><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/NoSQL%20Injection" target="_blank" rel="noopener">PayloadsAllTheThings/NoSQL Injection</a></p>
+</li>
+</ul>
+<h3 id="反序列化攻击"><a href="#反序列化攻击" class="headerlink" title="反序列化攻击"></a>反序列化攻击</h3><ul>
+<li><a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener">ysoserial</a> <em>java反序列化综合利用工具</em></li>
+</ul>
+<h3 id="模版注入"><a href="#模版注入" class="headerlink" title="模版注入"></a>模版注入</h3><ul>
+<li>[Tplmap]](<a href="https://github.com/epinna/tplmap" target="_blank" rel="noopener">https://github.com/epinna/tplmap</a>) <em>服务端模版注入利用工具</em></li>
+</ul>
+<h3 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h3><ul>
+<li><a href="https://github.com/swisskyrepo/SSRFmap" target="_blank" rel="noopener">SSRFmap</a> *<br>自动化 SSRF 模糊器和开发工具*</li>
+</ul>
+<h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><ul>
+<li><p><a href="https://github.com/luisfontes19/xxexploiter" target="_blank" rel="noopener">xxexploiter</a> <em>XXE漏洞利用测试工具</em></p>
+</li>
+<li><p><a href="https://github.com/enjoiz/XXEinjector" target="_blank" rel="noopener">XXEinjector</a> <em>XXE注入及利用工具</em></p>
+</li>
+</ul>
+<h2 id="网络攻击利用"><a href="#网络攻击利用" class="headerlink" title="网络攻击利用"></a>网络攻击利用</h2><h3 id="密码喷洒攻击"><a href="#密码喷洒攻击" class="headerlink" title="密码喷洒攻击"></a>密码喷洒攻击</h3><ul>
+<li><p><a href="https://github.com/Greenwolf/Spray" target="_blank" rel="noopener">Spray</a> <em>密码喷洒攻击工具</em></p>
+</li>
+<li><p><a href="https://github.com/sensepost/ruler" target="_blank" rel="noopener">Ruler</a></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过 MAPI/HTTP 或 RPC/HTTP 协议与 Exchange 服务器交互</span><br></pre></td></tr></table></figure>
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Red-Team/" rel="tag"><i class="fa fa-tag"></i>
+
+ Red Team</a>
+          
+            <a href="/tags/Tookits/" rel="tag"><i class="fa fa-tag"></i>
+
+ Tookits</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/31890/" rel="next" title="webshell对抗之工具篇">
+                <i class="fa fa-chevron-left"></i> webshell对抗之工具篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/62891/" rel="prev" title="内网渗透之DNS隧道搭建与利用">
+                内网渗透之DNS隧道搭建与利用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -369,6 +636,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -389,8 +660,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -468,6 +748,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#核心工具"><span class="nav-text">核心工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#侦查阶段"><span class="nav-text">侦查阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#端口扫描"><span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#搜索引擎"><span class="nav-text">搜索引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL证书解析"><span class="nav-text">SSL证书解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#子域名发现"><span class="nav-text">子域名发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git敏感信息"><span class="nav-text">Git敏感信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#云存储枚举"><span class="nav-text">云存储枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#子域名劫持"><span class="nav-text">子域名劫持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#电子邮件"><span class="nav-text">电子邮件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web漏洞利用"><span class="nav-text">Web漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本工具"><span class="nav-text">基本工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS利用"><span class="nav-text">XSS利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注入攻击"><span class="nav-text">注入攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反序列化攻击"><span class="nav-text">反序列化攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模版注入"><span class="nav-text">模版注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSRF"><span class="nav-text">SSRF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE"><span class="nav-text">XXE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络攻击利用"><span class="nav-text">网络攻击利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#密码喷洒攻击"><span class="nav-text">密码喷洒攻击</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -596,6 +892,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

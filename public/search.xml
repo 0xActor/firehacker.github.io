@@ -14,7 +14,7 @@
   </entry>
   <entry>
     <title><![CDATA[红队渗透武器工具库]]></title>
-    <url>%2Fposts%2F33890%2F</url>
+    <url>%2Fposts%2F33899%2F</url>
     <content type="text"><![CDATA[本文梳理实战中红队常用的武器、工具，后续针对此类武器库系统化研究、检测... 核心工具 Metasploit Cobalt Strike PowerShell Empire 后期漏洞利用框架 dnscat2 DNS隧道工具 Nishang Powershell脚本集合 Pupy Python编写跨平台后渗透工具 侦查阶段端口扫描 Masscan 快速端口扫描 Nmap 端口服务指纹识别 HTTPScreenshot 1使用 Masscan 快速扫描大型网络，并使用 phantomjs 捕捉它检测到的任何网站的屏幕截图 EyeWitness 1用 XML 文件的方式输出 nmap 的扫描结果、获取到的 Web 页面截图、RDP 服务器信息以及 VNC 服务器信息 搜索引擎 Shodan Censys.io ZoomEye Fofa Goby SSL证书解析 sslScrape 1利用 Masscan 快速扫描大型网络，当识别到443端口的服务，就会在 SSL 证书中提取主机名 子域名发现 Discover Scripts 1结合了Kali Linux 上的所有的子域名侦察工具 Knock 1python编写，通过一个 wordlist 来枚举目标域中的子域名 Sublist3r SubBrute 子域名字典 http://bit.ly/2qwxrxB Git敏感信息 Truffle Hog 1扫描不同的提交历史记录和分支来获取高机密的密钥，并输出它们 云存储枚举 slurp S3 存储桶 枚举 Bucket Finder 1查找不同的 bucket，还会从这些 bucket 中下载所有的内容进行分析 子域名劫持 tko-subs HostileSubBruteforcer autoSubTakeover 电子邮件 SimplyEmail 1输出公司的 email 地址格式和有效用户列表 Web漏洞利用基本工具 Burp Suite OWASP ZAP Wappalyzer 1可以检测内容管理系统，电子商务平台，Web 框架，服务器软件，分析工具等等 BuiltWith 1网站分析工具，返回它在页面上可以找到的所有技术 Retire.JS 1扫描 Web 应用程序所使用的易受攻击的 JavaScript 库 GoBuster 1轻量级、快速的目录和子域名爆破工具 BeEF 浏览器综合渗透框架 XSS利用 XSSHunter Blind XSS漏洞验证 xsser 通过 XSS 获取 Shell 注入攻击 SQLMap PayloadsAllTheThings/SQL Injection/ PayloadsAllTheThings/NoSQL Injection 反序列化攻击 ysoserial java反序列化综合利用工具 模版注入 [Tplmap]](https://github.com/epinna/tplmap) 服务端模版注入利用工具 SSRF SSRFmap *自动化 SSRF 模糊器和开发工具* XXE xxexploiter XXE漏洞利用测试工具 XXEinjector XXE注入及利用工具 网络攻击利用密码喷洒攻击 Spray 密码喷洒攻击工具 Ruler 1通过 MAPI/HTTP 或 RPC/HTTP 协议与 Exchange 服务器交互]]></content>
       <categories>
         <category>红队渗透</category>
@@ -26,7 +26,7 @@
   </entry>
   <entry>
     <title><![CDATA[webshell对抗之工具篇]]></title>
-    <url>%2Fposts%2F33890%2F</url>
+    <url>%2Fposts%2F31890%2F</url>
     <content type="text"><![CDATA[本文总结及研究webshell管理工具、检测工具...]]></content>
       <categories>
         <category>入侵对抗</category>
